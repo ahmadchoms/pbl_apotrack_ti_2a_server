@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Building2 } from "lucide-react";
+import { Building2, ArrowLeft } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import {
     Card,
@@ -8,11 +8,11 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { LoginForm } from "@/features/auth/components/login-form";
+import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-form";
 
-export default function LoginPage() {
-    const handleLogin = (data) => {
-        console.log("Login Data:", data);
+export default function ForgotPasswordPage() {
+    const handleForgot = (data) => {
+        console.log("Forgot Password Data:", data);
     };
 
     return (
@@ -48,25 +48,27 @@ export default function LoginPage() {
             >
                 <Card className="border-0 shadow-xl rounded-2xl overflow-hidden">
                     <CardHeader className="space-y-2 pb-6 pt-8 px-8 text-center sm:text-left">
+                        <div className="flex items-center space-x-2 mb-2">
+                            <Link
+                                href="/auth/login"
+                                className="text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                            </Link>
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                Kembali
+                            </span>
+                        </div>
                         <CardTitle className="text-2xl font-semibold text-slate-800">
-                            Selamat Datang Kembali
+                            Lupa Kata Sandi?
                         </CardTitle>
                         <CardDescription className="text-slate-500">
-                            Silakan masuk menggunakan kredensial Anda.
+                            Masukkan email Anda untuk menerima tautan pemulihan
+                            kata sandi.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="px-8 pb-8">
-                        <LoginForm onSubmitSuccess={handleLogin} />
-
-                        <div className="mt-6 text-center text-sm text-slate-500">
-                            Belum punya akun?{" "}
-                            <Link
-                                href="/auth/register"
-                                className="font-semibold text-[#0b3b60] hover:underline"
-                            >
-                                Daftar di sini
-                            </Link>
-                        </div>
+                        <ForgotPasswordForm onSubmitSuccess={handleForgot} />
                     </CardContent>
                 </Card>
             </motion.div>

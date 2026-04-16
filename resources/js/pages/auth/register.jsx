@@ -8,15 +8,15 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { LoginForm } from "@/features/auth/components/login-form";
+import { RegisterForm } from "@/features/auth/components/register-form";
 
-export default function LoginPage() {
-    const handleLogin = (data) => {
-        console.log("Login Data:", data);
+export default function RegisterPage() {
+    const handleRegister = (data) => {
+        console.log("Register Data:", data);
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#f0f7f9] relative overflow-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#f0f7f9] relative overflow-hidden py-10">
             <div
                 className="absolute inset-0 z-0 opacity-20 pointer-events-none"
                 style={{
@@ -36,7 +36,7 @@ export default function LoginPage() {
                 </div>
                 <h1 className="text-2xl font-bold text-[#0b3b60]">ApoTrack</h1>
                 <p className="text-xs font-medium text-slate-500 tracking-widest mt-1 uppercase">
-                    Pharmacy Portal Access
+                    Sistem Manajemen Apotek
                 </p>
             </motion.div>
 
@@ -44,27 +44,28 @@ export default function LoginPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="z-10 w-full max-w-md px-4"
+                className="z-10 w-full max-w-2xl px-4"
             >
                 <Card className="border-0 shadow-xl rounded-2xl overflow-hidden">
                     <CardHeader className="space-y-2 pb-6 pt-8 px-8 text-center sm:text-left">
                         <CardTitle className="text-2xl font-semibold text-slate-800">
-                            Selamat Datang Kembali
+                            Pendaftaran Apotek
                         </CardTitle>
                         <CardDescription className="text-slate-500">
-                            Silakan masuk menggunakan kredensial Anda.
+                            Daftarkan akun admin apotek Anda dan mulai mengelola
+                            inventori dengan lebih efisien.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="px-8 pb-8">
-                        <LoginForm onSubmitSuccess={handleLogin} />
+                        <RegisterForm onSubmitSuccess={handleRegister} />
 
-                        <div className="mt-6 text-center text-sm text-slate-500">
-                            Belum punya akun?{" "}
+                        <div className="mt-8 text-center text-sm text-slate-500">
+                            Sudah punya akun?{" "}
                             <Link
-                                href="/auth/register"
+                                href="/auth/login"
                                 className="font-semibold text-[#0b3b60] hover:underline"
                             >
-                                Daftar di sini
+                                Masuk di sini
                             </Link>
                         </div>
                     </CardContent>
