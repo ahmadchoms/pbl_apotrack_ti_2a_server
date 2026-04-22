@@ -2,9 +2,16 @@
 
 namespace App\Models;
 
-class Notification extends BaseModel
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class Notification extends Model
 {
-    const UPDATED_AT = null;
+    use HasUuids;
+
+    protected $guarded = [];
+
+    public $timestamps = false;
 
     public function user()
     {

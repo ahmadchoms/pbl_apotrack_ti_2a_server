@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { registerSchema } from "../schemas/register-schema";
-import { IconInput } from "./icon-input";
+import { IconInput } from "@/components/ui/icon-input";
 
 const STEPS = [
     {
@@ -334,11 +334,11 @@ export function RegisterForm({ onSubmitSuccess }) {
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
                                 <div
-                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${uploadedFile ? "border-[#0b3b60] bg-[#0b3b60]/5" : "border-slate-300 group-hover:border-[#0b3b60]"}`}
+                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${uploadedFile ? "border-primary bg-primary/5" : "border-slate-300 group-hover:border-primary"}`}
                                 >
                                     <div className="flex flex-col items-center gap-3">
                                         <div
-                                            className={`p-3 rounded-xl transition-colors duration-300 ${uploadedFile ? "bg-[#0b3b60] text-white" : "bg-slate-100 text-slate-500 group-hover:bg-[#0b3b60]/10 group-hover:text-[#0b3b60]"}`}
+                                            className={`p-3 rounded-xl transition-colors duration-300 ${uploadedFile ? "bg-primary text-primary-foreground" : "bg-slate-100 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"}`}
                                         >
                                             {uploadedFile ? (
                                                 <FileText className="h-6 w-6" />
@@ -394,9 +394,9 @@ export function RegisterForm({ onSubmitSuccess }) {
                                         animate={{ scale: isActive ? 1.05 : 1 }}
                                         className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 ${
                                             isCompleted
-                                                ? "bg-[#0b3b60] border-[#0b3b60] text-white"
+                                                ? "bg-primary border-primary text-primary-foreground"
                                                 : isActive
-                                                  ? "bg-white border-[#0b3b60] text-[#0b3b60] shadow-md shadow-[#0b3b60]/10"
+                                                  ? "bg-white border-primary text-primary shadow-md shadow-primary/10"
                                                   : "bg-white border-slate-200 text-slate-400"
                                         }`}
                                     >
@@ -415,7 +415,7 @@ export function RegisterForm({ onSubmitSuccess }) {
                                             animate={{
                                                 scaleX: isCompleted ? 1 : 0,
                                             }}
-                                            className="absolute inset-0 bg-[#0b3b60] origin-left"
+                                            className="absolute inset-0 bg-primary origin-left"
                                         />
                                     </div>
                                 )}
@@ -459,7 +459,7 @@ export function RegisterForm({ onSubmitSuccess }) {
                             type="button"
                             onClick={handleNextStep}
                             disabled={isSubmitting}
-                            className="flex-1 bg-[#0b3b60] hover:bg-[#082a45] text-white py-6 rounded-xl group"
+                            className="flex-1 py-6 rounded-xl group"
                         >
                             Lanjutkan{" "}
                             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -468,7 +468,7 @@ export function RegisterForm({ onSubmitSuccess }) {
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 bg-[#0b3b60] hover:bg-[#082a45] text-white py-6 rounded-xl group"
+                            className="flex-1 py-6 rounded-xl group"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">

@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
-class UserAddress extends BaseModel
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class UserAddress extends Model
 {
-    public $timestamps = false;
+    use HasUuids;
+
+    protected $guarded = [];
 
     public function user()
     {
@@ -13,6 +18,6 @@ class UserAddress extends BaseModel
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'address_id');
+        return $this->hasMany(Order::class, "address_id");
     }
 }

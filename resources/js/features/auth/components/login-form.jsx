@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { loginSchema } from "../schemas/login-schema";
-import { IconInput } from "./icon-input";
+import { IconInput } from "@/components/ui/icon-input";
 
 export function LoginForm({ onSubmitSuccess }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -91,7 +91,7 @@ export function LoginForm({ onSubmitSuccess }) {
                                 id="rememberMe"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                className="border-slate-300 data-[state=checked]:bg-[#0b3b60] data-[state=checked]:text-white rounded"
+                                className="border-slate-300 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground rounded"
                             />
                         )}
                     />
@@ -104,7 +104,7 @@ export function LoginForm({ onSubmitSuccess }) {
                 </div>
                 <Link
                     href="/auth/forgot-password"
-                    className="text-sm font-semibold text-[#0b3b60] hover:underline"
+                    className="text-sm font-semibold text-primary hover:underline"
                 >
                     Lupa Kata Sandi?
                 </Link>
@@ -113,7 +113,7 @@ export function LoginForm({ onSubmitSuccess }) {
             <div className="space-y-4 pt-2">
                 <Button
                     type="submit"
-                    className="w-full bg-[#0b3b60] hover:bg-[#082a45] text-white py-6 rounded-xl group"
+                    className="w-full py-6 rounded-xl group"
                 >
                     Masuk ke Dasbor
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
