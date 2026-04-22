@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Apotek\DashboardController;
 use App\Http\Controllers\Apotek\ProfileController;
+use App\Http\Controllers\Apotek\StaffManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -27,4 +28,6 @@ Route::prefix('apotek')
             ->name('dashboard');
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
+        Route::get('/staff', [StaffManagementController::class, 'index'])
+            ->name('staff');
     });
