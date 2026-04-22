@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Apotek\DashboardController;
+use App\Http\Controllers\Apotek\ObatController; // ← tambah ini
 use App\Http\Controllers\Apotek\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -27,4 +28,14 @@ Route::prefix('apotek')
             ->name('dashboard');
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
-    });
+        
+        Route::prefix('obat')->name('obat.')->group(function () {
+            Route::get('/', [ObatController::class, 'index'])->name('index');
+            Route::get('/tambah', [ObatController::class, 'create'])->name('create');
+            Route::post('/tambah', [ObatController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [ObatController::class, 'edit'])->name('edit');
+            Route::put('/{id}/edit', [ObatController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ObatController::class, 'destroy'])->name('destroy');
+        });
+            
+});
