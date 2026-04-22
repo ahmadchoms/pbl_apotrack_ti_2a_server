@@ -1,6 +1,9 @@
 <?php
 
-use App\Http\Controllers\Apotek\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PharmacyController;
+use App\Http\Controllers\Apotek\DashboardController as ApotekDashboardController;
+use App\Http\Controllers\Apotek\OrderController;
 use App\Http\Controllers\Apotek\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -23,8 +26,21 @@ Route::prefix('auth')->name('auth.')->group(function () {
 Route::prefix('apotek')
     ->name('apotek.')
     ->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])
+        Route::get('/', [ApotekDashboardController::class, 'index'])
             ->name('dashboard');
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
+        Route::get('/orders', [OrderController::class, 'index'])
+            ->name('orders');
+        Route::get('/orders/new', [OrderController::class, 'new'])
+            ->name('orders.new');
+    });
+
+Route::prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
+        Route::get('/pharmacies', [PharmacyController::class, 'index'])
+            ->name('pharmacies');
     });

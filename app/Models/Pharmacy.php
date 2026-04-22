@@ -2,13 +2,29 @@
 
 namespace App\Models;
 
-class Pharmacy extends BaseModel
-{
-    const UPDATED_AT = null;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-    public function admin()
+class Pharmacy extends Model
+{
+    use HasUuids, SoftDeletes;
+
+    protected $guarded = [];
+
+    public function images()
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->hasMany(PharmacyImage::class);
+    }
+
+    public function staffs()
+    {
+        return $this->hasMany(PharmacyStaff::class);
+    }
+
+    public function hours()
+    {
+        return $this->hasMany(PharmacyOperatingHour::class);
     }
 
     public function medicines()
@@ -24,10 +40,5 @@ class Pharmacy extends BaseModel
     public function reviews()
     {
         return $this->hasMany(Review::class);
-    }
-
-    public function operatingHours()
-    {
-        return $this->hasMany(PharmacyOperatingHour::class);
     }
 }

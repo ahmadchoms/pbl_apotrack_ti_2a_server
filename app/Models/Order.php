@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use App\Enums\OrderStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class Order extends BaseModel
+class Order extends Model
 {
-    protected $casts = [
-        'order_status' => OrderStatus::class,
-        'paid_at'      => 'datetime',
-        'expired_at'   => 'datetime',
-    ];
+    use HasUuids;
+
+    protected $guarded = [];
 
     public function user()
     {
@@ -24,12 +23,27 @@ class Order extends BaseModel
 
     public function address()
     {
-        return $this->belongsTo(UserAddress::class);
+        return $this->belongsTo(UserAddress::class, "address_id");
+    }
+
+    public function prescription()
+    {
+        return $this->belongsTo(Prescription::class, "prescription_id");
     }
 
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function tracking()
+    {
+        return $this->hasOne(DeliveryTracking::class);
+    }
+
+    public function paymentProof()
+    {
+        return $this->hasOne(PaymentProof::class);
     }
 
     public function review()

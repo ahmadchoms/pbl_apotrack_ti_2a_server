@@ -2,8 +2,15 @@
 
 namespace App\Models;
 
-class OrderItem extends BaseModel
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+class OrderItem extends Model
 {
+    use HasUuids;
+
+    protected $guarded = [];
+
     public $timestamps = false;
 
     public function order()

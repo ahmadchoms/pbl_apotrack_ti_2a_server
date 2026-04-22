@@ -21,10 +21,10 @@ const MENU_ITEMS = [
 
 export function Sidebar({ activeMenu = "Dasbor Utama" }) {
     return (
-        <aside className="w-64 bg-white border-r border-slate-100 flex flex-col justify-between shadow-sm z-20 flex-shrink-0">
+        <aside className="w-64 bg-white border-r border-slate-100 flex flex-col justify-between shadow-sm z-20 shrink-0 h-full">
             <div>
                 <div className="p-6">
-                    <h1 className="text-2xl font-extrabold text-[#0b3b60] tracking-tight">
+                    <h1 className="text-2xl font-extrabold text-primary tracking-tight">
                         ApoTrack
                     </h1>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
@@ -42,19 +42,19 @@ export function Sidebar({ activeMenu = "Dasbor Utama" }) {
                                 href={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative ${
                                     isActive
-                                        ? "bg-slate-50 text-[#0b3b60] font-bold"
+                                        ? "bg-slate-50 text-primary font-bold"
                                         : "text-slate-500 hover:bg-slate-50/50 hover:text-slate-700 font-medium"
                                 }`}
                             >
                                 <Icon
-                                    className={`h-5 w-5 ${isActive ? "text-[#0b3b60]" : "text-slate-400"}`}
+                                    className={`h-5 w-5 ${isActive ? "text-primary" : "text-slate-400"}`}
                                 />
                                 <span className="text-sm">{item.id}</span>
 
                                 {isActive && (
                                     <motion.div
                                         layoutId="activeSidebarTab"
-                                        className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#0b3b60] rounded-l-full"
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-l-full"
                                     />
                                 )}
                             </Link>

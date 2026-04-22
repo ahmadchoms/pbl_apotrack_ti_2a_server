@@ -41,91 +41,7 @@ import { ActivityDialog } from "@/features/apotek/components/activity-dialog";
 import { StockDialog } from "@/features/apotek/components/stock-dialog";
 import { DashboardApotekLayout } from "@/layouts/apotek-layout";
 
-const revenueData = [
-    { name: "SEN", revenue: 4000000, orders: 120 },
-    { name: "SEL", revenue: 5500000, orders: 150 },
-    { name: "RAB", revenue: 4800000, orders: 130 },
-    { name: "KAM", revenue: 6000000, orders: 170 },
-    { name: "JUM", revenue: 8500000, orders: 220 },
-    { name: "SAB", revenue: 7200000, orders: 190 },
-    { name: "MIN", revenue: 5000000, orders: 140 },
-];
-
-const trendData = [
-    { week: "Minggu 1", pesanan: 450 },
-    { week: "Minggu 2", pesanan: 580 },
-    { week: "Minggu 3", pesanan: 850 },
-    { week: "Minggu 4", pesanan: 1284 },
-];
-
-const userActivities = [
-    {
-        id: 1,
-        name: "Budi Santoso",
-        status: "Baru saja",
-        amount: "Rp 450.000",
-        avatar: "BS",
-    },
-    {
-        id: 2,
-        name: "Siti Aminah",
-        status: "2 menit yang lalu",
-        amount: "Rp 1.200.000",
-        avatar: "SA",
-    },
-    {
-        id: 3,
-        name: "Aditya Wijaya",
-        status: "15 menit yang lalu",
-        amount: "Rp 85.000",
-        avatar: "AW",
-    },
-    {
-        id: 4,
-        name: "Dr. Sarah",
-        status: "1 jam yang lalu",
-        amount: "Rp 3.500.000",
-        avatar: "DS",
-    },
-    {
-        id: 5,
-        name: "Rina Melati",
-        status: "2 jam yang lalu",
-        amount: "Rp 120.000",
-        avatar: "RM",
-    },
-    {
-        id: 6,
-        name: "Hendra Kusuma",
-        status: "3 jam yang lalu",
-        amount: "Rp 450.000",
-        avatar: "HK",
-    },
-];
-
-const criticalStocks = [
-    {
-        id: 1,
-        name: "Paracetamol 500mg",
-        type: "Obat Bebas",
-        sisa: 0,
-        critical: true,
-    },
-    {
-        id: 2,
-        name: "Amoxicillin 250mg",
-        type: "Antibiotik",
-        sisa: 5,
-        critical: false,
-    },
-    {
-        id: 3,
-        name: "Syrup OBH Combi",
-        type: "Obat Batuk",
-        sisa: 2,
-        critical: true,
-    },
-];
+// Data now comes from Inertia Props
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -141,7 +57,17 @@ const itemVariants = {
     },
 };
 
-export default function PharmacistDashboardPage() {
+export default function PharmacistDashboardPage({
+    totalOrders = 0,
+    totalMedicines = 0,
+    criticalStocksCount = 0,
+    prescriptionQueue = 0,
+    totalRevenue = 0,
+    revenueData = [],
+    trendData = [],
+    userActivities = [],
+    criticalStocks = []
+}) {
     return (
         <DashboardApotekLayout activeMenu="Dasbor Utama">
             <div className="max-w-7xl mx-auto">
@@ -195,7 +121,7 @@ export default function PharmacistDashboardPage() {
                                                 Total Order
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-slate-800">
-                                                1,284
+                                            {totalOrders.toLocaleString()}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
@@ -219,12 +145,12 @@ export default function PharmacistDashboardPage() {
                                                 Total Obat
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-slate-800">
-                                                452
+                                            {totalMedicines.toLocaleString()}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-semibold text-red-500 flex items-center gap-1">
-                                            <PackageX className="h-3 w-3" /> 12
-                                            stok menipis
+                                            <PackageX className="h-3 w-3" /> {criticalStocksCount} stok
+                                            menipis
                                         </p>
                                     </div>
                                 </CardContent>
@@ -243,7 +169,7 @@ export default function PharmacistDashboardPage() {
                                                 Antrean Resep
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-slate-800">
-                                                24
+                                            {prescriptionQueue.toLocaleString()}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-medium text-slate-500">
@@ -267,7 +193,7 @@ export default function PharmacistDashboardPage() {
                                                 Total Revenue
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-white">
-                                                Rp 458M
+                                            {"Rp " + (totalRevenue >= 1000000 ? (totalRevenue / 1000000).toFixed(1) + "M" : totalRevenue.toLocaleString())}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-semibold text-emerald-400 flex items-center gap-1">

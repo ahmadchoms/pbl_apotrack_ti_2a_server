@@ -6,7 +6,7 @@ import { Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { forgotPasswordSchema } from "../schemas/forgot-password-schema";
-import { IconInput } from "./icon-input";
+import { IconInput } from "@/components/ui/icon-input";
 
 export function ForgotPasswordForm({ onSubmitSuccess }) {
     const {
@@ -49,7 +49,7 @@ export function ForgotPasswordForm({ onSubmitSuccess }) {
 
             <Button
                 type="submit"
-                className="w-full bg-[#0b3b60] hover:bg-[#082a45] text-white py-6 rounded-xl group"
+                className="w-full py-6 rounded-xl group"
             >
                 Kirim Tautan Reset
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
