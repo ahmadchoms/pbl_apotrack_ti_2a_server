@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apotek;
+namespace App\Http\Controllers\Pharmacy;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ class ProfileController extends Controller
 {
     public function index(Request $request)
     {
-        return Inertia::render('apotek/profile', [
+        return Inertia::render('pharmacy/profile', [
             // [DATA]
         ]);
     }

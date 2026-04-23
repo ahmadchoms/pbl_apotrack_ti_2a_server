@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apotek;
+namespace App\Http\Controllers\Pharmacy;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,14 +10,14 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return Inertia::render('apotek/orders/index', [
+        return Inertia::render('pharmacy/orders/index', [
             // [DATA]
         ]);
     }
 
-    public function new()
+    public function create()
     {
-        return Inertia::render('apotek/orders/new', [
+        return Inertia::render('pharmacy/orders/create', [
             // [DATA]
         ]);
     }

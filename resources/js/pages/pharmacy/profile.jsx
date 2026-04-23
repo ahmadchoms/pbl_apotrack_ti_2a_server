@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { DashboardApotekLayout } from "@/layouts/apotek-layout";
-import { ProfileCard } from "@/features/apotek/components/profile-card";
-import { AuditLogCard } from "@/features/apotek/components/audit-log-card";
-import { OrderActivityCard } from "@/features/apotek/components/order-activity-card";
-import { SecurityCard } from "@/features/apotek/components/security-card";
-import { AccountSettingsCard } from "@/features/apotek/components/account-setting-card";
+import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
+import { ProfileCard } from "@/features/pharmacy/components/profile-card";
+import { AuditLogCard } from "@/features/pharmacy/components/audit-log-card";
+import { OrderActivityCard } from "@/features/pharmacy/components/order-activity-card";
+import { SecurityCard } from "@/features/pharmacy/components/security-card";
+import { AccountSettingsCard } from "@/features/pharmacy/components/account-setting-card";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -23,7 +23,7 @@ const itemVariants = {
 
 export default function ProfilePage() {
     return (
-        <DashboardApotekLayout activeMenu="Profil Pengguna">
+        <DashboardPharmacyLayout activeMenu="Profil Pengguna">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
                     <h2 className="text-2xl font-bold text-slate-800">
@@ -62,6 +62,6 @@ export default function ProfilePage() {
                     </div>
                 </motion.div>
             </div>
-        </DashboardApotekLayout>
+        </DashboardPharmacyLayout>
     );
 }

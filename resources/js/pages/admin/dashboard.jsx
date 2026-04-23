@@ -60,7 +60,7 @@ export default function AdminDashboardPage({
     activePharmacyPercentage = 0,
     userGrowthData = [],
     apotekGrowthData = [],
-    auditLogs = []
+    auditLogs = [],
 }) {
     const [userFilter, setUserFilter] = useState("Bulanan");
     const [apotekFilter, setApotekFilter] = useState("Bulanan");
@@ -85,7 +85,7 @@ export default function AdminDashboardPage({
                         className="grid grid-cols-1 lg:grid-cols-3 gap-6"
                     >
                         <motion.div variants={itemVariants}>
-                            <Card className="border-0 shadow-sm shadow-slate-200/50 rounded-3xl bg-gradient-to-br from-white to-slate-50/50 relative overflow-hidden h-full">
+                            <Card className="border-0 shadow-sm shadow-slate-200/50 rounded-3xl bg-linear-to-br from-white to-slate-50/50 relative overflow-hidden h-full">
                                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-60"></div>
                                 <CardContent className="p-8 relative z-10 flex flex-col justify-between h-full">
                                     <div>
@@ -102,7 +102,10 @@ export default function AdminDashboardPage({
                                     <div className="mt-6 flex items-center gap-2">
                                         <TrendingUp className="h-4 w-4 text-emerald-500" />
                                         <p className="text-xs font-bold text-emerald-500">
-                                            {userGrowth >= 0 ? "Peningkatan" : "Penurunan"} {Math.abs(userGrowth)}%{" "}
+                                            {userGrowth >= 0
+                                                ? "Peningkatan"
+                                                : "Penurunan"}{" "}
+                                            {Math.abs(userGrowth)}%{" "}
                                             <span className="text-slate-400 font-medium ml-1">
                                                 vs bulan lalu
                                             </span>
@@ -113,7 +116,7 @@ export default function AdminDashboardPage({
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
-                            <Card className="border-0 shadow-sm shadow-slate-200/50 rounded-3xl bg-gradient-to-br from-white to-slate-50/50 relative overflow-hidden h-full">
+                            <Card className="border-0 shadow-sm shadow-slate-200/50 rounded-3xl bg-linear-to-br from-white to-slate-50/50 relative overflow-hidden h-full">
                                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-emerald-50 rounded-full blur-3xl opacity-60"></div>
                                 <CardContent className="p-8 relative z-10 flex flex-col justify-between h-full">
                                     <div>
