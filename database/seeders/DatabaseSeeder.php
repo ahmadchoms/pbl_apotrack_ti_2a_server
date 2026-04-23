@@ -65,11 +65,12 @@ class DatabaseSeeder extends Seeder
         // 2. USER & ADDRESS SEEDS
         // ==========================================
         $users = [
-            ['username' => 'Super Admin', 'email' => 'admin@apotek.id', 'role' => 'SUPER_ADMIN', 'avatar_url' => $avatarUrl],
-            ['username' => 'Budi Santoso', 'email' => 'budi@customer.id', 'role' => 'CUSTOMER', 'avatar_url' => $avatarUrl],
-            ['username' => 'Siti Rahayu', 'email' => 'siti@customer.id', 'role' => 'CUSTOMER', 'avatar_url' => $avatarUrl],
-            ['username' => 'Dr. Ahmad Apoteker', 'email' => 'ahmad@apotek.id', 'role' => 'APOTEKER', 'avatar_url' => $avatarUrl],
-            ['username' => 'Rina Staff', 'email' => 'rina@apotek.id', 'role' => 'PHARMACY_STAFF', 'avatar_url' => $avatarUrl],
+            ['username' => 'Super Admin', 'email' => 'admin@apotek.id', 'phone' => '081111111111', 'role' => 'SUPER_ADMIN', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Budi Santoso', 'email' => 'budi@customer.id', 'phone' => '082222222222', 'role' => 'CUSTOMER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Siti Rahayu', 'email' => 'siti@customer.id', 'phone' => '083333333333', 'role' => 'CUSTOMER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Prayitno Apoteker', 'email' => 'prayitno@apotek.id', 'phone' => '084444444444', 'role' => 'APOTEKER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rina Staff', 'email' => 'rina@apotek.id', 'phone' => '085555555555', 'role' => 'PHARMACY_STAFF', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Hanif Nakal', 'email' => 'hanif@banned.id', 'phone' => '086666666666', 'role' => 'CUSTOMER', 'avatar_url' => $avatarUrl, 'is_active' => false],
         ];
 
         $createdUsers = [];
@@ -110,10 +111,12 @@ class DatabaseSeeder extends Seeder
                 'total_reviews' => 124,
                 'license_number' => 'SIA-2024-0001',
                 'license_document_url' => $licenseUrl,
-                'verification_status' => 'VERIFIED'
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false
             ],
             [
-                'name' => 'Apotek Farma Prima',
+                'name' => 'Apotek Farma Prima (Tutup Sementara)',
                 'address' => 'Jl. Gatot Subroto No. 55, Jakarta Selatan',
                 'phone' => '021-98765432',
                 'latitude' => -6.2350,
@@ -122,7 +125,23 @@ class DatabaseSeeder extends Seeder
                 'total_reviews' => 89,
                 'license_number' => 'SIA-2024-0055',
                 'license_document_url' => $licenseUrl,
-                'verification_status' => 'VERIFIED'
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => true
+            ],
+            [
+                'name' => 'Apotek Abal Abal',
+                'address' => 'Jl. Gelap Gulita No. 99, Jakarta Timur',
+                'phone' => '021-00000000',
+                'latitude' => -6.2500,
+                'longitude' => 106.8500,
+                'rating' => 0,
+                'total_reviews' => 0,
+                'license_number' => 'SIA-PALSU-123',
+                'license_document_url' => $licenseUrl,
+                'verification_status' => 'REJECTED',
+                'is_active' => false,
+                'is_force_closed' => false
             ]
         ];
 
@@ -144,7 +163,7 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id, 'user_id' => $createdUsers['ahmad@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id, 'user_id' => $createdUsers['prayitno@apotek.id']->id], ['role' => 'APOTEKER']);
         PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id, 'user_id' => $createdUsers['rina@apotek.id']->id], ['role' => 'STAFF']);
 
         // ==========================================
@@ -159,7 +178,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Sanmol Sirup 60ml', 'generic_name' => 'Paracetamol', 'category' => 'Antipiretik', 'form' => 'Sirup', 'type' => 'Obat Bebas', 'unit' => 'Botol', 'manufacturer' => 'Sanbe Farma', 'price' => 22000, 'weight_in_grams' => 120, 'requires_prescription' => false, 'desc' => 'Meredakan demam dan nyeri pada anak.', 'dosage' => 'Anak 1-5 thn: 1 sendok takar 3x sehari'],
         ];
 
-        $insertedMedicines = [];
+        $insertedMedicines = []; // Array akan berbentuk 2 dimensi
 
         foreach ($pharmaModels as $pModel) {
             foreach ($medicines as $med) {
@@ -179,19 +198,22 @@ class DatabaseSeeder extends Seeder
                     'description' => $med['desc'],
                     'dosage_info' => $med['dosage']
                 ]);
-                $insertedMedicines[$med['name']] = $m;
+
+                $insertedMedicines[$pModel->id][$med['name']] = $m;
 
                 MedicineImage::firstOrCreate(['medicine_id' => $m->id], [
                     'image_url' => $medicineUrl,
                     'is_primary' => true
                 ]);
 
+                $batchCode = 'BCH-2026-' . strtoupper(substr(md5($med['name']), 0, 5));
+
                 $b = MedicineBatch::firstOrCreate([
                     'medicine_id' => $m->id,
-                    'batch_number' => 'BCH-' . date('Ym') . '-' . rand(100, 999)
+                    'batch_number' => $batchCode
                 ], [
-                    'expired_date' => Carbon::now()->addMonths(rand(12, 36))->format('Y-m-d'),
-                    'stock' => rand(50, 200)
+                    'expired_date' => Carbon::now()->addMonths(24)->format('Y-m-d'),
+                    'stock' => 100
                 ]);
 
                 StockMovement::firstOrCreate([
@@ -209,23 +231,49 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 5. SAMPLE ORDERS & TRACKING
         // ==========================================
-        $phar1 = $pharmaModels[0];
+        $phar1 = $pharmaModels[0]; // Apotek Sehat Selalu (Aktif)
+        $medsPhar1 = $insertedMedicines[$phar1->id];
 
-        $o1 = Order::firstOrCreate(['order_number' => 'ORD-' . date('Ymd') . '-001'], [
+        // 1. PENDING (Belum Dibayar)
+        $o1 = Order::firstOrCreate(['order_number' => 'ORD-2026-PENDING'], [
             'user_id' => $budi->id,
             'pharmacy_id' => $phar1->id,
             'address_id' => $addrBudi->id,
             'service_type' => 'DELIVERY',
             'payment_method' => 'QRIS',
-            'order_status' => 'DELIVERED',
+            'order_status' => 'PENDING',
+            'payment_status' => 'UNPAID',
+            'subtotal_amount' => 12000,
+            'shipping_cost' => 15000,
+            'grand_total' => 27000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'expired_at' => Carbon::now()->addHours(24)
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o1->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], [
+            'medicine_name' => 'Panadol Extra 500mg',
+            'unit_name' => 'Strip',
+            'quantity' => 1,
+            'price' => 12000,
+            'subtotal' => 12000
+        ]);
+
+        // 2. PROCESSING (Sudah dibayar, sedang diracik Apotek)
+        $o2 = Order::firstOrCreate(['order_number' => 'ORD-2026-PROCESS'], [
+            'user_id' => $siti->id,
+            'pharmacy_id' => $phar1->id,
+            'address_id' => $addrSiti->id,
+            'service_type' => 'DELIVERY',
+            'payment_method' => 'VIRTUAL_ACCOUNT',
+            'order_status' => 'PROCESSING',
             'payment_status' => 'PAID',
             'subtotal_amount' => 45000,
-            'shipping_cost' => 15000,
-            'grand_total' => 60000,
-            'paid_at' => Carbon::now()->subDays(2),
-            'expired_at' => Carbon::now()->addHour()
+            'shipping_cost' => 10000,
+            'grand_total' => 55000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subMinutes(30),
+            'expired_at' => Carbon::now()->addHours(24)
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o1->id, 'medicine_id' => $insertedMedicines['Imboost Force']->id], [
+        OrderItem::firstOrCreate(['order_id' => $o2->id, 'medicine_id' => $medsPhar1['Imboost Force']->id], [
             'medicine_name' => 'Imboost Force',
             'unit_name' => 'Strip',
             'quantity' => 1,
@@ -233,85 +281,141 @@ class DatabaseSeeder extends Seeder
             'subtotal' => 45000
         ]);
 
-        $track1 = DeliveryTracking::firstOrCreate(['order_id' => $o1->id], [
-            'biteship_id' => 'bts_' . Str::random(10),
-            'courier_name' => 'Grab Express',
-            'tracking_number' => 'GRB-' . rand(100000, 999999),
-            'status' => 'DELIVERED'
-        ]);
-        DeliveryTrackingLog::create(['delivery_tracking_id' => $track1->id, 'status' => 'ALLOCATING', 'description' => 'Mencari kurir Grab']);
-        DeliveryTrackingLog::create(['delivery_tracking_id' => $track1->id, 'status' => 'PICKED_UP', 'description' => 'Kurir membawa pesanan']);
-        DeliveryTrackingLog::create(['delivery_tracking_id' => $track1->id, 'status' => 'DELIVERED', 'description' => 'Pesanan diterima oleh Budi']);
-
-        Review::firstOrCreate(['order_id' => $o1->id], [
+        // 3. READY_FOR_PICKUP (Ambil Sendiri di Apotek)
+        $o3 = Order::firstOrCreate(['order_number' => 'ORD-2026-READY'], [
             'user_id' => $budi->id,
             'pharmacy_id' => $phar1->id,
-            'rating' => 5,
-            'comment' => 'Pengiriman super cepat dan packing aman.'
+            'service_type' => 'PICKUP',
+            'payment_method' => 'QRIS',
+            'order_status' => 'READY_FOR_PICKUP',
+            'payment_status' => 'PAID',
+            'subtotal_amount' => 15000,
+            'shipping_cost' => 0,
+            'grand_total' => 15000, // Pick up ongkir 0
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subHours(1),
+            'expired_at' => Carbon::now()->addHours(24)
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o3->id, 'medicine_id' => $medsPhar1['Betadine Antiseptic 15ml']->id], [
+            'medicine_name' => 'Betadine Antiseptic 15ml',
+            'unit_name' => 'Botol',
+            'quantity' => 1,
+            'price' => 15000,
+            'subtotal' => 15000
         ]);
 
-
-        $o2 = Order::firstOrCreate(['order_number' => 'ORD-' . date('Ymd') . '-002'], [
+        // 4. SHIPPED (Kurir Sedang Mengantar)
+        $o4 = Order::firstOrCreate(['order_number' => 'ORD-2026-SHIPPED'], [
             'user_id' => $siti->id,
             'pharmacy_id' => $phar1->id,
             'address_id' => $addrSiti->id,
             'service_type' => 'DELIVERY',
-            'payment_method' => 'COD',
-            'order_status' => 'SHIPPED',
-            'payment_status' => 'UNPAID',
-            'subtotal_amount' => 24000,
-            'shipping_cost' => 12000,
-            'grand_total' => 36000,
-            'expired_at' => Carbon::now()->addHour()
-        ]);
-        OrderItem::firstOrCreate(['order_id' => $o2->id, 'medicine_id' => $insertedMedicines['Panadol Extra 500mg']->id], [
-            'medicine_name' => 'Panadol Extra 500mg',
-            'unit_name' => 'Strip',
-            'quantity' => 2,
-            'price' => 12000,
-            'subtotal' => 24000
-        ]);
-
-        $track2 = DeliveryTracking::firstOrCreate(['order_id' => $o2->id], [
-            'biteship_id' => 'bts_' . Str::random(10),
-            'courier_name' => 'Gojek Instant',
-            'tracking_number' => 'GOJ-' . rand(100000, 999999),
-            'status' => 'DROPPING_OFF'
-        ]);
-        DeliveryTrackingLog::create(['delivery_tracking_id' => $track2->id, 'status' => 'PICKED_UP', 'description' => 'Apotek telah menyerahkan obat ke Kurir Gojek']);
-
-
-        $presc = Prescription::firstOrCreate(['image_url' => $prescriptionUrl], [
-            'user_id' => $budi->id,
-            'doctor_name' => 'Dr. Cipto Mangunkusumo',
-            'patient_name' => 'Budi Santoso',
-            'status' => 'VERIFIED',
-            'verified_by' => $createdUsers['ahmad@apotek.id']->id,
-            'verified_at' => Carbon::now()
-        ]);
-
-        $o3 = Order::firstOrCreate(['order_number' => 'ORD-' . date('Ymd') . '-003'], [
-            'user_id' => $budi->id,
-            'pharmacy_id' => $phar1->id,
-            'prescription_id' => $presc->id,
-            'service_type' => 'PICKUP',
             'payment_method' => 'QRIS',
-            'order_status' => 'PENDING',
-            'payment_status' => 'UNPAID',
-            'subtotal_amount' => 8500,
-            'grand_total' => 8500,
+            'order_status' => 'SHIPPED',
+            'payment_status' => 'PAID',
+            'subtotal_amount' => 22000,
+            'shipping_cost' => 15000,
+            'grand_total' => 37000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subHours(2),
             'expired_at' => Carbon::now()->addHours(24)
         ]);
+        OrderItem::firstOrCreate(['order_id' => $o4->id, 'medicine_id' => $medsPhar1['Sanmol Sirup 60ml']->id], [
+            'medicine_name' => 'Sanmol Sirup 60ml',
+            'unit_name' => 'Botol',
+            'quantity' => 1,
+            'price' => 22000,
+            'subtotal' => 22000
+        ]);
+        $track4 = DeliveryTracking::firstOrCreate(['order_id' => $o4->id], [
+            'biteship_id' => 'bts_shipped_123',
+            'courier_name' => 'Grab Express',
+            'tracking_number' => 'GRB-99999',
+            'status' => 'DROPPING_OFF'
+        ]);
+        DeliveryTrackingLog::create(['delivery_tracking_id' => $track4->id, 'status' => 'PICKED_UP', 'description' => 'Pesanan dibawa kurir']);
 
-        $presc->update(['order_id' => $o3->id]);
-
-        OrderItem::firstOrCreate(['order_id' => $o3->id, 'medicine_id' => $insertedMedicines['Amoxicillin 500mg']->id], [
-            'medicine_name' => 'Amoxicillin 500mg',
+        // 5. DELIVERED (Pesanan Sampai, Belum di Review User)
+        $o5 = Order::firstOrCreate(['order_number' => 'ORD-2026-DELIVERED'], [
+            'user_id' => $budi->id,
+            'pharmacy_id' => $phar1->id,
+            'address_id' => $addrBudi->id,
+            'service_type' => 'DELIVERY',
+            'payment_method' => 'QRIS',
+            'order_status' => 'DELIVERED',
+            'payment_status' => 'PAID',
+            'subtotal_amount' => 9000,
+            'shipping_cost' => 12000,
+            'grand_total' => 21000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subDays(1),
+            'expired_at' => Carbon::now()->addHours(24)
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o5->id, 'medicine_id' => $medsPhar1['Promag Tablet']->id], [
+            'medicine_name' => 'Promag Tablet',
             'unit_name' => 'Strip',
             'quantity' => 1,
-            'price' => 8500,
-            'subtotal' => 8500,
-            'requires_prescription' => true
+            'price' => 9000,
+            'subtotal' => 9000
+        ]);
+        DeliveryTracking::firstOrCreate(['order_id' => $o5->id], [
+            'biteship_id' => 'bts_deliv_123',
+            'courier_name' => 'Gojek Instant',
+            'tracking_number' => 'GOJ-11111',
+            'status' => 'DELIVERED'
+        ]);
+
+        // 6. COMPLETED (Sudah selesai dan di Review)
+        $o6 = Order::firstOrCreate(['order_number' => 'ORD-2026-COMPLETED'], [
+            'user_id' => $siti->id,
+            'pharmacy_id' => $phar1->id,
+            'address_id' => $addrSiti->id,
+            'service_type' => 'DELIVERY',
+            'payment_method' => 'QRIS',
+            'order_status' => 'COMPLETED',
+            'payment_status' => 'PAID',
+            'subtotal_amount' => 12000,
+            'shipping_cost' => 15000,
+            'grand_total' => 27000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subDays(3),
+            'expired_at' => Carbon::now()->addHours(24)
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o6->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], [
+            'medicine_name' => 'Panadol Extra 500mg',
+            'unit_name' => 'Strip',
+            'quantity' => 1,
+            'price' => 12000,
+            'subtotal' => 12000
+        ]);
+        Review::firstOrCreate(['order_id' => $o6->id], [
+            'user_id' => $siti->id,
+            'pharmacy_id' => $phar1->id,
+            'rating' => 5,
+            'comment' => 'Sangat membantu di saat sakit malam-malam!'
+        ]);
+
+        // 7. CANCELLED (Dibatalkan beserta alasan)
+        $o7 = Order::firstOrCreate(['order_number' => 'ORD-2026-CANCELLED'], [
+            'user_id' => $budi->id,
+            'pharmacy_id' => $phar1->id,
+            'service_type' => 'DELIVERY',
+            'payment_method' => 'QRIS',
+            'order_status' => 'CANCELLED',
+            'payment_status' => 'UNPAID',
+            'subtotal_amount' => 45000,
+            'shipping_cost' => 20000,
+            'grand_total' => 65000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'cancellation_reason' => 'User tidak melakukan pembayaran hingga batas waktu habis (Expired).',
+            'expired_at' => Carbon::now()->subHours(1)
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o7->id, 'medicine_id' => $medsPhar1['Imboost Force']->id], [
+            'medicine_name' => 'Imboost Force',
+            'unit_name' => 'Strip',
+            'quantity' => 1,
+            'price' => 45000,
+            'subtotal' => 45000
         ]);
     }
 }

@@ -33,12 +33,12 @@ return new class extends Migration
             $table->foreignUuid('address_id')->nullable()->constrained('user_addresses');
             $table->foreignUuid('prescription_id')->nullable()->constrained('prescriptions');
             $table->string('order_number', 30)->unique();
+            $table->string('verification_code', 10)->unique();
             $table->string('service_type', 20);
             $table->string('payment_method', 20);
             $table->string('order_status', 20)->default('PENDING');
             $table->string('payment_status', 20)->default('UNPAID');
             $table->decimal('subtotal_amount', 12, 2);
-            $table->decimal('discount_amount', 12, 2)->default(0);
             $table->decimal('shipping_cost', 12, 2)->default(0);
             $table->decimal('grand_total', 12, 2);
             $table->text('notes')->nullable();
