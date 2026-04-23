@@ -11,25 +11,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary(); // Default handled in model
-            $table->string('full_name', 100);
+            $table->string('username', 100);
             $table->string('phone', 20)->nullable();
             $table->string('email', 100)->unique();
             $table->string('password_hash');
             $table->string('role', 20); // CUSTOMER | PHARMACY_STAFF | APOTEKER | SUPER_ADMIN
+            $table->string('avatar_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->softDeletes();
             $table->timestamps();
 
             $table->index('role');
-        });
-
-        Schema::create('refresh_tokens', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('token_hash')->unique();
-            $table->timestamp('expires_at');
-            $table->boolean('is_revoked')->default(false);
-            $table->timestamps();
         });
 
         Schema::create('user_addresses', function (Blueprint $table) {
@@ -52,7 +44,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('user_addresses');
-        Schema::dropIfExists('refresh_tokens');
         Schema::dropIfExists('users');
     }
 };

@@ -43,6 +43,8 @@ return new class extends Migration
             $table->text('dosage_info')->nullable();
             $table->decimal('price', 12, 2);
             $table->boolean('requires_prescription')->default(false);
+            $table->integer('weight_in_grams')->default(100);
+            $table->integer('total_active_stock')->default(10);
             $table->boolean('is_active')->default(true);
             $table->softDeletes();
             $table->timestamps();
@@ -57,6 +59,7 @@ return new class extends Migration
             $table->string('image_url');
             $table->boolean('is_primary')->default(false);
             $table->integer('sort_order')->default(0);
+            $table->timestamps();
         });
 
         Schema::create('medicine_batches', function (Blueprint $table) {

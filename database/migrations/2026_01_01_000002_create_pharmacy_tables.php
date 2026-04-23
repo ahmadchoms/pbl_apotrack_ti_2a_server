@@ -17,6 +17,9 @@ return new class extends Migration
             $table->float('latitude', 10, 6);
             $table->float('longitude', 10, 6);
             $table->float('rating', 8, 2)->default(0.0);
+            $table->string('license_number', 100)->nullable();
+            $table->string('license_document_url')->nullable();
+            $table->string('verification_status', 20)->default('PENDING');
             $table->integer('total_reviews')->default(0);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_force_closed')->default(false);
@@ -25,6 +28,7 @@ return new class extends Migration
 
             $table->index(['latitude', 'longitude']);
             $table->index('is_active');
+            $table->index('verification_status');
         });
 
         DB::statement('ALTER TABLE pharmacies ADD CONSTRAINT chk_pharmacy_rating CHECK (rating >= 0 AND rating <= 5)');
