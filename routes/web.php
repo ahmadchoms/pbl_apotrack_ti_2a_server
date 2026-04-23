@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PharmacyController;
 use App\Http\Controllers\Apotek\DashboardController as ApotekDashboardController;
 use App\Http\Controllers\Apotek\OrderController;
+use App\Http\Controllers\Apotek\ObatController; // ← tambah ini
 use App\Http\Controllers\Apotek\ProfileController;
 use App\Http\Controllers\Apotek\StaffManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -46,4 +47,13 @@ Route::prefix('admin')
             ->name('dashboard');
         Route::get('/pharmacies', [PharmacyController::class, 'index'])
             ->name('pharmacies');
+
+        Route::prefix('obat')->name('obat.')->group(function () {
+            Route::get('/', [ObatController::class, 'index'])->name('index');
+            Route::get('/tambah', [ObatController::class, 'create'])->name('create');
+            Route::post('/tambah', [ObatController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [ObatController::class, 'edit'])->name('edit');
+            Route::put('/{id}/edit', [ObatController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ObatController::class, 'destroy'])->name('destroy');
+        });
     });
