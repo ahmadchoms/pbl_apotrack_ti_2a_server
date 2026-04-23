@@ -37,9 +37,9 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { ActivityDialog } from "@/features/apotek/components/activity-dialog";
-import { StockDialog } from "@/features/apotek/components/stock-dialog";
-import { DashboardApotekLayout } from "@/layouts/apotek-layout";
+import { ActivityDialog } from "@/features/pharmacy/components/activity-dialog";
+import { StockDialog } from "@/features/pharmacy/components/stock-dialog";
+import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
 
 // Data now comes from Inertia Props
 
@@ -66,10 +66,10 @@ export default function PharmacistDashboardPage({
     revenueData = [],
     trendData = [],
     userActivities = [],
-    criticalStocks = []
+    criticalStocks = [],
 }) {
     return (
-        <DashboardApotekLayout activeMenu="Dasbor Utama">
+        <DashboardPharmacyLayout activeMenu="Dasbor Utama">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <div>
@@ -121,7 +121,7 @@ export default function PharmacistDashboardPage({
                                                 Total Order
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-slate-800">
-                                            {totalOrders.toLocaleString()}
+                                                {totalOrders.toLocaleString()}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
@@ -145,12 +145,12 @@ export default function PharmacistDashboardPage({
                                                 Total Obat
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-slate-800">
-                                            {totalMedicines.toLocaleString()}
+                                                {totalMedicines.toLocaleString()}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-semibold text-red-500 flex items-center gap-1">
-                                            <PackageX className="h-3 w-3" /> {criticalStocksCount} stok
-                                            menipis
+                                            <PackageX className="h-3 w-3" />{" "}
+                                            {criticalStocksCount} stok menipis
                                         </p>
                                     </div>
                                 </CardContent>
@@ -169,7 +169,7 @@ export default function PharmacistDashboardPage({
                                                 Antrean Resep
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-slate-800">
-                                            {prescriptionQueue.toLocaleString()}
+                                                {prescriptionQueue.toLocaleString()}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-medium text-slate-500">
@@ -181,7 +181,7 @@ export default function PharmacistDashboardPage({
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
-                            <Card className="bg-gradient-to-br from-[#0b3b60] to-[#082a45] text-white shadow-xl shadow-[#0b3b60]/20 hover:scale-[1.02] transition-all duration-300 border-0 rounded-2xl overflow-hidden relative">
+                            <Card className="bg-linear-to-br from-[#0b3b60] to-[#082a45] text-white shadow-xl shadow-[#0b3b60]/20 hover:scale-[1.02] transition-all duration-300 border-0 rounded-2xl overflow-hidden relative">
                                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
                                 <CardContent className="p-6 relative z-10">
                                     <div className="flex flex-col gap-4">
@@ -193,7 +193,13 @@ export default function PharmacistDashboardPage({
                                                 Total Revenue
                                             </p>
                                             <h3 className="text-3xl font-extrabold text-white">
-                                            {"Rp " + (totalRevenue >= 1000000 ? (totalRevenue / 1000000).toFixed(1) + "M" : totalRevenue.toLocaleString())}
+                                                {"Rp " +
+                                                    (totalRevenue >= 1000000
+                                                        ? (
+                                                              totalRevenue /
+                                                              1000000
+                                                          ).toFixed(1) + "M"
+                                                        : totalRevenue.toLocaleString())}
                                             </h3>
                                         </div>
                                         <p className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
@@ -542,6 +548,6 @@ export default function PharmacistDashboardPage({
                     </div>
                 </motion.div>
             </div>
-        </DashboardApotekLayout>
+        </DashboardPharmacyLayout>
     );
 }

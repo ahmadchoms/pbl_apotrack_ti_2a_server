@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PharmacyController;
-use App\Http\Controllers\Apotek\DashboardController as ApotekDashboardController;
-use App\Http\Controllers\Apotek\OrderController;
-use App\Http\Controllers\Apotek\ObatController; // ← tambah ini
-use App\Http\Controllers\Apotek\ProfileController;
-use App\Http\Controllers\Apotek\StaffManagementController;
+use App\Http\Controllers\Pharmacy\DashboardController as PharmacyDashboardController;
+use App\Http\Controllers\Pharmacy\OrderController;
+use App\Http\Controllers\Pharmacy\MedicineController;
+use App\Http\Controllers\Pharmacy\ProfileController;
+use App\Http\Controllers\Pharmacy\StaffManagementController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -25,10 +25,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
 });
 
 
-Route::prefix('apotek')
-    ->name('apotek.')
+Route::prefix('pharmacy')
+    ->name('pharmacy.')
     ->group(function () {
-        Route::get('/', [ApotekDashboardController::class, 'index'])
+        Route::get('/', [PharmacyDashboardController::class, 'index'])
             ->name('dashboard');
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
@@ -36,8 +36,16 @@ Route::prefix('apotek')
             ->name('staff');
         Route::get('/orders', [OrderController::class, 'index'])
             ->name('orders');
-        Route::get('/orders/new', [OrderController::class, 'new'])
-            ->name('orders.new');
+        Route::get('/orders/create', [OrderController::class, 'create'])
+            ->name('orders.create');
+        Route::prefix('medicines')->name('medicines.')->group(function () {
+            Route::get('/', [MedicineController::class, 'index'])->name('index');
+            Route::get('/create', [MedicineController::class, 'create'])->name('create');
+            Route::post('/create', [MedicineController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [MedicineController::class, 'edit'])->name('edit');
+            Route::put('/{id}/edit', [MedicineController::class, 'update'])->name('update');
+            Route::delete('/{id}', [MedicineController::class, 'destroy'])->name('destroy');
+        });
     });
 
 Route::prefix('admin')
@@ -47,13 +55,4 @@ Route::prefix('admin')
             ->name('dashboard');
         Route::get('/pharmacies', [PharmacyController::class, 'index'])
             ->name('pharmacies');
-
-        Route::prefix('obat')->name('obat.')->group(function () {
-            Route::get('/', [ObatController::class, 'index'])->name('index');
-            Route::get('/tambah', [ObatController::class, 'create'])->name('create');
-            Route::post('/tambah', [ObatController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [ObatController::class, 'edit'])->name('edit');
-            Route::put('/{id}/edit', [ObatController::class, 'update'])->name('update');
-            Route::delete('/{id}', [ObatController::class, 'destroy'])->name('destroy');
-        });
     });

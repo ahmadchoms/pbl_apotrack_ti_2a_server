@@ -12,11 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@inertiajs/react";
 
 const MENU_ITEMS = [
-    { id: "Dasbor Utama", icon: LayoutGrid, href: "apotek" },
-    { id: "Manajemen Staff", icon: Users, href: "apotek.staff" },
-    { id: "Daftar Pesanan", icon: ShoppingCart, href: "apotek.orders" },
-    { id: "Daftar Obat", icon: Pill, href: "apotek.inventory" },
-    { id: "Profil Pengguna", icon: UserCircle, href: "apotek.profile" },
+    { id: "Dasbor Utama", icon: LayoutGrid, href: "/pharmacy" },
+    { id: "Manajemen Staff", icon: Users, href: "/pharmacy/staff" },
+    { id: "Daftar Pesanan", icon: ShoppingCart, href: "/pharmacy/orders" },
+    { id: "Daftar Obat", icon: Pill, href: "/pharmacy/medicines" },
+    { id: "Profil Pengguna", icon: UserCircle, href: "/pharmacy/profile" },
 ];
 
 export function Sidebar({ activeMenu = "Dasbor Utama" }) {

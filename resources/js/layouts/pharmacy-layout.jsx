@@ -1,8 +1,8 @@
-import { Header } from "@/features/apotek/components/header";
-import { Sidebar } from "@/features/apotek/components/sidebar";
+import { Header } from "@/features/pharmacy/components/header";
+import { Sidebar } from "@/features/pharmacy/components/sidebar";
 import React from "react";
 
-export function DashboardApotekLayout({ children, activeMenu }) {
+export function DashboardPharmacyLayout({ children, activeMenu }) {
     return (
         <div className="flex h-screen bg-slate-50/50 text-slate-800 font-sans overflow-hidden">
             <div className="hidden md:flex shrink-0 z-20 shadow-sm border-r border-slate-100 bg-white">
