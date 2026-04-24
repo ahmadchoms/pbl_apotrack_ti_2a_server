@@ -68,7 +68,7 @@ export default function AdminDashboardPage({
     return (
         <DashboardAdminLayout>
             <main className="flex-1 overflow-y-auto p-8 relative">
-                <div className="max-w-[1400px] mx-auto space-y-8">
+                <div className="max-w-350 mx-auto space-y-8">
                     <div>
                         <p className="text-[10px] font-bold text-[#0b3b60] uppercase tracking-widest mb-1">
                             Ikhtisar Ekosistem
@@ -155,14 +155,14 @@ export default function AdminDashboardPage({
                                 </CardHeader>
                                 <CardContent className="px-6 py-4">
                                     <div className="relative pl-3 space-y-5">
-                                        <div className="absolute left-[5px] top-2 bottom-2 w-px bg-slate-100"></div>
+                                        <div className="absolute left-1.25 top-2 bottom-2 w-px bg-slate-100"></div>
                                         {auditLogs.map((log) => (
                                             <div
                                                 key={log.id}
                                                 className="relative pl-5"
                                             >
                                                 <div
-                                                    className={`absolute left-[-5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white shadow-sm ${log.isNew ? "bg-emerald-500" : "bg-[#0b3b60]"}`}
+                                                    className={`absolute -left-1.25 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white shadow-sm ${log.isNew ? "bg-emerald-500" : "bg-[#0b3b60]"}`}
                                                 ></div>
                                                 <div className="flex justify-between items-start gap-2">
                                                     <p className="text-xs font-bold text-slate-800 leading-none">
@@ -213,7 +213,7 @@ export default function AdminDashboardPage({
                                     ))}
                                 </div>
                             </div>
-                            <div className="h-[280px] w-full">
+                            <div className="h-70 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={
@@ -297,7 +297,7 @@ export default function AdminDashboardPage({
                                     ))}
                                 </div>
                             </div>
-                            <div className="h-[280px] w-full">
+                            <div className="h-70 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={

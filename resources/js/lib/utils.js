@@ -20,15 +20,6 @@ export function formatTime(dateStr) {
     );
 }
 
-export function getInitials(name) {
-    return name
-        .split(" ")
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase();
-}
-
 export function getTodaySchedule(operating_hours) {
     const today = new Date().getDay(); // 0 = Minggu
     const normalizedDay = today === 0 ? 7 : today;

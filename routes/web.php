@@ -6,7 +6,7 @@ use App\Http\Controllers\Pharmacy\DashboardController as PharmacyDashboardContro
 use App\Http\Controllers\Pharmacy\OrderController;
 use App\Http\Controllers\Pharmacy\MedicineController;
 use App\Http\Controllers\Pharmacy\ProfileController;
-use App\Http\Controllers\Pharmacy\StaffManagementController;
+use App\Http\Controllers\Pharmacy\StaffController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -32,16 +32,20 @@ Route::prefix('pharmacy')
             ->name('dashboard');
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
-        Route::get('/staff', [StaffManagementController::class, 'index'])
+        Route::get('/staff', [StaffController::class, 'index'])
             ->name('staff');
         Route::get('/orders', [OrderController::class, 'index'])
             ->name('orders');
+        Route::get('/orders/list', [OrderController::class, 'list'])
+            ->name('orders.list');
+        Route::get('/orders/pos', [OrderController::class, 'pos'])
+            ->name('orders.pos');
         Route::get('/orders/create', [OrderController::class, 'create'])
             ->name('orders.create');
         Route::prefix('medicines')->name('medicines.')->group(function () {
             Route::get('/', [MedicineController::class, 'index'])->name('index');
-            Route::get('/create', [MedicineController::class, 'create'])->name('create');
-            Route::post('/create', [MedicineController::class, 'store'])->name('store');
+            Route::get('/new', [MedicineController::class, 'create'])->name('create');
+            Route::post('/new', [MedicineController::class, 'store'])->name('store');
             Route::get('/{id}/edit', [MedicineController::class, 'edit'])->name('edit');
             Route::put('/{id}/edit', [MedicineController::class, 'update'])->name('update');
             Route::delete('/{id}', [MedicineController::class, 'destroy'])->name('destroy');

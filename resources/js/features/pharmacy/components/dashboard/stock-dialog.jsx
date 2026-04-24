@@ -23,7 +23,7 @@ export function StockDialog({ stocks }) {
                         Semua Stok Kritis
                     </DialogTitle>
                 </DialogHeader>
-                <ScrollArea className="h-[400px] w-full pr-4 mt-4">
+                <ScrollArea className="h-100 w-full pr-4 mt-4">
                     <div className="space-y-4">
                         {stocks.map((stock) => (
                             <div

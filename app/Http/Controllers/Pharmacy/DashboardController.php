@@ -56,15 +56,21 @@ class DashboardController extends Controller
 
         $revenueDataRaw = Order::where('pharmacy_id', $pharmacyId)
             ->where('order_status', 'COMPLETED')
-            ->select(DB::raw("SUM(grand_total) as revenue"), DB::raw("COUNT(*) as orders"), DB::raw("$dayOfWeekQuery as day"))
+            ->select(
+                DB::raw("SUM(grand_total) as revenue"),
+                DB::raw("COUNT(*) as orders"),
+                DB::raw("EXTRACT(DOW FROM created_at) as day") // 0=Sun, 1=Mon... 6=Sat
+            )
             ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('day')
             ->get();
 
-        $daysMap = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB']; // SQLite mapping
+        $daysMap = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
 
         $revenueData = collect(range(0, 6))->map(function ($day) use ($revenueDataRaw, $daysMap) {
-            $stat = $revenueDataRaw->firstWhere('day', (string)$day);
+            // Check for both string and integer formats just in case PDO casting varies
+            $stat = $revenueDataRaw->firstWhere('day', (string)$day) ?? $revenueDataRaw->firstWhere('day', $day);
+
             return [
                 'name' => $daysMap[$day],
                 'revenue' => $stat ? (float)$stat->revenue : 0,
