@@ -17,7 +17,7 @@ function getUniqueMedicines(list) {
 
 export default function PharmacistPOS({ medicines }) {
     const uniqueMedicines = useMemo(
-        () => getUniqueMedicines(medicines),
+        () => getUniqueMedicines(medicines.data),
         [medicines],
     );
 

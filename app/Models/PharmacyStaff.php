@@ -22,4 +22,22 @@ class PharmacyStaff extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Local Scopes
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->whereHas('user', function ($sq) use ($search) {
+                $sq->where('username', 'ilike', "%{$search}%")
+                  ->orWhere('email', 'ilike', "%{$search}%");
+            });
+        });
+    }
+
+    public function scopeFilterStatus($query, $status)
+    {
+        return $query->when($status && $status !== 'all', function ($q) use ($status) {
+            $q->where('is_active', $status === 'active');
+        });
+    }
 }

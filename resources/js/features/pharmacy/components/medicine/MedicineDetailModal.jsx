@@ -37,9 +37,9 @@ export function MedicineDetailModal({ medicine, open, onClose }) {
             >
                 <DialogTitle className="hidden" />
                 <div className="relative h-52 bg-linear-to-br from-slate-100 to-slate-200 overflow-hidden">
-                    {medicine.images?.[0]?.image_url ? (
+                    {medicine.image_url ? (
                         <img
-                            src={medicine.images[0].image_url}
+                            src={medicine.image_url}
                             alt={medicine.name}
                             className="w-full h-full object-cover opacity-80"
                             onError={(e) => {
@@ -221,7 +221,12 @@ export function MedicineDetailModal({ medicine, open, onClose }) {
                     <div className="flex gap-2 pt-1">
                         <Button
                             onClick={() =>
-                                router.visit(`/pharmacy/medicines/${medicine.id}/edit`)
+                                router.visit(
+                                    route(
+                                        "pharmacy.medicines.edit",
+                                        medicine.id,
+                                    ),
+                                )
                             }
                             className="flex-1 bg-linear-to-r from-[#00346C] to-[#0055a5] hover:from-[#002a58] hover:to-[#00469a] text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-[#00346C]/20"
                         >
@@ -231,8 +236,14 @@ export function MedicineDetailModal({ medicine, open, onClose }) {
                         <Button
                             variant="outline"
                             onClick={() => {
-                                if (confirm("Apakah Anda yakin ingin menghapus obat ini?")) {
-                                    router.delete(`/pharmacy/medicines/${medicine.id}`);
+                                if (
+                                    confirm(
+                                        "Apakah Anda yakin ingin menghapus obat ini?",
+                                    )
+                                ) {
+                                    router.delete(
+                                        `/pharmacy/medicines/${medicine.id}`,
+                                    );
                                 }
                             }}
                             className="h-11 rounded-xl border-red-200 text-red-500 hover:bg-red-50 px-4"

@@ -127,7 +127,7 @@ export default function PharmacistStaff(props) {
                                 {pagination.to || 0} dari{" "}
                                 {pagination.total || 0} staff
                             </span>
-                            <Pagination links={pagination.links} />
+                            <Pagination links={pagination.meta.links} />
                         </div>
                     </CardContent>
                 </Card>

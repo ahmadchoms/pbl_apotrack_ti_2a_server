@@ -66,21 +66,21 @@ export function AuthLayout({
             <footer className="z-10 mt-10 flex flex-col items-center space-y-4 text-slate-500 text-xs">
                 <div className="flex space-x-6">
                     <Link
-                        href={route("help.center")}
+                        // href={route("help.center")}
                         className="hover:text-primary transition-colors"
                     >
                         Pusat Bantuan
                     </Link>
 
                     <Link
-                        href={route("privacy")}
+                        // href={route("privacy")}
                         className="hover:text-primary transition-colors"
                     >
                         Kebijakan Privasi
                     </Link>
 
                     <Link
-                        href={route("terms")}
+                        // href={route("terms")}
                         className="hover:text-primary transition-colors"
                     >
                         Syarat & Ketentuan

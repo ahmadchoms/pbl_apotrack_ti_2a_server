@@ -9,11 +9,12 @@ export default function PharmacistEditMedicine({
     types = [],
     forms = [],
 }) {
+    console.log(medicine);
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Obat">
             <MedicineForm
                 isEdit={true}
-                medicine={medicine}
+                medicine={medicine.data}
                 categories={categories}
                 units={units}
                 types={types}

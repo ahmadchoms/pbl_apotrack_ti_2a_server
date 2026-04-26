@@ -154,7 +154,7 @@ export default function PharmacistMedicineCatalog({
                                         />
                                     ))}
                                 </motion.div>
-                                <Pagination links={safeMedicines.links} />
+                                <Pagination links={safeMedicines.meta.links} />
                             </>
                         )}
                     </AnimatePresence>

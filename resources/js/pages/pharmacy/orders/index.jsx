@@ -5,7 +5,6 @@ export default function OrderManagementPage({
     pendingCount = 0,
     completedCount = 0,
 }) {
-    console.log("Orders:", orders);
     return (
         <PharmacistOrderManagement
             orders={orders}

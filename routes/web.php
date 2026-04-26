@@ -29,11 +29,13 @@ use App\Http\Controllers\Pharmacy\{
 |--------------------------------------------------------------------------
 */
 
+use App\Http\Controllers\WaitingRoomController;
+
 Route::get('/', fn() => Inertia::render('index'))->name('home');
 
-Route::get('/waiting-room', fn() => Inertia::render('waiting-room'))
+Route::get('/waiting-room', [WaitingRoomController::class, 'index'])
+    ->middleware('auth')
     ->name('waiting-room');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -43,18 +45,23 @@ Route::get('/waiting-room', fn() => Inertia::render('waiting-room'))
 
 Route::prefix('auth')
     ->name('auth.')
-    ->controller(LoginController::class)
     ->group(function () {
-        Route::get('/login', 'index')->name('login');
-    });
+        Route::controller(LoginController::class)->group(function () {
+            Route::get('/login', 'index')->name('login');
+            Route::post('/login', 'store')->name('login.store');
+            Route::post('/logout', 'destroy')->name('logout');
+        });
 
-Route::prefix('auth')
-    ->name('auth.')
-    ->group(function () {
-        Route::get('/register', [RegisterController::class, 'index'])->name('register');
-        Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])->name('forgot-password');
-    });
+        Route::controller(RegisterController::class)->group(function () {
+            Route::get('/register', 'index')->name('register');
+            Route::post('/register', 'store')->name('register.store');
+        });
 
+        Route::controller(ForgotPasswordController::class)->group(function () {
+            Route::get('/forgot-password', 'index')->name('forgot-password');
+            Route::post('/forgot-password', 'store')->name('forgot-password.store');
+        });
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -64,7 +71,7 @@ Route::prefix('auth')
 
 Route::prefix('admin')
     ->name('admin.')
-    // ->middleware(['auth', 'role:admin']) // aktifkan nanti
+    ->middleware(['auth', 'role:SUPER_ADMIN'])
     ->group(function () {
 
         // Dashboard
@@ -111,7 +118,6 @@ Route::prefix('admin')
             });
     });
 
-
 /*
 |--------------------------------------------------------------------------
 | Pharmacy Routes
@@ -120,7 +126,7 @@ Route::prefix('admin')
 
 Route::prefix('pharmacy')
     ->name('pharmacy.')
-    // ->middleware(['auth', 'role:pharmacy'])
+    ->middleware(['auth', 'role:APOTEKER,STAFF'])
     ->group(function () {
 
         // Dashboard
@@ -134,9 +140,10 @@ Route::prefix('pharmacy')
             ->name('profile');
 
         /*
-        | Staff
+        | Staff (Only APOTEKER)
         */
         Route::get('/staff', [StaffController::class, 'index'])
+            ->middleware('role:APOTEKER')
             ->name('staff');
 
         /*

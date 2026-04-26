@@ -22,4 +22,35 @@ class AuditLog extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Local Scopes
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sq) use ($search) {
+                $sq->where('description', 'ilike', "%{$search}%")
+                  ->orWhere('action', 'ilike', "%{$search}%");
+            });
+        });
+    }
+
+    public function scopeFilterStatus($query, $status)
+    {
+        return $query->when($status && $status !== 'all', function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+    }
+
+    public function scopeFilterAction($query, $action)
+    {
+        return $query->when($action && $action !== 'all', function ($q) use ($action) {
+            $q->where('action', $action);
+        });
+    }
+
+    public function scopeFilterDate($query, $from, $to)
+    {
+        return $query->when($from, fn($q) => $q->whereDate('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->whereDate('created_at', '<=', $to));
+    }
 }

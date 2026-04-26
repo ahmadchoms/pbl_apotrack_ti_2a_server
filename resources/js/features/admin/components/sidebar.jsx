@@ -258,15 +258,18 @@ export function Sidebar({ activeMenu = "dashboard", onNavigate }) {
             </div>
 
             <div className="p-4 border-t border-slate-100 shrink-0">
-                <Button
-                    variant="ghost"
-                    className="group w-full justify-start gap-3.5 h-12 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-2xl font-black text-sm transition-all duration-300"
+                <Link
+                    href={route("auth.logout")}
+                    method="post"
+                    className="w-full cursor-pointer"
                 >
-                    <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
-                        <LogOut className="h-4 w-4" />
+                    <div className="group w-full gap-3.5 h-12 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-2xl font-black text-sm transition-all duration-300 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
+                            <LogOut className="h-4 w-4" />
+                        </div>
+                        <span>Keluar Panel</span>
                     </div>
-                    <span>Keluar Panel</span>
-                </Button>
+                </Link>
             </div>
         </aside>
     );

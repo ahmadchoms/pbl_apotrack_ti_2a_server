@@ -3,8 +3,10 @@ import { Search, Bell, Menu } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePage } from "@inertiajs/react";
 
 export function Header({ mobileSidebar }) {
+    const user = usePage().props?.auth?.user;
     return (
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 md:px-8 flex items-center justify-between sticky top-0 z-10 w-full">
             <div className="flex items-center gap-4 flex-1">
@@ -16,13 +18,16 @@ export function Header({ mobileSidebar }) {
                                     <Menu className="h-6 w-6" />
                                 </button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="p-0 w-64 bg-white border-0 shadow-xl [&>button]:hidden">
+                            <SheetContent
+                                side="left"
+                                className="p-0 w-64 bg-white border-0 shadow-xl [&>button]:hidden"
+                            >
                                 {mobileSidebar}
                             </SheetContent>
                         </Sheet>
                     </div>
                 )}
-                
+
                 <div className="relative w-full max-w-md group hidden sm:block">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                         <Search className="h-4 w-4" />
@@ -46,16 +51,25 @@ export function Header({ mobileSidebar }) {
                 <div className="flex items-center gap-3 cursor-pointer group">
                     <div className="text-right hidden sm:block">
                         <p className="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">
-                            Prayitno
+                            {user?.username || "Prayitno"}
                         </p>
                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                            Apoteker Utama
+                            {user?.role === "APOTEKER"
+                                ? "Apoteker Utama"
+                                : "Staff Apotek"}
                         </p>
                     </div>
                     <Avatar className="h-10 w-10 border-2 border-slate-100 group-hover:border-primary transition-colors">
-                        <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Prayitno&backgroundColor=0b3b60" />
+                        <AvatarImage
+                            src={
+                                user?.avatar_url ||
+                                "https://api.dicebear.com/7.x/avataaars/svg?seed=Prayitno&backgroundColor=0b3b60"
+                            }
+                        />
                         <AvatarFallback className="bg-primary text-primary-foreground">
-                            PP
+                            {user?.username
+                                ? user.username.charAt(0).toUpperCase()
+                                : "P"}
                         </AvatarFallback>
                     </Avatar>
                 </div>

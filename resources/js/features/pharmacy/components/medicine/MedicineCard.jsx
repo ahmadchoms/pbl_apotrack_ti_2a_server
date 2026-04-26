@@ -43,8 +43,6 @@ const cardVariants = {
 };
 
 export function MedicineCard({ medicine, index, onView }) {
-    const primaryImage =
-        medicine.images?.find((img) => img.is_primary) ?? medicine.images?.[0];
     const stockStatus = getStockStatus(medicine);
     const expiryDays = getExpiryWarning(medicine);
 
@@ -59,9 +57,9 @@ export function MedicineCard({ medicine, index, onView }) {
             className="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden group flex flex-col"
         >
             <div className="relative aspect-4/3 bg-linear-to-br from-slate-100 to-slate-150 overflow-hidden">
-                {primaryImage?.image_url ? (
+                {medicine.image_url ? (
                     <img
-                        src={primaryImage.image_url}
+                        src={medicine.image_url}
                         alt={medicine.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {

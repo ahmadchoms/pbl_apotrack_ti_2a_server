@@ -41,4 +41,30 @@ class Pharmacy extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    // Local Scopes
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sq) use ($search) {
+                $sq->where('name', 'ilike', "%{$search}%")
+                  ->orWhere('address', 'ilike', "%{$search}%")
+                  ->orWhere('phone', 'ilike', "%{$search}%");
+            });
+        });
+    }
+
+    public function scopeFilterStatus($query, $status)
+    {
+        return $query->when($status && $status !== 'all', function ($q) use ($status) {
+            match ($status) {
+                'verified' => $q->where('verification_status', 'VERIFIED'),
+                'pending' => $q->where('verification_status', 'PENDING'),
+                'rejected' => $q->where('verification_status', 'REJECTED'),
+                'active' => $q->where('is_active', true)->where('is_force_closed', false),
+                'closed' => $q->where(fn($sq) => $sq->where('is_active', false)->orWhere('is_force_closed', true)),
+                default => null,
+            };
+        });
+    }
 }

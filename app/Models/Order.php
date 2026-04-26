@@ -50,4 +50,17 @@ class Order extends Model
     {
         return $this->hasOne(Review::class);
     }
+
+    // Local Scopes
+    public function scopeForPharmacy($query, $pharmacyId)
+    {
+        return $query->where('pharmacy_id', $pharmacyId);
+    }
+
+    public function scopeFilterStatus($query, $status)
+    {
+        return $query->when($status && $status !== 'ALL', function ($q) use ($status) {
+            $q->where('order_status', strtoupper($status));
+        });
+    }
 }

@@ -3,9 +3,6 @@ import { AuthLayout } from "@/layouts/auth-layout";
 import { LoginForm } from "@/features/auth/components/login-form";
 
 export default function LoginPage() {
-    const handleLogin = (data) => {
-        console.log("Login Data:", data);
-    };
 
     return (
         <AuthLayout
@@ -14,7 +11,7 @@ export default function LoginPage() {
             subtitle="Pharmacy Portal Access"
             maxWidthClass="max-w-md"
         >
-            <LoginForm onSubmitSuccess={handleLogin} />
+            <LoginForm />
 
             <div className="mt-6 text-center text-sm text-slate-500">
                 Belum punya akun?{" "}

@@ -3,8 +3,10 @@ import { Search, Bell, Menu } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePage } from "@inertiajs/react";
 
 export function Header({ mobileSidebar }) {
+    const user = usePage().props?.auth?.user;
     return (
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 md:px-8 flex items-center justify-between sticky top-0 z-10 w-full">
             <div className="flex items-center gap-4 flex-1">
@@ -39,7 +41,7 @@ export function Header({ mobileSidebar }) {
             </div>
 
             <div className="flex items-center gap-5">
-                <button className="relative p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-500 hover:text-[#0b3b60] hover:bg-white transition-all shadow-sm">
+                <button className="relative p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-500 hover:text-primary hover:bg-white transition-all shadow-sm">
                     <Bell className="h-5 w-5" />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white shadow-sm"></span>
                 </button>
@@ -48,17 +50,19 @@ export function Header({ mobileSidebar }) {
 
                 <div className="flex items-center gap-3 cursor-pointer group">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-black text-slate-800 group-hover:text-[#0b3b60] transition-colors leading-none">
-                            Administrator
+                        <p className="text-sm font-black text-slate-800 group-hover:text-primary transition-colors leading-none">
+                            {user?.username || "Admin"}
                         </p>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 leading-none">
                             Super Admin
                         </p>
                     </div>
-                    <Avatar className="h-10 w-10 border-2 border-slate-100 group-hover:border-[#0b3b60] transition-colors shadow-sm">
-                        <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin&backgroundColor=0b3b60" />
-                        <AvatarFallback className="bg-[#0b3b60] text-white font-black">
-                            AD
+                    <Avatar className="h-10 w-10 border-2 border-slate-100 group-hover:border-primary transition-colors shadow-sm">
+                        <AvatarImage src={user?.avatar_url} />
+                        <AvatarFallback className="bg-primary text-white font-black">
+                            {user?.username
+                                ? user.username.charAt(0).toUpperCase()
+                                : "A"}
                         </AvatarFallback>
                     </Avatar>
                 </div>

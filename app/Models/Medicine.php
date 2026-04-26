@@ -51,4 +51,55 @@ class Medicine extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    // Local Scopes
+    public function scopeWithTotalActiveStock($query)
+    {
+        return $query->withSum(['batches as total_active_stock' => function ($sq) {
+            $sq->where('expired_date', '>', now());
+        }], 'stock');
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sq) use ($search) {
+                $sq->where('name', 'ilike', "%{$search}%")
+                    ->orWhere('generic_name', 'ilike', "%{$search}%");
+            });
+        });
+    }
+
+    public function scopeFilterByCategory($query, $category)
+    {
+        return $query->when($category && $category !== 'Semua', function ($q) use ($category) {
+            $q->whereHas('category', function ($sq) use ($category) {
+                $sq->where('name', $category);
+            });
+        });
+    }
+
+    public function scopeFilterByStatus($query, $status)
+    {
+        return $query->when($status, function ($q) use ($status) {
+            if ($status === 'low') {
+                $q->whereIn('id', function ($sub) {
+                    $sub->select('medicine_id')
+                        ->from('medicine_batches')
+                        ->groupBy('medicine_id')
+                        ->havingRaw('SUM(stock) <= 10');
+                });
+            } elseif ($status === 'expiring') {
+                $q->whereHas('batches', function ($sq) {
+                    $sq->where('expired_date', '<=', now()->addMonths(3));
+                });
+            }
+        });
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(MedicineImage::class)
+            ->where('is_primary', true);
+    }
 }

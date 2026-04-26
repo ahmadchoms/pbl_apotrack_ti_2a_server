@@ -16,9 +16,7 @@ import {
     Trash2,
     Edit3,
     ShieldCheck,
-    MoreHorizontal,
     User,
-    Building2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { router } from "@inertiajs/react";
@@ -41,7 +39,6 @@ export default function PharmacyDetail({ pharmacy, pharmacist, stats }) {
     return (
         <DashboardAdminLayout activeMenu="pharmacies">
             <div className="space-y-10 pb-20">
-                {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
                     <div className="flex items-center gap-3">
                         <h1 className="text-4xl font-black text-slate-900 tracking-tight">
@@ -54,7 +51,6 @@ export default function PharmacyDetail({ pharmacy, pharmacist, stats }) {
                     </div>
                 </div>
 
-                {/* Top Quick Stats */}
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
@@ -119,7 +115,6 @@ export default function PharmacyDetail({ pharmacy, pharmacist, stats }) {
                     </motion.div>
                 </motion.div>
 
-                {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2 space-y-10">
                         <section className="space-y-6">

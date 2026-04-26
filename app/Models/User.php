@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use Laravel\Sanctum\HasApiTokens;
+
 class User extends Authenticatable
 {
-    use HasUuids, Notifiable, SoftDeletes;
+    use HasApiTokens, HasUuids, Notifiable, SoftDeletes;
 
     protected $guarded = [];
 
@@ -60,5 +62,33 @@ class User extends Authenticatable
     public function auditLogs()
     {
         return $this->hasMany(AuditLog::class);
+    }
+
+    // Local Scopes
+    public function scopeSearch($query, $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sq) use ($search) {
+                $sq->where('username', 'ilike', "%{$search}%")
+                  ->orWhere('email', 'ilike', "%{$search}%")
+                  ->orWhereHas('pharmacyStaff.pharmacy', function($pq) use ($search) {
+                      $pq->where('name', 'ilike', "%{$search}%");
+                  });
+            });
+        });
+    }
+
+    public function scopeFilterRole($query, $role)
+    {
+        return $query->when($role && $role !== 'all', function ($q) use ($role) {
+            $q->where('role', $role);
+        });
+    }
+
+    public function scopeFilterStatus($query, $status)
+    {
+        return $query->when($status && $status !== 'all', function ($q) use ($status) {
+            $q->where('is_active', $status === 'active');
+        });
     }
 }
