@@ -19,7 +19,7 @@ export default function LoginPage() {
             <div className="mt-6 text-center text-sm text-slate-500">
                 Belum punya akun?{" "}
                 <Link
-                    href="/auth/register"
+                    href={route("auth.register")}
                     className="font-semibold text-primary hover:underline"
                 >
                     Daftar di sini

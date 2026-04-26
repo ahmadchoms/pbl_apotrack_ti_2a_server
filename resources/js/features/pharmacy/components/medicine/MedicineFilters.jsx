@@ -54,7 +54,7 @@ export function MedicineFilters({
                         </InputGroupAddon>
                     </InputGroup>
                     <Link
-                        href="/pharmacy/medicines/create"
+                        href={route("pharmacy.medicines.create")}
                         className="inline-flex items-center gap-2 bg-linear-to-r from-primary to-[#0055a5] text-white px-4 h-10 rounded-xl font-bold text-xs shadow-md shadow-primary/25 hover:from-[#002a58] hover:to-[#00469a] transition-all whitespace-nowrap"
                     >
                         <PlusCircle className="w-4 h-4" />

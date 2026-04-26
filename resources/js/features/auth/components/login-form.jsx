@@ -103,7 +103,7 @@ export function LoginForm({ onSubmitSuccess }) {
                     </Label>
                 </div>
                 <Link
-                    href="/auth/forgot-password"
+                    href={route("forgot-password")}
                     className="text-sm font-semibold text-primary hover:underline"
                 >
                     Lupa Kata Sandi?
@@ -111,10 +111,7 @@ export function LoginForm({ onSubmitSuccess }) {
             </div>
 
             <div className="space-y-4 pt-2">
-                <Button
-                    type="submit"
-                    className="w-full py-6 rounded-xl group"
-                >
+                <Button type="submit" className="w-full py-6 rounded-xl group">
                     Masuk ke Dasbor
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>

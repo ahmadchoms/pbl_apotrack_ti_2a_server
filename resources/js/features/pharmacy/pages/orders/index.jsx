@@ -34,7 +34,7 @@ export default function PharmacistOrderManagement({ orders: paginatedOrders }) {
 
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Pesanan">
-            <div className="max-w-7xl mx-auto pb-8">
+            <div className="pb-8">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function PharmacistOrderManagement({ orders: paginatedOrders }) {
                             </InputGroupAddon>
                         </InputGroup>
                         <Link
-                            href="/pharmacy/orders/pos"
+                            href={route("pharmacy.orders.pos")}
                             className="inline-flex items-center gap-2.5 bg-primary text-white px-5 h-11 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-[#002a58] transition-all whitespace-nowrap active:scale-95"
                         >
                             <PlusCircle className="w-4.5 h-4.5" />
@@ -78,7 +78,7 @@ export default function PharmacistOrderManagement({ orders: paginatedOrders }) {
                                 Daftar Transaksi ({filteredOrders.length})
                             </h3>
                             <Link
-                                href="/pharmacy/orders/list"
+                                href={route("pharmacy.orders.list")}
                                 className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
                             >
                                 Lihat Semua List →

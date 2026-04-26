@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { DAY_NAMES } from "./constants";
-import { AlertTriangle, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 
 export function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -89,4 +89,13 @@ export function getHoursSummary(operatingHours) {
         ),
     ];
     return unique.join(", ") || "-";
+}
+
+export function getInitials(name) {
+    return name
+        .split(" ")
+        .slice(0, 2)
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase();
 }

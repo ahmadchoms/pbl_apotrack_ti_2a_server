@@ -33,8 +33,8 @@ export default function PharmacistDashboard({
 }) {
     return (
         <DashboardPharmacyLayout activeMenu="Dasbor Utama">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
+            <div className="space-y-8">
+                <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-2xl font-bold text-slate-800">
                             Ikhtisar Apotek

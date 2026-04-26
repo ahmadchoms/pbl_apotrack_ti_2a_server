@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { getInitials } from "@/features/pharmacy/lib/helpers";
+import { getInitials } from "@/lib/utils";
 
 const ANIMATION = {
     row: {

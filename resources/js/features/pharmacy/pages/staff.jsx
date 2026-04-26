@@ -1,10 +1,5 @@
 import React from "react";
-import {
-    UserPlus,
-    Search,
-    Trash2,
-    X,
-} from "lucide-react";
+import { UserPlus, Search, Trash2, X } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,7 +40,7 @@ export default function PharmacistStaff(props) {
 
     return (
         <DashboardPharmacyLayout activeMenu="Manajemen Staff">
-            <div className="max-w-7xl mx-auto space-y-6">
+            <div className="space-y-6">
                 <header>
                     <h2 className="text-2xl font-bold text-slate-800">
                         Manajemen Staff
@@ -128,7 +123,8 @@ export default function PharmacistStaff(props) {
 
                         <div className="px-6 py-4 border-t border-slate-50 flex items-center justify-between flex-wrap gap-4">
                             <span className="text-xs text-slate-400 font-medium">
-                                Menampilkan {pagination.from || 0} - {pagination.to || 0} dari{" "}
+                                Menampilkan {pagination.from || 0} -{" "}
+                                {pagination.to || 0} dari{" "}
                                 {pagination.total || 0} staff
                             </span>
                             <Pagination links={pagination.links} />
@@ -193,4 +189,3 @@ export default function PharmacistStaff(props) {
         </DashboardPharmacyLayout>
     );
 }
-

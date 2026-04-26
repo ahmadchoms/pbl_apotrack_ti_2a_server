@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
         >
             <div className="flex items-center space-x-2 mb-6">
                 <Link
-                    href="/auth/login"
+                    href={route("auth.login")}
                     className="text-slate-400 hover:text-primary transition-colors flex items-center"
                 >
                     <ArrowLeft className="h-4 w-4 mr-1" />
@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
                     </span>
                 </Link>
             </div>
-            
+
             <ForgotPasswordForm onSubmitSuccess={handleForgot} />
         </AuthLayout>
     );

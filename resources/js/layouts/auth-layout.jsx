@@ -8,6 +8,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Link } from "@inertiajs/react";
 
 export function AuthLayout({
     children,
@@ -58,26 +59,36 @@ export function AuthLayout({
                             </CardDescription>
                         )}
                     </CardHeader>
-                    <CardContent className="px-8 pb-8">
-                        {children}
-                    </CardContent>
+                    <CardContent className="px-8 pb-8">{children}</CardContent>
                 </Card>
             </motion.div>
 
             <footer className="z-10 mt-10 flex flex-col items-center space-y-4 text-slate-500 text-xs">
                 <div className="flex space-x-6">
-                    <a href="#" className="hover:text-primary transition-colors">
+                    <Link
+                        href={route("help.center")}
+                        className="hover:text-primary transition-colors"
+                    >
                         Pusat Bantuan
-                    </a>
-                    <a href="#" className="hover:text-primary transition-colors">
+                    </Link>
+
+                    <Link
+                        href={route("privacy")}
+                        className="hover:text-primary transition-colors"
+                    >
                         Kebijakan Privasi
-                    </a>
-                    <a href="#" className="hover:text-primary transition-colors">
+                    </Link>
+
+                    <Link
+                        href={route("terms")}
+                        className="hover:text-primary transition-colors"
+                    >
                         Syarat & Ketentuan
-                    </a>
+                    </Link>
                 </div>
                 <p className="text-[10px] tracking-wider uppercase font-semibold">
-                    &copy; {new Date().getFullYear()} APOTRACK. ALL RIGHTS RESERVED.
+                    &copy; {new Date().getFullYear()} APOTRACK. ALL RIGHTS
+                    RESERVED.
                 </p>
             </footer>
         </div>

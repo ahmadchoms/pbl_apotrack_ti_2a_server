@@ -103,7 +103,10 @@ export function MedicineCard({ medicine, index, onView }) {
                                 className="text-xs font-semibold rounded-lg cursor-pointer"
                             >
                                 <Link
-                                    href={`/pharmacy/medicines/${medicine.id}`}
+                                    href={route(
+                                        "pharmacy.medicines.edit",
+                                        medicine.id,
+                                    )}
                                     className="w-full flex items-center"
                                 >
                                     <Pencil className="mr-2 w-3.5 h-3.5" />

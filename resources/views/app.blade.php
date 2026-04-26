@@ -10,5 +10,6 @@
 </head>
 <body class="min-h-full flex flex-col antialiased">
     @inertia
+    @routes
 </body>
 </html>

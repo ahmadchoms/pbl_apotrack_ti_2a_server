@@ -138,7 +138,7 @@ export function MedicineForm({
                 className="mb-6 flex items-center gap-4"
             >
                 <Link
-                    href="/pharmacy/medicines"
+                    href={route("pharmacy.medicines.index")}
                     className="w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-500 shadow-sm transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
@@ -416,7 +416,7 @@ export function MedicineForm({
                             animate="visible"
                             className="flex items-center justify-end gap-3 pb-8"
                         >
-                            <Link href="/pharmacy/medicines">
+                            <Link href={route("pharmacy.medicines.index")}>
                                 <Button
                                     type="button"
                                     variant="ghost"

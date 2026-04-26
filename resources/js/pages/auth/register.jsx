@@ -19,7 +19,7 @@ export default function RegisterPage() {
             <div className="mt-8 text-center text-sm text-slate-500">
                 Sudah punya akun?{" "}
                 <Link
-                    href="/auth/login"
+                    href={route("auth.login")}
                     className="font-semibold text-primary hover:underline"
                 >
                     Masuk di sini

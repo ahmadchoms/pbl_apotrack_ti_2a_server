@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Scan, ShoppingCart, X } from "lucide-react";
-import { medicines as allMedicines } from "@/data/medicines";
 import { OrderCatalog } from "../../components/orders/OrderCatalog";
 import { OrderCart } from "../../components/orders/OrderCart";
 import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
@@ -16,9 +15,11 @@ function getUniqueMedicines(list) {
     });
 }
 
-export default function PharmacistPOS({ medicines: propMedicines }) {
-    const source = propMedicines ?? allMedicines;
-    const uniqueMedicines = useMemo(() => getUniqueMedicines(source), [source]);
+export default function PharmacistPOS({ medicines }) {
+    const uniqueMedicines = useMemo(
+        () => getUniqueMedicines(medicines),
+        [medicines],
+    );
 
     const [cart, setCart] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");

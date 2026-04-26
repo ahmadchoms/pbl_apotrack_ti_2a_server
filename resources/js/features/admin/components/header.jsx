@@ -39,26 +39,26 @@ export function Header({ mobileSidebar }) {
             </div>
 
             <div className="flex items-center gap-5">
-                <button className="relative p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-500 hover:text-primary hover:bg-white transition-all">
+                <button className="relative p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-500 hover:text-[#0b3b60] hover:bg-white transition-all shadow-sm">
                     <Bell className="h-5 w-5" />
-                    <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white shadow-sm"></span>
                 </button>
 
                 <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
 
                 <div className="flex items-center gap-3 cursor-pointer group">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">
-                            Prayitno
+                        <p className="text-sm font-black text-slate-800 group-hover:text-[#0b3b60] transition-colors leading-none">
+                            Administrator
                         </p>
-                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                            Apoteker Utama
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 leading-none">
+                            Super Admin
                         </p>
                     </div>
-                    <Avatar className="h-10 w-10 border-2 border-slate-100 group-hover:border-primary transition-colors">
-                        <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Prayitno&backgroundColor=0b3b60" />
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                            PP
+                    <Avatar className="h-10 w-10 border-2 border-slate-100 group-hover:border-[#0b3b60] transition-colors shadow-sm">
+                        <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin&backgroundColor=0b3b60" />
+                        <AvatarFallback className="bg-[#0b3b60] text-white font-black">
+                            AD
                         </AvatarFallback>
                     </Avatar>
                 </div>

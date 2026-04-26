@@ -135,12 +135,4 @@ class OrderController extends Controller
             'medicines' => $medicines,
         ]);
     }
-
-    /**
-     * Legacy create method, redirect to POS.
-     */
-    public function create()
-    {
-        return redirect()->route('pharmacy.orders.pos');
-    }
 }
