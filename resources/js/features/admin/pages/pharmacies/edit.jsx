@@ -23,7 +23,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
     const initialStaffs = (pharmacy.staffs || []).map((s) => ({ user_id: s.user_id, role: s.role, user_data: s.user }));
 
     const { data, setData, put, processing, errors } = useForm({
-        name: pharmacy.name || "", license_number: pharmacy.license_number || "",
+        name: pharmacy.name || "", sia_number: pharmacy.legality?.sia_number || "",
         phone: pharmacy.phone || "", address: pharmacy.address || "",
         latitude: pharmacy.latitude ?? "", longitude: pharmacy.longitude ?? "",
         verification_status: pharmacy.verification_status || "PENDING",
@@ -68,7 +68,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                                 <CardContent className="p-10 space-y-8">
                                     <FormField label="Nama Lengkap Apotek" error={errors.name}><Input value={data.name} onChange={(e) => setData("name", e.target.value)} placeholder="Contoh: Apotek Sehat Jaya" className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></FormField>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormField label="Nomor Lisensi (SIA)" error={errors.license_number}><Input value={data.license_number} onChange={(e) => setData("license_number", e.target.value)} placeholder="SIA/XXX/2024" className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></FormField>
+                                        <FormField label="Nomor Lisensi (SIA)" error={errors.sia_number}><Input value={data.sia_number} onChange={(e) => setData("sia_number", e.target.value)} placeholder="SIA/XXX/2024" className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></FormField>
                                         <FormField label="Nomor Telepon Operasional" error={errors.phone}><div className="relative"><Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input value={data.phone} onChange={(e) => setData("phone", e.target.value)} placeholder="+62 21 xxxx" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div></FormField>
                                     </div>
                                     <FormField label="Alamat Lengkap" error={errors.address}><Textarea value={data.address} onChange={(e) => setData("address", e.target.value)} placeholder="Nama jalan, nomor gedung, RT/RW..." className="min-h-[120px] rounded-[1.5rem] bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold p-6" /></FormField>

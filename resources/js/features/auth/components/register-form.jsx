@@ -16,6 +16,7 @@ import {
     ArrowLeft,
     ClipboardCheck,
     Info,
+    UploadCloud,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -25,6 +26,34 @@ import { Label } from "@/components/ui/label";
 import { registerSchema } from "../schemas/register-schema";
 import { IconInput } from "@/components/ui/icon-input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+    MapContainer,
+    TileLayer,
+    Marker,
+    useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
+
+// Fix leaflet icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
+function LocationMarker({ position, setPosition }) {
+    useMapEvents({
+        click(e) {
+            setPosition(e.latlng);
+        },
+    });
+
+    return position === null ? null : (
+        <Marker position={position} />
+    );
+}
 
 const STEPS = [
     {
@@ -45,7 +74,18 @@ const STEPS = [
         title: "Legalitas Apotek",
         description: "Informasi operasional apotek",
         icon: Building2,
-        fields: ["pharmacy_name", "pharmacy_address", "license_number"],
+        fields: [
+            "pharmacy_name",
+            "pharmacy_address",
+            "pharmacy_phone",
+            "sia_number",
+            "sipa_number",
+            "stra_number",
+            "apoteker_nik",
+            "sia_document",
+            "pharmacy_latitude",
+            "pharmacy_longitude",
+        ],
     },
     {
         id: 3,
@@ -66,6 +106,8 @@ export function RegisterForm() {
         register,
         handleSubmit,
         getValues,
+        setValue,
+        watch,
         formState: { errors },
         trigger,
         setError,
@@ -81,11 +123,21 @@ export function RegisterForm() {
             pharmacy_name: "",
             pharmacy_address: "",
             pharmacy_phone: "",
-            pharmacy_latitude: -6.2088, // Default Jakarta
+            pharmacy_latitude: -6.2088,
             pharmacy_longitude: 106.8456,
-            license_number: "",
+            sia_number: "",
+            sipa_number: "",
+            stra_number: "",
+            apoteker_nik: "",
+            sia_document: null,
         },
     });
+
+    const files = {
+        sia: watch("sia_document"),
+        sipa: watch("sipa_document"),
+        ktp: watch("ktp_document"),
+    };
 
     const handleNextStep = async (e) => {
         if (e) e.preventDefault();
@@ -118,7 +170,7 @@ export function RegisterForm() {
 
     const onSubmit = (data) => {
         setIsSubmitting(true);
-        router.post(route("auth.register"), data, {
+        router.post(route("auth.register.store"), data, {
             onSuccess: () => {
                 toast.success("Pendaftaran berhasil!", {
                     description: "Akun Anda telah dibuat.",
@@ -138,10 +190,12 @@ export function RegisterForm() {
                         Object.values(err)[0] ||
                         "Silakan periksa kembali data Anda.",
                 });
-                
+
                 // If there are errors on previous steps, navigate back
                 const firstErrorField = Object.keys(err)[0];
-                const stepWithError = STEPS.find(step => step.fields.includes(firstErrorField));
+                const stepWithError = STEPS.find((step) =>
+                    step.fields.includes(firstErrorField),
+                );
                 if (stepWithError && stepWithError.id !== currentStep) {
                     setCurrentStep(stepWithError.id);
                 }
@@ -300,25 +354,48 @@ export function RegisterForm() {
                         exit={{ opacity: 0, x: -10 }}
                         className="space-y-6"
                     >
-                        <div className="space-y-2">
-                            <Label
-                                htmlFor="pharmacy_name"
-                                className="text-xs font-bold text-slate-500 uppercase tracking-wider"
-                            >
-                                Nama Apotek
-                            </Label>
-                            <IconInput
-                                id="pharmacy_name"
-                                icon={Building2}
-                                placeholder="PT. Apotek Jaya Sejahtera"
-                                {...register("pharmacy_name")}
-                                disabled={isSubmitting}
-                            />
-                            {errors.pharmacy_name && (
-                                <p className="text-[10px] text-red-500 font-medium">
-                                    {errors.pharmacy_name.message}
-                                </p>
-                            )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="pharmacy_name"
+                                    className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                >
+                                    Nama Apotek
+                                </Label>
+                                <IconInput
+                                    id="pharmacy_name"
+                                    icon={Building2}
+                                    placeholder="PT. Apotek Jaya Sejahtera"
+                                    {...register("pharmacy_name")}
+                                    disabled={isSubmitting}
+                                />
+                                {errors.pharmacy_name && (
+                                    <p className="text-[10px] text-red-500 font-medium">
+                                        {errors.pharmacy_name.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="pharmacy_phone"
+                                    className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                >
+                                    Telepon Apotek
+                                </Label>
+                                <IconInput
+                                    id="pharmacy_phone"
+                                    icon={Phone}
+                                    placeholder="021-1234567"
+                                    {...register("pharmacy_phone")}
+                                    disabled={isSubmitting}
+                                />
+                                {errors.pharmacy_phone && (
+                                    <p className="text-[10px] text-red-500 font-medium">
+                                        {errors.pharmacy_phone.message}
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="space-y-2">
@@ -343,24 +420,151 @@ export function RegisterForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label
-                                htmlFor="license_number"
-                                className="text-xs font-bold text-slate-500 uppercase tracking-wider"
-                            >
-                                Nomor SIA (Surat Izin Apotek)
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                Lokasi di Peta
                             </Label>
-                            <IconInput
-                                id="license_number"
-                                icon={FileText}
-                                placeholder="SIA/12345/DKI/2026"
-                                {...register("license_number")}
-                                disabled={isSubmitting}
-                            />
-                            {errors.license_number && (
-                                <p className="text-[10px] text-red-500 font-medium">
-                                    {errors.license_number.message}
-                                </p>
-                            )}
+                            <div className="h-[250px] w-full rounded-xl overflow-hidden border border-slate-200 z-0">
+                                <MapContainer
+                                    center={[formData.pharmacy_latitude, formData.pharmacy_longitude]}
+                                    zoom={13}
+                                    style={{ height: "100%", width: "100%" }}
+                                >
+                                    <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    />
+                                    <LocationMarker
+                                        position={[formData.pharmacy_latitude, formData.pharmacy_longitude]}
+                                        setPosition={(latlng) => {
+                                            setValue("pharmacy_latitude", latlng.lat);
+                                            setValue("pharmacy_longitude", latlng.lng);
+                                        }}
+                                    />
+                                </MapContainer>
+                            </div>
+                            <div className="flex gap-4 text-[10px] text-slate-500 font-medium">
+                                <span>Lat: {formData.pharmacy_latitude.toFixed(6)}</span>
+                                <span>Long: {formData.pharmacy_longitude.toFixed(6)}</span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="sia_number"
+                                    className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                >
+                                    Nomor SIA
+                                </Label>
+                                <IconInput
+                                    id="sia_number"
+                                    icon={FileText}
+                                    placeholder="SIA/12345/DKI/2026"
+                                    {...register("sia_number")}
+                                    disabled={isSubmitting}
+                                />
+                                {errors.sia_number && (
+                                    <p className="text-[10px] text-red-500 font-medium">
+                                        {errors.sia_number.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="sipa_number"
+                                    className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                >
+                                    Nomor SIPA
+                                </Label>
+                                <IconInput
+                                    id="sipa_number"
+                                    icon={FileText}
+                                    placeholder="SIPA/12345/DKI/2026"
+                                    {...register("sipa_number")}
+                                    disabled={isSubmitting}
+                                />
+                                {errors.sipa_number && (
+                                    <p className="text-[10px] text-red-500 font-medium">
+                                        {errors.sipa_number.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="stra_number"
+                                    className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                >
+                                    Nomor STRA
+                                </Label>
+                                <IconInput
+                                    id="stra_number"
+                                    icon={FileText}
+                                    placeholder="STRA/12345/DKI/2026"
+                                    {...register("stra_number")}
+                                    disabled={isSubmitting}
+                                />
+                                {errors.stra_number && (
+                                    <p className="text-[10px] text-red-500 font-medium">
+                                        {errors.stra_number.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="apoteker_nik"
+                                    className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                                >
+                                    NIK KTP Apoteker
+                                </Label>
+                                <IconInput
+                                    id="apoteker_nik"
+                                    icon={User}
+                                    placeholder="3201234567890001"
+                                    {...register("apoteker_nik")}
+                                    disabled={isSubmitting}
+                                />
+                                {errors.apoteker_nik && (
+                                    <p className="text-[10px] text-red-500 font-medium">
+                                        {errors.apoteker_nik.message}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <h4 className="text-sm font-bold text-slate-700">
+                                Unggah Dokumen SIA
+                            </h4>
+                            <p className="text-xs text-slate-500">
+                                Format PDF/JPG/PNG. Maks 2MB.
+                            </p>
+
+                            <div className="space-y-2">
+                                <Label className="text-xs font-bold text-slate-500 uppercase">
+                                    Dokumen SIA *
+                                </Label>
+                                <Input
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    disabled={isSubmitting}
+                                    className="text-xs file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary hover:file:bg-primary-100 cursor-pointer"
+                                    onChange={(e) =>
+                                        setValue(
+                                            "sia_document",
+                                            e.target.files[0],
+                                            { shouldValidate: true },
+                                        )
+                                    }
+                                />
+                                {errors.sia_document && (
+                                    <p className="text-[10px] text-red-500">
+                                        {errors.sia_document.message}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </motion.div>
                 );
@@ -372,7 +576,7 @@ export function RegisterForm() {
                         animate={{ opacity: 1, scale: 1 }}
                         className="space-y-6"
                     >
-                        <Card className="border-slate-200 shadow-sm overflow-hidden bg-slate-50/50">
+                        <Card className="pt-0 border-slate-200 shadow-sm overflow-hidden bg-slate-50/50">
                             <CardContent className="p-0">
                                 <div className="p-4 bg-white border-b border-slate-100 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -421,7 +625,7 @@ export function RegisterForm() {
                             </CardContent>
                         </Card>
 
-                        <Card className="border-slate-200 shadow-sm overflow-hidden bg-slate-50/50">
+                        <Card className="pt-0 border-slate-200 shadow-sm overflow-hidden bg-slate-50/50">
                             <CardContent className="p-0">
                                 <div className="p-4 bg-white border-b border-slate-100 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -453,10 +657,10 @@ export function RegisterForm() {
                                         </div>
                                         <div>
                                             <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
-                                                Nomor SIA
+                                                Telepon Apotek
                                             </p>
-                                            <p className="text-sm font-mono font-medium text-slate-700">
-                                                {formData.license_number}
+                                            <p className="text-sm font-medium text-slate-800">
+                                                {formData.pharmacy_phone}
                                             </p>
                                         </div>
                                     </div>
@@ -467,6 +671,82 @@ export function RegisterForm() {
                                         <p className="text-sm font-medium text-slate-800">
                                             {formData.pharmacy_address}
                                         </p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
+                                                Nomor SIA
+                                            </p>
+                                            <p className="text-sm font-mono font-medium text-slate-700">
+                                                {formData.sia_number}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
+                                                Nomor SIPA
+                                            </p>
+                                            <p className="text-sm font-mono font-medium text-slate-700">
+                                                {formData.sipa_number}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
+                                                Nomor STRA
+                                            </p>
+                                            <p className="text-sm font-mono font-medium text-slate-700">
+                                                {formData.stra_number}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">
+                                                NIK Apoteker
+                                            </p>
+                                            <p className="text-sm font-mono font-medium text-slate-700">
+                                                {formData.apoteker_nik}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="pt-0 border-slate-200 shadow-sm overflow-hidden bg-slate-50/50">
+                            <CardContent className="p-0">
+                                <div className="p-4 bg-white border-b border-slate-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 bg-slate-100 rounded-lg">
+                                            <UploadCloud className="h-4 w-4 text-slate-500" />
+                                        </div>
+                                        <span className="text-xs font-bold text-slate-700 uppercase tracking-tight">
+                                            Dokumen SIA
+                                        </span>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setCurrentStep(2)}
+                                        className="h-8 text-[10px] text-primary"
+                                    >
+                                        Ubah
+                                    </Button>
+                                </div>
+                                <div className="p-5 flex items-center gap-4">
+                                    <div className="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-lg bg-white w-32">
+                                        <FileText
+                                            className={`h-6 w-6 mb-2 ${formData.sia_document ? "text-primary" : "text-slate-300"}`}
+                                        />
+                                        <span className="text-[10px] font-bold text-slate-500">
+                                            SIA
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 mt-1 truncate w-full text-center">
+                                            {formData.sia_document
+                                                ? formData.sia_document.name
+                                                : "Belum diunggah"}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs text-slate-500">
+                                        <p className="font-bold text-slate-700 mb-1">Dokumen Fisik SIA</p>
+                                        <p>Pastikan dokumen yang diunggah terbaca dengan jelas untuk mempercepat proses verifikasi.</p>
                                     </div>
                                 </div>
                             </CardContent>

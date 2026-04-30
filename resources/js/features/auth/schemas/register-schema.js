@@ -16,10 +16,16 @@ export const registerSchema = z
         // Pharmacy Data
         pharmacy_name: z.string().min(3, { message: "Nama apotek minimal 3 karakter." }),
         pharmacy_address: z.string().min(5, { message: "Alamat apotek minimal 5 karakter." }),
-        pharmacy_phone: z.string().optional(),
+        pharmacy_phone: z.string().min(10, { message: "Nomor telepon apotek minimal 10 digit." }),
         pharmacy_latitude: z.number().or(z.string().transform((v) => parseFloat(v))),
         pharmacy_longitude: z.number().or(z.string().transform((v) => parseFloat(v))),
-        license_number: z.string().min(5, { message: "Nomor SIA harus diisi." }),
+
+        // Legality Data
+        sia_number: z.string().min(5, { message: "Nomor SIA harus diisi." }),
+        sipa_number: z.string().min(5, { message: "Nomor SIPA harus diisi." }),
+        stra_number: z.string().min(5, { message: "Nomor STRA harus diisi." }),
+        apoteker_nik: z.string().length(16, { message: "NIK KTP Apoteker harus 16 digit." }),
+        sia_document: z.any().refine((file) => file !== null, "Dokumen SIA wajib diunggah."),
     })
     .refine((data) => data.password === data.password_confirmation, {
         message: "Konfirmasi kata sandi tidak cocok.",

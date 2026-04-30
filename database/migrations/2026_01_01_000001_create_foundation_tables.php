@@ -10,12 +10,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // Default handled in model
+            $table->uuid('id')->primary();
             $table->string('username', 100);
             $table->string('phone', 20)->nullable();
             $table->string('email', 100)->unique();
             $table->string('password_hash');
-            $table->string('role', 20); // CUSTOMER | PHARMACY_STAFF | APOTEKER | SUPER_ADMIN
+            $table->string('role', 20)->default('USERS');
             $table->string('avatar_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->softDeletes();

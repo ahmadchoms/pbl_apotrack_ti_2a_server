@@ -48,7 +48,7 @@ class PharmacyController extends Controller
 
     public function edit(Pharmacy $pharmacy)
     {
-        $pharmacy->load(['staffs.user', 'hours', 'images']);
+        $pharmacy->load(['legality', 'staffs.user', 'hours', 'images']);
 
         return Inertia::render('admin/pharmacies/edit', [
             'pharmacy' => new PharmacyResource($pharmacy),
@@ -76,7 +76,7 @@ class PharmacyController extends Controller
 
     public function detail(Pharmacy $pharmacy)
     {
-        $pharmacy->load(['staffs.user'])
+        $pharmacy->load(['legality', 'staffs.user'])
             ->loadCount([
                 'orders as monthly_orders_count' => fn($q) => $q
                     ->whereMonth('created_at', now()->month)
@@ -90,8 +90,8 @@ class PharmacyController extends Controller
 
     public function export()
     {
-        $pharmacies = Pharmacy::all();
-        $csvHeader = ['ID', 'Name', 'Address', 'Phone', 'License Number', 'Status', 'Rating', 'Created At'];
+        $pharmacies = Pharmacy::with('legality')->get();
+        $csvHeader = ['ID', 'Name', 'Address', 'Phone', 'SIA Number', 'Status', 'Rating', 'Created At'];
         
         $callback = function() use ($pharmacies, $csvHeader) {
             $file = fopen('php://output', 'w');
@@ -103,7 +103,7 @@ class PharmacyController extends Controller
                     $pharmacy->name,
                     $pharmacy->address,
                     $pharmacy->phone,
-                    $pharmacy->license_number,
+                    $pharmacy->legality?->sia_number,
                     $pharmacy->verification_status,
                     $pharmacy->rating,
                     $pharmacy->created_at

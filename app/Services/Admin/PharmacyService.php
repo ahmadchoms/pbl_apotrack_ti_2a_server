@@ -15,10 +15,11 @@ class PharmacyService
         return Pharmacy::query()
             ->select([
                 'id', 'name', 'address', 'phone', 'latitude', 'longitude',
-                'rating', 'total_reviews', 'license_number',
+                'rating', 'total_reviews',
                 'verification_status', 'is_active', 'is_force_closed', 'created_at'
             ])
             ->with([
+                'legality',
                 'staffs.user:id,username,avatar_url',
                 'hours',
                 'images' => fn($q) => $q->where('is_primary', true)
@@ -44,9 +45,12 @@ class PharmacyService
                 'phone' => $data['phone'],
                 'latitude' => $data['latitude'],
                 'longitude' => $data['longitude'],
-                'license_number' => $data['license_number'],
                 'verification_status' => $data['verification_status'],
                 'is_active' => $data['is_active'] ?? true,
+            ]);
+
+            $pharmacy->legality()->create([
+                'sia_number' => $data['sia_number'] ?? null,
             ]);
 
             // Default hours: Mon-Sun, 08:00 - 20:00 if not provided
@@ -79,11 +83,15 @@ class PharmacyService
                 'phone' => $data['phone'],
                 'latitude' => $data['latitude'],
                 'longitude' => $data['longitude'],
-                'license_number' => $data['license_number'],
                 'verification_status' => $data['verification_status'],
                 'is_active' => $data['is_active'] ?? true,
                 'is_force_closed' => $data['is_force_closed'] ?? false,
             ]);
+
+            $pharmacy->legality()->updateOrCreate(
+                ['pharmacy_id' => $pharmacy->id],
+                ['sia_number' => $data['sia_number'] ?? null]
+            );
 
             $this->syncHours($pharmacy, $data['hours'] ?? []);
             $this->syncStaffs($pharmacy, $data['staffs'] ?? []);

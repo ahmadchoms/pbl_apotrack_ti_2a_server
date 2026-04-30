@@ -17,7 +17,7 @@ class PharmacyDetailResource extends JsonResource
             'name' => $this->name,
             'address' => $this->address,
             'phone' => $this->phone,
-            'license_number' => $this->license_number,
+            'legality' => $this->whenLoaded('legality'),
             'verification_status' => $this->verification_status,
             'rating' => $this->rating,
             'total_reviews' => $this->total_reviews,

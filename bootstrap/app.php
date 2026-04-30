@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'verified.pharmacy' => \App\Http\Middleware\EnsurePharmacyVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -41,7 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Always handle 404 and 403 for Inertia even in local for consistency
             if (in_array($response->getStatusCode(), [404, 403])) {
-                 return \Inertia\Inertia::render('error', [
+                return \Inertia\Inertia::render('error', [
                     'status' => $response->getStatusCode(),
                 ])->toResponse($request)->setStatusCode($response->getStatusCode());
             }

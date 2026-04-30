@@ -171,7 +171,7 @@ export default function PharmacyDetail({ pharmacy, pharmacist, stats }) {
                                                     Nomor Lisensi (SIA)
                                                 </p>
                                                 <p className="text-sm font-black text-slate-900 tracking-wider">
-                                                    {pharmacy.license_number}
+                                                    {pharmacy.legality?.sia_number}
                                                 </p>
                                             </div>
                                         </div>

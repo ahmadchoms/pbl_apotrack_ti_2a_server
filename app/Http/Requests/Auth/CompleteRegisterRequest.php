@@ -23,12 +23,26 @@ class CompleteRegisterRequest extends FormRequest
             // Pharmacy Data
             'pharmacy_name' => 'required|string|max:150',
             'pharmacy_address' => 'required|string',
-            'pharmacy_phone' => 'nullable|string|max:20',
+            'pharmacy_phone' => 'required|string|max:20',
             'pharmacy_latitude' => 'required|numeric|between:-90,90',
             'pharmacy_longitude' => 'required|numeric|between:-180,180',
-            'license_number' => 'required|string|max:100',
-            
-            // Optional: License document, etc.
+
+            // Legality Data
+            'sia_number' => 'required|string|max:100',
+            'sipa_number' => 'required|string|max:100',
+            'stra_number' => 'required|string|max:100',
+            'apoteker_nik' => 'required|string|size:16',
+            'sia_document' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'sia_document.required' => 'Surat Izin Apotek (SIA) wajib diunggah.',
+            'sia_document.mimes'    => 'Dokumen SIA harus berupa PDF, JPG, atau PNG.',
+            'sia_document.max'      => 'Ukuran dokumen SIA maksimal 2MB.',
+            'apoteker_nik.size'     => 'NIK KTP Apoteker harus 16 digit.',
         ];
     }
 }

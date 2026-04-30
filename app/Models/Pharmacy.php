@@ -10,7 +10,7 @@ class Pharmacy extends Model
 {
     use HasUuids, SoftDeletes, \App\Models\Traits\HasSearchScope;
 
-    protected $fillable = ['name', 'address', 'phone', 'latitude', 'longitude', 'rating', 'total_reviews', 'license_number', 'verification_status', 'is_active', 'is_force_closed'];
+    protected $fillable = ['name', 'address', 'phone', 'latitude', 'longitude', 'rating', 'total_reviews', 'verification_status', 'is_active', 'is_force_closed'];
 
     protected array $searchColumns = ['name', 'address', 'phone'];
 
@@ -42,6 +42,11 @@ class Pharmacy extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function legality()
+    {
+        return $this->hasOne(PharmacyLegality::class);
     }
 
     // Local Scopes

@@ -45,7 +45,7 @@ import {
 export default function AdminPharmacyCreate({ available_staff = [] }) {
     const { data, setData, post, processing, errors } = useForm({
         name: "",
-        license_number: "",
+        sia_number: "",
         phone: "",
         address: "",
         latitude: "",
@@ -106,7 +106,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
     const totalFields = 6;
     const filledFields = [
         data.name,
-        data.license_number,
+        data.sia_number,
         data.phone,
         data.address,
         data.latitude && data.longitude ? "coords" : "",
@@ -175,13 +175,13 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <FormField
                                             label="Nomor Lisensi (SIA)"
-                                            error={errors.license_number}
+                                            error={errors.sia_number}
                                         >
                                             <Input
-                                                value={data.license_number}
+                                                value={data.sia_number}
                                                 onChange={(e) =>
                                                     setData(
-                                                        "license_number",
+                                                        "sia_number",
                                                         e.target.value,
                                                     )
                                                 }

@@ -133,7 +133,7 @@ Route::prefix('admin')
 
 Route::prefix('pharmacy')
     ->name('pharmacy.')
-    ->middleware(['auth', 'role:APOTEKER,STAFF'])
+    ->middleware(['auth', 'role:APOTEKER', 'verified.pharmacy'])
     ->group(function () {
 
         // Dashboard

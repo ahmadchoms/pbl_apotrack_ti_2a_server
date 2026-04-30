@@ -2,9 +2,15 @@
 
 namespace App\Services\Auth;
 
+use App\Models\Pharmacy;
+use App\Models\PharmacyDocument;
+use App\Models\PharmacyLegality;
+use App\Models\PharmacyStaff;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
@@ -40,8 +46,8 @@ class AuthService
             ]);
         }
 
-        // Logic for sending reset link would go here (e.g., Mail::to($user)->send(...))
-        // For now, we simulate success
+
+
         return true;
     }
 
@@ -59,39 +65,57 @@ class AuthService
 
     public function registerWithPharmacy(array $data)
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data) {
             // 1. Create User
             $user = User::create([
-                'username' => $data['username'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
+                'username'      => $data['username'],
+                'email'         => $data['email'],
+                'phone'         => $data['phone'] ?? null,
                 'password_hash' => Hash::make($data['password']),
-                'role' => 'PHARMACY_STAFF', // Default for pharmacy register
-                'is_active' => true,
+                'role'          => 'USER',
+                'is_active'     => true,
             ]);
 
             // 2. Create Pharmacy
-            $pharmacy = \App\Models\Pharmacy::create([
-                'name' => $data['pharmacy_name'],
-                'address' => $data['pharmacy_address'],
-                'phone' => $data['pharmacy_phone'] ?? null,
-                'latitude' => $data['pharmacy_latitude'],
-                'longitude' => $data['pharmacy_longitude'],
-                'license_number' => $data['license_number'],
+            $pharmacy = Pharmacy::create([
+                'name'                => $data['pharmacy_name'],
+                'address'             => $data['pharmacy_address'],
+                'phone'               => $data['pharmacy_phone'],
+                'latitude'            => $data['pharmacy_latitude'],
+                'longitude'           => $data['pharmacy_longitude'],
                 'verification_status' => 'PENDING',
-                'is_active' => true,
+                'is_active'          => false,
             ]);
 
-            // 3. Link User to Pharmacy as Apoteker (Owner/Admin)
-            \App\Models\PharmacyStaff::create([
+            // 3. Link User to Pharmacy as APOTEKER
+            PharmacyStaff::create([
                 'pharmacy_id' => $pharmacy->id,
-                'user_id' => $user->id,
-                'role' => 'APOTEKER',
-                'is_active' => true,
+                'user_id'     => $user->id,
+                'role'        => 'APOTEKER',
+                'is_active'   => true,
+            ]);
+
+            // 4. Upload SIA Document
+            $siaUrl = null;
+            $disk = 'supabase_private';
+
+            if (isset($data['sia_document']) && $data['sia_document'] instanceof \Illuminate\Http\UploadedFile) {
+                $path = $data['sia_document']->store('documents/pharmacies/' . $pharmacy->id . '/legality', $disk);
+                $siaUrl = Storage::disk($disk)->url($path);
+            }
+
+            // 5. Create Pharmacy Legality
+            PharmacyLegality::create([
+                'pharmacy_id'      => $pharmacy->id,
+                'sia_number'       => $data['sia_number'],
+                'sipa_number'      => $data['sipa_number'],
+                'stra_number'      => $data['stra_number'],
+                'apoteker_nik'     => $data['apoteker_nik'],
+                'sia_document_url' => $siaUrl,
             ]);
 
             return [
-                'user' => $user,
+                'user'     => $user,
                 'pharmacy' => $pharmacy,
             ];
         });

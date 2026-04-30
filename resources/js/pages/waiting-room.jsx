@@ -431,7 +431,7 @@ export default function WaitingRoomPage({ registration }) {
                                         <DataField
                                             icon={FileText}
                                             label="Nomor SIA"
-                                            value={registration.licenseNumber}
+                                            value={registration.sia_number}
                                             mono
                                         />
                                         <DataField

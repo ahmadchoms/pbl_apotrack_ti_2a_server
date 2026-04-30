@@ -208,7 +208,7 @@ export function PharmacyCard({ pharmacy, onDetail, onEdit, onDelete }) {
                             </div>
                         </div>
                         <span className="text-[9px] font-medium text-slate-600 tracking-widest uppercase">
-                            {pharmacy.license_number || "—"}
+                            {pharmacy.legality?.sia_number || "—"}
                         </span>
                     </div>
                     <div className="mt-auto flex gap-2">

@@ -19,7 +19,7 @@ class UpdatePharmacyRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'license_number' => 'nullable|string|max:100',
+            'sia_number' => 'nullable|string|max:100',
             'verification_status' => 'required|in:PENDING,VERIFIED,REJECTED',
             'is_active' => 'boolean',
             'is_force_closed' => 'boolean',

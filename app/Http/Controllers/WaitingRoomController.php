@@ -13,7 +13,7 @@ class WaitingRoomController extends Controller
     {
         $user = $request->user();
         
-        $pharmacyStaff = $user->pharmacyStaff()->with('pharmacy')->first();
+        $pharmacyStaff = $user->pharmacyStaff()->with('pharmacy.legality')->first();
         
         if (!$pharmacyStaff || !$pharmacyStaff->pharmacy) {
             return redirect()->route('home');
@@ -32,7 +32,7 @@ class WaitingRoomController extends Controller
                 'email'          => $user->email,
                 'phone'          => $pharmacy->phone ?? $user->phone,
                 'address'        => $pharmacy->address,
-                'licenseNumber'  => $pharmacy->license_number,
+                'sia_number'     => $pharmacy->legality?->sia_number,
                 'status'         => $pharmacy->verification_status,
                 'submissionDate' => $pharmacy->created_at->format('d M Y'),
                 'isRejected'     => $pharmacy->verification_status === 'REJECTED',

@@ -18,7 +18,7 @@ class PharmacyResource extends JsonResource
             'longitude' => $this->longitude,
             'rating' => $this->rating,
             'total_reviews' => $this->total_reviews,
-            'license_number' => $this->license_number,
+            'legality' => $this->whenLoaded('legality'),
             'verification_status' => $this->verification_status,
             'is_active' => $this->is_active,
             'is_force_closed' => $this->is_force_closed,
