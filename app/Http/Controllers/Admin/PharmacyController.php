@@ -76,10 +76,48 @@ class PharmacyController extends Controller
 
     public function detail(Pharmacy $pharmacy)
     {
-        $pharmacy->load(['staffs.user']);
+        $pharmacy->load(['staffs.user'])
+            ->loadCount([
+                'orders as monthly_orders_count' => fn($q) => $q
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+            ]);
 
         return Inertia::render('admin/pharmacies/detail', [
             'pharmacy' => new PharmacyDetailResource($pharmacy),
+        ]);
+    }
+
+    public function export()
+    {
+        $pharmacies = Pharmacy::all();
+        $csvHeader = ['ID', 'Name', 'Address', 'Phone', 'License Number', 'Status', 'Rating', 'Created At'];
+        
+        $callback = function() use ($pharmacies, $csvHeader) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $csvHeader);
+
+            foreach ($pharmacies as $pharmacy) {
+                fputcsv($file, [
+                    $pharmacy->id,
+                    $pharmacy->name,
+                    $pharmacy->address,
+                    $pharmacy->phone,
+                    $pharmacy->license_number,
+                    $pharmacy->verification_status,
+                    $pharmacy->rating,
+                    $pharmacy->created_at
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=pharmacies_export_" . now()->format('YmdHis') . ".csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
         ]);
     }
 }

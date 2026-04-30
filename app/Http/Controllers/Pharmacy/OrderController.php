@@ -21,30 +21,65 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $filters = $request->only(['search', 'status']);
         
         $orders = OrderResource::collection(
-            $this->orderService->list($pharmacyId, ['status' => 'ALL'])
+            $this->orderService->list($pharmacyId, $filters)
         );
 
         return Inertia::render('pharmacy/orders/index', [
             'orders' => $orders,
-            'pendingCount' => $this->orderService->getPendingCount($pharmacyId)
+            'pendingCount' => $this->orderService->getPendingCount($pharmacyId),
+            'filters' => $filters
         ]);
     }
 
     public function list(Request $request)
     {
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
-        $status = $request->query('status', 'ALL');
+        $filters = $request->only(['search', 'status']);
+        $filters['status'] = $filters['status'] ?? 'ALL';
 
         $orders = OrderResource::collection(
-            $this->orderService->list($pharmacyId, ['status' => $status])
+            $this->orderService->list($pharmacyId, $filters)
         );
 
         return Inertia::render('pharmacy/orders/list', [
             'orders' => $orders,
-            'currentStatus' => strtoupper($status)
+            'currentStatus' => strtoupper($filters['status']),
+            'filters' => $filters
         ]);
+    }
+
+    public function show(Request $request, string $id)
+    {
+        $order = $this->orderService->getOrderDetail($id);
+
+        if ($order->pharmacy_id !== $request->user()->pharmacyStaff->pharmacy_id) {
+            abort(403);
+        }
+
+        return Inertia::render('pharmacy/orders/show', [
+            'order' => new OrderResource($order)
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.id' => 'required|exists:medicines,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric',
+            'total' => 'required|numeric',
+            'payment_method' => 'required|string'
+        ]);
+
+        $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $this->orderService->createPOSOrder($pharmacyId, $request->all());
+
+        return redirect()->route('pharmacy.orders.index')
+            ->with('success', 'Pesanan POS berhasil dibuat');
     }
 
     public function pos(Request $request)

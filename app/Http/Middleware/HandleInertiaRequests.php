@@ -36,26 +36,43 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        
+        // Eager load relasi sekaligus
+        if ($user && !$user->relationLoaded('pharmacyStaff')) {
+            $user->load('pharmacyStaff');
+        }
+
         return [
             ...parent::share($request),
 
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'username' => $request->user()->username,
-                    'email' => $request->user()->email,
-                    'role' => $request->user()->role,
-                    'avatar_url' => $request->user()->avatar_url,
-                    'pharmacy_staff' => $request->user()->pharmacyStaff ? [
-                        'role' => $request->user()->pharmacyStaff->role,
-                        'pharmacy_id' => $request->user()->pharmacyStaff->pharmacy_id,
-                    ] : null,
-                ] : null,
+                'user' => $user ? $this->formatUser($user) : null,
             ],
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            // Flash messages untuk feedback
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error'   => $request->session()->get('error'),
+            ],
+        ];
+    }
+
+    private function formatUser($user): array
+    {
+        return [
+            'id'             => $user->id,
+            'username'       => $user->username,
+            'email'          => $user->email,
+            'role'           => $user->role,
+            'avatar_url'     => $user->avatar_url,
+            'pharmacy_staff' => $user->pharmacyStaff ? [
+                'role'        => $user->pharmacyStaff->role,
+                'pharmacy_id' => $user->pharmacyStaff->pharmacy_id,
+            ] : null,
         ];
     }
 }

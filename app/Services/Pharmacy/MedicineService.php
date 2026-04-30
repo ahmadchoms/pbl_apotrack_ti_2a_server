@@ -53,6 +53,16 @@ class MedicineService
                 $medicine->batches()->create($batchData);
             }
 
+            if (isset($data['images'])) {
+                foreach ($data['images'] as $index => $image) {
+                    $path = $image->store('medicines', 'public');
+                    $medicine->images()->create([
+                        'image_url' => $path,
+                        'is_primary' => $index === 0
+                    ]);
+                }
+            }
+
             return $medicine;
         });
     }
@@ -82,6 +92,19 @@ class MedicineService
             ]);
 
             $this->syncBatches($medicine, $data['batches'] ?? []);
+
+            if (isset($data['images'])) {
+                // For update, we might want to clear old images or append.
+                // Request says "implement a storage bucket system", so I'll handle replacement.
+                $medicine->images()->delete(); 
+                foreach ($data['images'] as $index => $image) {
+                    $path = $image->store('medicines', 'public');
+                    $medicine->images()->create([
+                        'image_url' => $path,
+                        'is_primary' => $index === 0
+                    ]);
+                }
+            }
 
             return $medicine;
         });

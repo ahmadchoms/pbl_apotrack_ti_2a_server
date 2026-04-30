@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\Auth\AuthService;
@@ -23,18 +24,18 @@ class LoginController extends Controller
     {
         $user = $this->authService->login($request->validated());
 
-        if ($user->role === 'SUPER_ADMIN') {
+        if ($user->role === UserRole::SUPER_ADMIN->value) {
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->role === 'APOTEKER' || $user->role === 'PHARMACY_STAFF') {
+        if ($user->role === UserRole::APOTEKER->value || $user->role === UserRole::PHARMACY_STAFF->value) {
             $staff = $user->pharmacyStaff;
             $pharmacy = $staff?->pharmacy;
-            
+
             if ($pharmacy && $pharmacy->verification_status !== 'VERIFIED') {
                 return redirect()->route('waiting-room');
             }
-            
+
             return redirect()->route('pharmacy.dashboard');
         }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { USER_ROLE } from "@/lib/enums";
 import {
     LayoutGrid,
     Users,
@@ -27,7 +28,7 @@ const NAV_STRUCTURE = [
     {
         label: "Tim Apotek",
         icon: Users,
-        route: "pharmacy.staff",
+        route: "pharmacy.staff.index",
     },
     {
         label: "Pesanan",
@@ -70,7 +71,7 @@ const NAV_STRUCTURE = [
     {
         label: "Profil Saya",
         icon: UserCircle,
-        route: "pharmacy.profile",
+        route: "pharmacy.profile.index",
     },
 ];
 
@@ -199,10 +200,10 @@ export function Sidebar() {
     const auth = page.props?.auth;
 
     const userRole = auth?.user?.pharmacy_staff?.role;
-    const isApoteker = userRole === "APOTEKER";
+    const isApoteker = userRole === USER_ROLE.APOTEKER;
 
     const filteredNav = NAV_STRUCTURE.filter((item) => {
-        if (item.route === "pharmacy.staff") {
+        if (item.route === "pharmacy.staff.index") {
             return isApoteker;
         }
         return true;

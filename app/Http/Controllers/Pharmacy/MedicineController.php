@@ -59,12 +59,11 @@ class MedicineController extends Controller
             ->with('success', 'Obat berhasil ditambahkan');
     }
 
-    public function edit(Request $request, string $id)
+    public function edit(Request $request, Medicine $medicine)
     {
-        $medicine = Medicine::query()
-            ->where('pharmacy_id', $request->user()->pharmacyStaff->pharmacy_id)
-            ->with(['category', 'unit', 'type', 'form', 'images', 'batches'])
-            ->findOrFail($id);
+        $this->authorize('update', $medicine);
+
+        $medicine->load(['category', 'unit', 'type', 'form', 'images', 'batches']);
 
         return Inertia::render('pharmacy/medicine/edit', [
             'medicine' => new MedicineResource($medicine),
@@ -75,11 +74,10 @@ class MedicineController extends Controller
         ]);
     }
 
-    public function update(UpdateMedicineRequest $request, string $id)
+    public function update(UpdateMedicineRequest $request, Medicine $medicine)
     {
-        $medicine = Medicine::where('pharmacy_id', $request->user()->pharmacyStaff->pharmacy_id)
-            ->findOrFail($id);
-        
+        $this->authorize('update', $medicine);
+
         $this->medicineService->update($medicine, $request->validated());
 
         return redirect()->route('pharmacy.medicines.index')
@@ -88,9 +86,7 @@ class MedicineController extends Controller
 
     public function destroy(Request $request, Medicine $medicine)
     {
-        if ($medicine->pharmacy_id !== $request->user()->pharmacyStaff->pharmacy_id) {
-            abort(403);
-        }
+        $this->authorize('delete', $medicine);
 
         $medicine->delete();
         return redirect()->back()->with('success', 'Obat berhasil dihapus');

@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { router } from "@inertiajs/react";
+import { toast } from "sonner";
 
 export function useStaff(props) {
     const { staff, filters: serverFilters } = props;
-    const [filters, setFilters] = useState({ 
-        status: serverFilters?.status || "all" 
+    const [filters, setFilters] = useState({
+        status: serverFilters?.status || "all",
     });
     const [searchQuery, setSearchQuery] = useState(serverFilters?.search || "");
     const [dialog, setDialog] = useState({
@@ -23,18 +24,28 @@ export function useStaff(props) {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
+    const normalizeParams = (params) => {
+        return Object.fromEntries(
+            Object.entries(params).filter(([key, value]) => {
+                if (value == null) return false;
+                if (typeof value === "string" && value.trim() === "")
+                    return false;
+                if (key === "status" && value === "all") return false;
+                return true;
+            }),
+        );
+    };
+
     const handleFilterChange = (newFilters) => {
-        const params = {
+        const rawParams = {
             search: searchQuery,
-            status: filters.status,
+            ...filters,
             ...newFilters,
         };
 
-        // Remove empty/default values
-        if (params.search === "") delete params.search;
-        if (params.status === "all") delete params.status;
+        const params = normalizeParams(rawParams);
 
-        router.get("/pharmacy/staff", params, {
+        router.get(route("pharmacy.staff.index", params), {
             preserveState: true,
             preserveScroll: true,
             replace: true,
@@ -45,36 +56,55 @@ export function useStaff(props) {
         setDialog((prev) => ({ ...prev, [type]: true, selected: staff }));
     }, []);
 
+    const handleError = (errors) => {
+        const firstError =
+            Object.values(errors ?? {})[0] ?? "Terjadi kesalahan";
+        toast.error("Gagal menyimpan", { description: firstError });
+    };
+
     const handleSave = (data) => {
-        if (dialog.selected) {
-            router.put(`/pharmacy/staff/${dialog.selected.id}`, data, {
+        const staffId = dialog.selected?.id;
+
+        if (staffId) {
+            router.put(route("pharmacy.staff.update", staffId), data, {
                 onSuccess: () => {
-                    setDialog((p) => ({ ...p, formOpen: false, selected: null }));
+                    toast.success("Staf berhasil diperbarui");
+                    setDialog((p) => ({
+                        ...p,
+                        formOpen: false,
+                        selected: null,
+                    }));
                 },
+                onError: handleError,
             });
         } else {
-            router.post("/pharmacy/staff", data, {
+            router.post(route("pharmacy.staff.store"), data, {
                 onSuccess: () => {
+                    toast.success("Staf berhasil ditambahkan");
                     setDialog((p) => ({ ...p, formOpen: false }));
                 },
+                onError: handleError,
             });
         }
     };
 
     const handleDelete = () => {
-        if (!dialog.selected) return;
-        
-        router.delete(`/pharmacy/staff/${dialog.selected.id}`, {
+        const staffId = dialog.selected?.id;
+        if (!staffId) return;
+
+        router.delete(route("pharmacy.staff.destroy", staffId), {
             onSuccess: () => {
+                toast.success("Staf berhasil dihapus");
                 setDialog((p) => ({ ...p, deleteOpen: false, selected: null }));
             },
+            onError: () => toast.error("Gagal menghapus staf"),
         });
     };
 
     return {
         filters,
         setFilters: (newFilters) => {
-            if (typeof newFilters === 'function') {
+            if (typeof newFilters === "function") {
                 const nextFilters = newFilters(filters);
                 setFilters(nextFilters);
                 handleFilterChange(nextFilters);
@@ -94,4 +124,3 @@ export function useStaff(props) {
         handleDelete,
     };
 }
-

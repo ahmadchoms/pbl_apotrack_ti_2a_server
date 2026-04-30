@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pharmacy extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, \App\Models\Traits\HasSearchScope;
 
-    protected $guarded = [];
+    protected $fillable = ['name', 'address', 'phone', 'latitude', 'longitude', 'rating', 'total_reviews', 'license_number', 'verification_status', 'is_active', 'is_force_closed'];
+
+    protected array $searchColumns = ['name', 'address', 'phone'];
 
     public function images()
     {
@@ -43,17 +45,6 @@ class Pharmacy extends Model
     }
 
     // Local Scopes
-    public function scopeSearch($query, $search)
-    {
-        return $query->when($search, function ($q) use ($search) {
-            $q->where(function ($sq) use ($search) {
-                $sq->where('name', 'ilike', "%{$search}%")
-                  ->orWhere('address', 'ilike', "%{$search}%")
-                  ->orWhere('phone', 'ilike', "%{$search}%");
-            });
-        });
-    }
-
     public function scopeFilterStatus($query, $status)
     {
         return $query->when($status && $status !== 'all', function ($q) use ($status) {

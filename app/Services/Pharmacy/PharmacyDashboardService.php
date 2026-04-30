@@ -81,12 +81,35 @@ class PharmacyDashboardService
 
     protected function getOrderTrendData(string $pharmacyId)
     {
-        return collect([
-            ['week' => 'Minggu 1', 'pesanan' => Order::where('pharmacy_id', $pharmacyId)->whereBetween('created_at', [now()->startOfMonth(), now()->startOfMonth()->addDays(7)])->count()],
-            ['week' => 'Minggu 2', 'pesanan' => Order::where('pharmacy_id', $pharmacyId)->whereBetween('created_at', [now()->startOfMonth()->addDays(7), now()->startOfMonth()->addDays(14)])->count()],
-            ['week' => 'Minggu 3', 'pesanan' => Order::where('pharmacy_id', $pharmacyId)->whereBetween('created_at', [now()->startOfMonth()->addDays(14), now()->startOfMonth()->addDays(21)])->count()],
-            ['week' => 'Minggu 4', 'pesanan' => Order::where('pharmacy_id', $pharmacyId)->whereBetween('created_at', [now()->startOfMonth()->addDays(21), now()->endOfMonth()])->count()],
-        ]);
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+
+        // Calculate dates for week boundaries
+        $week2Start = $startOfMonth->copy()->addDays(7);
+        $week3Start = $startOfMonth->copy()->addDays(14);
+        $week4Start = $startOfMonth->copy()->addDays(21);
+
+        $data = Order::where('pharmacy_id', $pharmacyId)
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->select(
+                DB::raw("CASE 
+                    WHEN created_at < '{$week2Start->toDateTimeString()}' THEN 1
+                    WHEN created_at < '{$week3Start->toDateTimeString()}' THEN 2
+                    WHEN created_at < '{$week4Start->toDateTimeString()}' THEN 3
+                    ELSE 4
+                END as week_number"),
+                DB::raw("COUNT(*) as count")
+            )
+            ->groupBy('week_number')
+            ->get();
+
+        return collect([1, 2, 3, 4])->map(function ($weekNum) use ($data) {
+            $stat = $data->firstWhere('week_number', $weekNum);
+            return [
+                'week' => "Minggu $weekNum",
+                'pesanan' => $stat ? (int)$stat->count : 0
+            ];
+        })->values();
     }
 
     protected function getRecentActivities(string $pharmacyId)

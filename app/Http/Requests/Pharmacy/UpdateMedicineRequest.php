@@ -32,6 +32,8 @@ class UpdateMedicineRequest extends FormRequest
             'batches.*.batch_number' => 'required|string',
             'batches.*.expired_date' => 'required|date',
             'batches.*.stock' => 'required|integer|min:0',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:5120',
         ];
     }
 }

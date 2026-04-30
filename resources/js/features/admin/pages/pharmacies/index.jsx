@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, AlertTriangle } from "lucide-react";
+import { Building2, AlertTriangle, Download, Plus } from "lucide-react";
 import { DashboardAdminLayout } from "@/layouts/admin-layout";
 import {
     AlertDialog,
@@ -18,6 +18,7 @@ import { PharmacyCard } from "@/features/admin/components/pharmacies/PharmacyCar
 import { AdminPagination } from "@/features/admin/components/shared/AdminPagination";
 import { usePharmacyList } from "@/features/admin/hooks/usePharmacyList";
 import { router } from "@inertiajs/react";
+import { Button } from "@/components/ui/button";
 
 export default function AdminPharmacyList(props) {
     const {

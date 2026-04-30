@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class PharmacyStaff extends Model
 {
-    use HasUuids;
+    use HasUuids, \App\Models\Traits\HasStatusScope;
 
-    protected $guarded = [];
+    protected $fillable = ['pharmacy_id', 'user_id', 'role', 'is_active'];
 
     protected $table = 'pharmacy_staffs';
 
@@ -34,10 +34,5 @@ class PharmacyStaff extends Model
         });
     }
 
-    public function scopeFilterStatus($query, $status)
-    {
-        return $query->when($status && $status !== 'all', function ($q) use ($status) {
-            $q->where('is_active', $status === 'active');
-        });
-    }
+
 }

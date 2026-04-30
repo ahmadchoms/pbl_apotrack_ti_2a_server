@@ -16,8 +16,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import { LogOut, AlertTriangle, AlertOctagon } from "lucide-react";
 
+import { router } from "@inertiajs/react";
+import { toast } from "sonner";
+
 export function AccountSettingsCard() {
-    const [deleteConfirmText, setDeleteConfirmText] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogout = () => {
+        router.post(route("logout"));
+    };
+
+    const handleDeleteAccount = () => {
+        router.delete(route("pharmacy.profile.delete"), {
+            data: { password },
+            onSuccess: () => toast.success("Akun berhasil dihapus"),
+            onError: (err) => toast.error("Gagal menghapus akun", { description: Object.values(err)[0] }),
+        });
+    };
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -32,6 +47,7 @@ export function AccountSettingsCard() {
                     </p>
                     <Button
                         variant="outline"
+                        onClick={handleLogout}
                         className="w-full justify-between rounded-xl h-12 border-slate-200 hover:bg-slate-50 hover:text-slate-800 group"
                     >
                         <span className="flex items-center gap-2 font-semibold">
@@ -86,10 +102,8 @@ export function AccountSettingsCard() {
                                     <Input
                                         type="password"
                                         placeholder="••••••••"
-                                        value={deleteConfirmText}
-                                        onChange={(e) =>
-                                            setDeleteConfirmText(e.target.value)
-                                        }
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         className="h-11 bg-slate-50 border-slate-200 rounded-xl focus-visible:ring-red-500"
                                     />
                                 </div>
@@ -99,7 +113,8 @@ export function AccountSettingsCard() {
                                     Batal
                                 </AlertDialogCancel>
                                 <AlertDialogAction
-                                    disabled={!deleteConfirmText}
+                                    disabled={!password}
+                                    onClick={handleDeleteAccount}
                                     className="rounded-xl bg-red-600 hover:bg-red-700"
                                 >
                                     Ya, Hapus Akun Saya

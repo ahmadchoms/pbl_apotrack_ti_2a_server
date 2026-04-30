@@ -8,9 +8,26 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Medicine extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, \App\Models\Traits\HasSearchScope;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'pharmacy_id',
+        'category_id',
+        'form_id',
+        'type_id',
+        'unit_id',
+        'name',
+        'generic_name',
+        'manufacturer',
+        'description',
+        'dosage_info',
+        'price',
+        'requires_prescription',
+        'weight_in_grams',
+        'is_active',
+    ];
+
+    protected array $searchColumns = ['name', 'generic_name'];
 
     public function pharmacy()
     {
@@ -58,16 +75,6 @@ class Medicine extends Model
         return $query->withSum(['batches as total_active_stock' => function ($sq) {
             $sq->where('expired_date', '>', now());
         }], 'stock');
-    }
-
-    public function scopeSearch($query, $search)
-    {
-        return $query->when($search, function ($q) use ($search) {
-            $q->where(function ($sq) use ($search) {
-                $sq->where('name', 'ilike', "%{$search}%")
-                    ->orWhere('generic_name', 'ilike', "%{$search}%");
-            });
-        });
     }
 
     public function scopeFilterByCategory($query, $category)

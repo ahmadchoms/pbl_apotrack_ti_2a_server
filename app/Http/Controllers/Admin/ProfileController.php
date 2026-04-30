@@ -37,4 +37,29 @@ class ProfileController extends Controller
             'actionTypes' => $actionTypes
         ]);
     }
+
+    public function update(Request $request)
+    {
+        $data = $request->validate([
+            'username' => 'required|string|max:50|unique:users,username,' . auth()->id(),
+            'email' => 'required|email|unique:users,email,' . auth()->id(),
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $this->profileService->updateProfile($data);
+
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $this->profileService->updatePassword($request->password);
+
+        return redirect()->back()->with('success', 'Password berhasil diubah');
+    }
 }

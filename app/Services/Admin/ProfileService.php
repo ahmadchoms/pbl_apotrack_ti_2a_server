@@ -7,28 +7,26 @@ use App\Models\User;
 
 class ProfileService
 {
-    protected string $adminId = '019db9a6-8991-7103-b685-bf0ed93fe9fb';
-
     public function getProfileData()
     {
-        // In a real scenario, this would be auth()->user()
-        // For now, using the hardcoded logic provided
+        $user = auth()->user();
+        
         return [
-            'id' => $this->adminId,
-            'username' => 'Super Admin',
-            'email' => 'admin@apotek.id',
-            'phone' => '081111111111',
-            'role' => 'SUPER_ADMIN',
-            'avatar_url' => 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/avatar/avatar.jpg',
-            'is_active' => true,
-            'created_at' => '25 Apr 2026',
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->role,
+            'avatar_url' => $user->avatar_url,
+            'is_active' => $user->is_active,
+            'created_at' => $user->created_at->format('d M Y'),
             'addresses' => []
         ];
     }
 
     public function getRecentLogs(int $limit = 4)
     {
-        return AuditLog::where('user_id', $this->adminId)
+        return AuditLog::where('user_id', auth()->id())
             ->latest()
             ->take($limit)
             ->get();
@@ -36,7 +34,7 @@ class ProfileService
 
     public function getAuditHistory(array $filters)
     {
-        return AuditLog::where('user_id', $this->adminId)
+        return AuditLog::where('user_id', auth()->id())
             ->select('id', 'action', 'description', 'status', 'created_at', 'metadata')
             ->search($filters['search'] ?? null)
             ->filterStatus($filters['status'] ?? null)
@@ -49,8 +47,28 @@ class ProfileService
 
     public function getActionTypes()
     {
-        return AuditLog::where('user_id', $this->adminId)
+        return AuditLog::where('user_id', auth()->id())
             ->distinct()
             ->pluck('action');
+    }
+
+    public function updateProfile(array $data)
+    {
+        $user = auth()->user();
+        $user->update([
+            'username' => $data['username'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? $user->phone,
+        ]);
+
+        return $user;
+    }
+
+    public function updatePassword(string $newPassword)
+    {
+        $user = auth()->user();
+        $user->update([
+            'password_hash' => \Hash::make($newPassword)
+        ]);
     }
 }

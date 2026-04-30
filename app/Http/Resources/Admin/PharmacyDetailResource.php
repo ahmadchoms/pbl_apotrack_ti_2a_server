@@ -10,10 +10,7 @@ class PharmacyDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         $pharmacist = $this->staffs->where('role', 'APOTEKER')->first();
-        $monthlyOrders = $this->orders()
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
+        $monthlyOrders = $this->monthly_orders_count ?? 0;
 
         return [
             'id' => $this->id,

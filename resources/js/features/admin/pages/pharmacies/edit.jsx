@@ -16,15 +16,10 @@ import { FormField } from "@/features/admin/components/shared/FormField";
 import { UploadZone } from "@/features/admin/components/shared/UploadZone";
 import { InfoBox } from "@/features/admin/components/shared/InfoBox";
 import { StaffPicker } from "@/features/admin/components/pharmacies/StaffPicker";
-import { OperatingHoursEditor } from "@/features/admin/components/pharmacies/OperatingHoursEditor";
-import { containerVariants, itemVariants, DAY_NAMES, INITIAL_HOURS, VERIFICATION_OPTIONS } from "@/features/admin/lib/constants";
+import { LocationPicker } from "@/features/admin/components/shared/LocationPicker";
+import { containerVariants, itemVariants, VERIFICATION_OPTIONS } from "@/features/admin/lib/constants";
 
 export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
-    const initialHours = DAY_NAMES.map((_, i) => {
-        const existing = pharmacy.hours?.find((h) => h.day_of_week === i);
-        return existing ? { ...existing, open_time: existing.open_time?.slice(0, 5) || "08:00", close_time: existing.close_time?.slice(0, 5) || "22:00" } : INITIAL_HOURS[i];
-    });
-
     const initialStaffs = (pharmacy.staffs || []).map((s) => ({ user_id: s.user_id, role: s.role, user_data: s.user }));
 
     const { data, setData, put, processing, errors } = useForm({
@@ -33,14 +28,12 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
         latitude: pharmacy.latitude ?? "", longitude: pharmacy.longitude ?? "",
         verification_status: pharmacy.verification_status || "PENDING",
         is_active: pharmacy.is_active ?? true, is_force_closed: pharmacy.is_force_closed ?? false,
-        hours: initialHours, staffs: initialStaffs,
+        staffs: initialStaffs,
     });
 
     const [staffSearch, setStaffSearch] = useState("");
 
-    const handleHourChange = (dayIndex, field, value) => {
-        setData("hours", data.hours.map((h) => h.day_of_week === dayIndex ? { ...h, [field]: value } : h));
-    };
+
 
     const addStaff = (user) => {
         if (data.staffs.find((s) => s.user_id === user.id)) return;
@@ -93,23 +86,28 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
 
                         {/* Coordinates */}
                         <motion.section variants={itemVariants} className="space-y-6">
-                            <SectionHeader icon={<MapPin className="w-5 h-5" />} bg="bg-rose-50" color="text-rose-600" title="Titik Koordinat" />
+                            <SectionHeader icon={<MapPin className="w-5 h-5" />} bg="bg-rose-50" color="text-rose-600" title="Lokasi Apotek (Peta)" />
                             <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
                                 <CardContent className="p-10 space-y-8">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormField label="Latitude" error={errors.latitude}><div className="relative"><Navigation className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 rotate-45" /><Input value={data.latitude} onChange={(e) => setData("latitude", e.target.value)} placeholder="-6.2088" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div></FormField>
-                                        <FormField label="Longitude" error={errors.longitude}><div className="relative"><Navigation className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input value={data.longitude} onChange={(e) => setData("longitude", e.target.value)} placeholder="106.8456" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div></FormField>
+                                    <LocationPicker 
+                                        lat={data.latitude} 
+                                        lng={data.longitude} 
+                                        onChange={(lat, lng) => {
+                                            setData((prev) => ({ ...prev, latitude: lat, longitude: lng }));
+                                        }} 
+                                    />
+                                    
+                                    <div className="grid grid-cols-2 gap-8 opacity-50">
+                                        <FormField label="Latitude" error={errors.latitude}>
+                                            <Input readOnly value={data.latitude} className="h-12 rounded-xl bg-slate-50 border-transparent font-mono text-xs" />
+                                        </FormField>
+                                        <FormField label="Longitude" error={errors.longitude}>
+                                            <Input readOnly value={data.longitude} className="h-12 rounded-xl bg-slate-50 border-transparent font-mono text-xs" />
+                                        </FormField>
                                     </div>
-                                    <InfoBox text="Gunakan Google Maps untuk mendapatkan koordinat yang akurat." />
+                                    
+                                    <InfoBox text="Pengaturan jam operasional dapat dikelola oleh Apoteker melalui halaman profil apotek." />
                                 </CardContent>
-                            </Card>
-                        </motion.section>
-
-                        {/* Hours */}
-                        <motion.section variants={itemVariants} className="space-y-6">
-                            <SectionHeader icon={<Clock className="w-5 h-5" />} bg="bg-amber-50" color="text-amber-600" title="Jam Operasional" />
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
-                                <CardContent className="p-10"><OperatingHoursEditor hours={data.hours} onHourChange={handleHourChange} /></CardContent>
                             </Card>
                         </motion.section>
 

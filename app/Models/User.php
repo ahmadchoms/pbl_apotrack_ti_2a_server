@@ -11,9 +11,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasUuids, Notifiable, SoftDeletes;
+    use HasApiTokens, HasUuids, Notifiable, SoftDeletes, \App\Models\Traits\HasSearchScope, \App\Models\Traits\HasStatusScope;
 
-    protected $guarded = [];
+    protected $fillable = ['username', 'phone', 'email', 'password_hash', 'role', 'avatar_url', 'is_active'];
+
+    protected array $searchColumns = ['username', 'email'];
 
     protected $hidden = [
         'password_hash',
@@ -64,31 +66,10 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
-    // Local Scopes
-    public function scopeSearch($query, $search)
-    {
-        return $query->when($search, function ($q) use ($search) {
-            $q->where(function ($sq) use ($search) {
-                $sq->where('username', 'ilike', "%{$search}%")
-                  ->orWhere('email', 'ilike', "%{$search}%")
-                  ->orWhereHas('pharmacyStaff.pharmacy', function($pq) use ($search) {
-                      $pq->where('name', 'ilike', "%{$search}%");
-                  });
-            });
-        });
-    }
-
     public function scopeFilterRole($query, $role)
     {
         return $query->when($role && $role !== 'all', function ($q) use ($role) {
             $q->where('role', $role);
-        });
-    }
-
-    public function scopeFilterStatus($query, $status)
-    {
-        return $query->when($status && $status !== 'all', function ($q) use ($status) {
-            $q->where('is_active', $status === 'active');
         });
     }
 }

@@ -24,6 +24,11 @@ class PharmacyService
                 'images' => fn($q) => $q->where('is_primary', true)
             ])
             ->withCount(['orders', 'medicines'])
+            ->withCount([
+                'orders as monthly_orders_count' => fn($q) => $q
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+            ])
             ->search($filters['search'] ?? null)
             ->filterStatus($filters['status'] ?? null)
             ->latest()
@@ -44,7 +49,21 @@ class PharmacyService
                 'is_active' => $data['is_active'] ?? true,
             ]);
 
-            $this->syncHours($pharmacy, $data['hours'] ?? []);
+            // Default hours: Mon-Sun, 08:00 - 20:00 if not provided
+            $hours = $data['hours'] ?? [];
+            if (empty($hours)) {
+                for ($i = 0; $i < 7; $i++) {
+                    $hours[] = [
+                        'day_of_week' => $i,
+                        'open_time' => '08:00',
+                        'close_time' => '20:00',
+                        'is_closed' => false,
+                        'is_24_hours' => false
+                    ];
+                }
+            }
+
+            $this->syncHours($pharmacy, $hours);
             $this->syncStaffs($pharmacy, $data['staffs'] ?? []);
 
             return $pharmacy;

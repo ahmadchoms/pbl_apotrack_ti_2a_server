@@ -33,7 +33,7 @@ export function StaffTable({ paginatedStaff, onAction }) {
         <Table>
             <TableHeader>
                 <TableRow className="border-slate-100 hover:bg-transparent bg-slate-50/60">
-                    <TableHead className="w-[300px] pl-6 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                    <TableHead className="w-75 pl-6 font-semibold text-slate-500 text-xs uppercase tracking-wider">
                         Informasi Staff
                     </TableHead>
                     <TableHead className="font-semibold text-slate-500 text-xs uppercase tracking-wider">

@@ -86,6 +86,8 @@ Route::prefix('admin')
             ->controller(AdminProfileController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::patch('/', 'update')->name('update');
+                Route::post('/password', 'updatePassword')->name('updatePassword');
                 Route::get('/audit-history', 'auditHistory')->name('audit-history');
             });
 
@@ -97,8 +99,12 @@ Route::prefix('admin')
             ->controller(UserController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/export', 'export')->name('export');
                 Route::get('/create', 'create')->name('create');
-                Route::get('/{id}/edit', 'edit')->name('edit');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{user}/edit', 'edit')->name('edit');
+                Route::put('/{user}', 'update')->name('update');
+                Route::delete('/{user}', 'destroy')->name('destroy');
             });
 
         /*
@@ -109,6 +115,7 @@ Route::prefix('admin')
             ->controller(PharmacyController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/export', 'export')->name('export');
                 Route::get('/create', 'create')->name('create');
                 Route::post('/', 'store')->name('store');
                 Route::get('/{id}', 'detail')->name('show');
@@ -136,15 +143,31 @@ Route::prefix('pharmacy')
         /*
         | Profile
         */
-        Route::get('/profile', [PharmacyProfileController::class, 'index'])
-            ->name('profile');
+        Route::prefix('profile')
+            ->name('profile.')
+            ->controller(PharmacyProfileController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::patch('/', 'update')->name('update');
+                Route::post('/password', 'updatePassword')->name('updatePassword');
+                Route::post('/hours', 'updateHours')->name('updateHours');
+                Route::delete('/', 'delete')->name('delete');
+                Route::get('/audit-logs', 'auditLogs')->name('audit-logs');
+            });
 
         /*
         | Staff (Only APOTEKER)
         */
-        Route::get('/staff', [StaffController::class, 'index'])
+        Route::prefix('staff')
+            ->name('staff.')
             ->middleware('role:APOTEKER')
-            ->name('staff');
+            ->controller(StaffController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::put('/{staff}', 'update')->name('update');
+                Route::delete('/{staff}', 'destroy')->name('destroy');
+            });
 
         /*
         | Orders
@@ -156,6 +179,8 @@ Route::prefix('pharmacy')
                 Route::get('/', 'index')->name('index');
                 Route::get('/list', 'list')->name('list');
                 Route::get('/pos', 'pos')->name('pos');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{id}', 'show')->name('show');
             });
 
         /*

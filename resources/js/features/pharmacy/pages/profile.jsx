@@ -6,6 +6,7 @@ import { AuditLogCard } from "@/features/pharmacy/components/profile/audit-log-c
 import { OrderActivityCard } from "@/features/pharmacy/components/profile/order-activity-card";
 import { SecurityCard } from "@/features/pharmacy/components/profile/security-card";
 import { AccountSettingsCard } from "@/features/pharmacy/components/profile/account-setting-card";
+import { PharmacyHoursCard } from "@/features/pharmacy/components/profile/pharmacy-hours-card";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -22,6 +23,8 @@ const itemVariants = {
 };
 
 export default function PharmacistProfile(props) {
+    const isApoteker = props.user?.pharmacy_staff?.role === "APOTEKER";
+
     return (
         <DashboardPharmacyLayout activeMenu="Profil Pengguna">
             <div className="max-w-7xl mx-auto">
@@ -42,22 +45,27 @@ export default function PharmacistProfile(props) {
                 >
                     <div className="space-y-8">
                         <motion.div variants={itemVariants}>
-                            <ProfileCard {...props} />
+                            <ProfileCard user={props.user} pharmacy={props.pharmacy} />
                         </motion.div>
                         <motion.div variants={itemVariants}>
-                            <AuditLogCard {...props} />
+                            <AuditLogCard auditLogs={props.auditLogs} />
                         </motion.div>
                     </div>
 
                     <div className="lg:col-span-2 space-y-8">
+                        {isApoteker && (
+                            <motion.div variants={itemVariants}>
+                                <PharmacyHoursCard pharmacy={props.pharmacy} />
+                            </motion.div>
+                        )}
                         <motion.div variants={itemVariants}>
-                            <OrderActivityCard {...props} />
+                            <OrderActivityCard recentActivities={props.recentActivities} />
                         </motion.div>
                         <motion.div variants={itemVariants}>
-                            <SecurityCard {...props} />
+                            <SecurityCard />
                         </motion.div>
                         <motion.div variants={itemVariants}>
-                            <AccountSettingsCard {...props} />
+                            <AccountSettingsCard />
                         </motion.div>
                     </div>
                 </motion.div>

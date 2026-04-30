@@ -1,0 +1,16 @@
+export const ORDER_STATUS = {
+    PENDING:          'PENDING',
+    PROCESSING:       'PROCESSING',
+    READY_FOR_PICKUP: 'READY_FOR_PICKUP',
+    SHIPPED:          'SHIPPED',
+    DELIVERED:        'DELIVERED',
+    COMPLETED:        'COMPLETED',
+    CANCELLED:        'CANCELLED',
+};
+
+export const USER_ROLE = {
+    CUSTOMER:       'CUSTOMER',
+    PHARMACY_STAFF: 'PHARMACY_STAFF',
+    APOTEKER:       'APOTEKER',
+    SUPER_ADMIN:    'SUPER_ADMIN',
+};
