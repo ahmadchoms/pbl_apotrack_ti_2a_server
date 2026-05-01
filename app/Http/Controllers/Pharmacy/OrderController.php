@@ -91,4 +91,39 @@ class OrderController extends Controller
             'medicines' => MedicineResource::collection($medicines),
         ]);
     }
+
+    public function updateStatus(Request $request, string $id)
+    {
+        $request->validate([
+            'status' => 'required|string|in:PENDING,PROCESSING,READY_FOR_PICKUP,SHIPPED,DELIVERED,COMPLETED,CANCELLED',
+            'note' => 'nullable|string'
+        ]);
+
+        $this->orderService->updateStatus($id, $request->status, $request->note);
+
+        return redirect()->back()->with('success', "Status pesanan berhasil diupdate ke {$request->status}");
+    }
+
+    public function reject(Request $request, string $id)
+    {
+        $request->validate([
+            'reason' => 'required|string'
+        ]);
+
+        $this->orderService->rejectOrder($id, $request->reason);
+
+        return redirect()->back()->with('success', "Pesanan berhasil ditolak");
+    }
+
+    public function validatePrescription(Request $request, string $id)
+    {
+        $request->validate([
+            'status' => 'required|string|in:VERIFIED,REJECTED',
+            'note' => 'nullable|string'
+        ]);
+
+        $this->orderService->validatePrescription($id, $request->status, $request->note);
+
+        return redirect()->back()->with('success', "Resep berhasil divalidasi");
+    }
 }

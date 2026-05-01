@@ -11,6 +11,8 @@ export const ORDER_STATUS = {
 export const USER_ROLE = {
     USER: "USER",
     SUPER_ADMIN: "SUPER_ADMIN",
+    APOTEKER: "APOTEKER",
+    STAFF: "STAFF",
 };
 
 export const DOCUMENT_STATUS = {

@@ -17,7 +17,7 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
         $user = $request->user()->load('pharmacyStaff.pharmacy');
-        $pharmacy = $user->pharmacyStaff->pharmacy->load('hours');
+        $pharmacy = $user->pharmacyStaff->pharmacy->load('operatingHours');
 
         return Inertia::render('pharmacy/profile', [
             'user' => $user,
@@ -29,6 +29,10 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        if ($request->user()->pharmacyStaff->role !== 'APOTEKER') {
+            abort(403, 'Hanya Apoteker yang dapat mengubah informasi apotek.');
+        }
+
         $pharmacy = $request->user()->pharmacyStaff->pharmacy;
         
         $data = $request->validate([
@@ -56,6 +60,10 @@ class ProfileController extends Controller
 
     public function updateHours(Request $request)
     {
+        if ($request->user()->pharmacyStaff->role !== 'APOTEKER') {
+            abort(403, 'Hanya Apoteker yang dapat mengubah jam operasional.');
+        }
+
         $request->validate([
             'hours' => 'required|array',
             'hours.*.day_of_week' => 'required|integer|between:0,6',

@@ -3,18 +3,21 @@
 namespace App\Services\Pharmacy;
 
 use App\Models\Medicine;
+use App\Models\MedicineBatch;
 use App\Models\MedicineCategory;
 use App\Models\MedicineForm;
 use App\Models\MedicineType;
 use App\Models\MedicineUnit;
+use App\Models\StockMovement;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MedicineService
 {
     public function list(string $pharmacyId, array $filters)
     {
         return Medicine::query()
-            ->with(['category', 'form', 'type', 'unit', 'images', 'batches'])
+            ->with(['category', 'form', 'type', 'unit', 'batches'])
             ->withTotalActiveStock()
             ->where('pharmacy_id', $pharmacyId)
             ->search($filters['search'] ?? null)
@@ -49,19 +52,16 @@ class MedicineService
                 'is_active' => $data['is_active'],
             ]);
 
+            if (isset($data['image'])) {
+                $path = $data['image']->store('medicines', 'public');
+                $medicine->update(['image_url' => $path]);
+            }
+
             foreach ($data['batches'] as $batchData) {
                 $medicine->batches()->create($batchData);
             }
 
-            if (isset($data['images'])) {
-                foreach ($data['images'] as $index => $image) {
-                    $path = $image->store('medicines', 'public');
-                    $medicine->images()->create([
-                        'image_url' => $path,
-                        'is_primary' => $index === 0
-                    ]);
-                }
-            }
+
 
             return $medicine;
         });
@@ -91,20 +91,17 @@ class MedicineService
                 'is_active' => $data['is_active'],
             ]);
 
+            if (isset($data['image'])) {
+                if ($medicine->image_url) {
+                    Storage::disk('public')->delete($medicine->image_url);
+                }
+                $path = $data['image']->store('medicines', 'public');
+                $medicine->update(['image_url' => $path]);
+            }
+
             $this->syncBatches($medicine, $data['batches'] ?? []);
 
-            if (isset($data['images'])) {
-                // For update, we might want to clear old images or append.
-                // Request says "implement a storage bucket system", so I'll handle replacement.
-                $medicine->images()->delete(); 
-                foreach ($data['images'] as $index => $image) {
-                    $path = $image->store('medicines', 'public');
-                    $medicine->images()->create([
-                        'image_url' => $path,
-                        'is_primary' => $index === 0
-                    ]);
-                }
-            }
+
 
             return $medicine;
         });
@@ -127,6 +124,78 @@ class MedicineService
                 ]
             );
         }
+
+        $this->updateTotalStock($medicine);
+    }
+
+    public function addBatch(string $medicineId, array $data, string $userId)
+    {
+        return DB::transaction(function () use ($medicineId, $data, $userId) {
+            $medicine = Medicine::findOrFail($medicineId);
+
+            $batch = $medicine->batches()->create([
+                'batch_number' => $data['batch_number'],
+                'expired_date' => $data['expired_date'],
+                'stock' => $data['stock'],
+            ]);
+
+            StockMovement::create([
+                'medicine_id' => $medicineId,
+                'batch_id' => $batch->id,
+                'type' => 'IN',
+                'quantity' => $data['stock'],
+                'note' => $data['note'] ?? 'Initial batch stock',
+                'created_by' => $userId,
+            ]);
+
+            $this->updateTotalStock($medicine);
+
+            return $batch;
+        });
+    }
+
+    public function adjustStock(string $batchId, array $data, string $userId)
+    {
+        return DB::transaction(function () use ($batchId, $data, $userId) {
+            $batch = MedicineBatch::with('medicine')->findOrFail($batchId);
+            $oldStock = $batch->stock;
+            $newStock = $data['new_stock'];
+            $diff = $newStock - $oldStock;
+
+            if ($diff == 0) return $batch;
+
+            $batch->update(['stock' => $newStock]);
+
+            StockMovement::create([
+                'medicine_id' => $batch->medicine_id,
+                'batch_id' => $batch->id,
+                'type' => 'ADJUSTMENT',
+                'quantity' => abs($diff),
+                'note' => ($data['note'] ?? 'Stock adjustment') . " (From $oldStock to $newStock)",
+                'created_by' => $userId,
+            ]);
+
+            $this->updateTotalStock($batch->medicine);
+
+            return $batch;
+        });
+    }
+
+    public function getStockHistory(string $medicineId)
+    {
+        return StockMovement::with(['batch', 'creator'])
+            ->where('medicine_id', $medicineId)
+            ->latest()
+            ->paginate(10);
+    }
+
+    protected function updateTotalStock(Medicine $medicine)
+    {
+        $total = $medicine->batches()
+            ->where('expired_date', '>', now())
+            ->sum('stock');
+
+        $medicine->update(['total_active_stock' => $total]);
     }
 
     public function getActiveMedicines(string $pharmacyId)
@@ -137,7 +206,6 @@ class MedicineService
                 'form',
                 'unit',
             ])
-            ->with(['primaryImage'])
             ->withTotalActiveStock()
             ->where('pharmacy_id', $pharmacyId)
             ->where('is_active', true)

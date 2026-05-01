@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LoginController extends Controller
@@ -17,6 +18,10 @@ class LoginController extends Controller
 
     public function index()
     {
+        if (Auth::check()) {
+            return $this->redirectBasedOnRole(Auth::user());
+        }
+
         return Inertia::render('auth/login');
     }
 
@@ -24,22 +29,7 @@ class LoginController extends Controller
     {
         $user = $this->authService->login($request->validated());
 
-        if ($user->role === UserRole::SUPER_ADMIN->value) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        if ($user->role === UserRole::APOTEKER->value || $user->role === UserRole::PHARMACY_STAFF->value) {
-            $staff = $user->pharmacyStaff;
-            $pharmacy = $staff?->pharmacy;
-
-            if ($pharmacy && $pharmacy->verification_status !== 'VERIFIED') {
-                return redirect()->route('waiting-room');
-            }
-
-            return redirect()->route('pharmacy.dashboard');
-        }
-
-        return redirect()->route('home');
+        return $this->redirectBasedOnRole($user);
     }
 
     public function destroy()
@@ -47,5 +37,29 @@ class LoginController extends Controller
         $this->authService->logout();
 
         return redirect()->route('auth.login');
+    }
+
+    private function redirectBasedOnRole($user)
+    {
+        if ($user->role === UserRole::SUPER_ADMIN->value) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user->role === UserRole::USER->value) {
+            $user->loadMissing('pharmacyStaff.pharmacy');
+
+            $staff = $user->pharmacyStaff;
+            $pharmacy = $staff?->pharmacy;
+
+            if ($pharmacy && $pharmacy->verification_status !== 'VERIFIED') {
+                return redirect()->route('waiting-room');
+            }
+
+            if ($pharmacy && $pharmacy->verification_status === 'VERIFIED') {
+                return redirect()->route('pharmacy.dashboard');
+            }
+        }
+
+        return redirect()->route('home');
     }
 }

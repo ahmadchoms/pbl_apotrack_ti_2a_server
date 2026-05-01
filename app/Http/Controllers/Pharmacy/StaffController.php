@@ -23,9 +23,11 @@ class StaffController extends Controller
         $filters = $request->only(['search', 'status']);
 
         $staff = $this->staffService->list($pharmacyId, $filters);
+        $activityLogs = $this->staffService->getActivityLogs($pharmacyId);
 
         return Inertia::render('pharmacy/staff', [
             'staff' => PharmacyStaffResource::collection($staff),
+            'activityLogs' => $activityLogs,
             'filters' => $filters
         ]);
     }
@@ -52,5 +54,20 @@ class StaffController extends Controller
         $this->staffService->delete($staff);
 
         return redirect()->back()->with('success', 'Staff berhasil dihapus');
+    }
+
+    public function toggleStatus(PharmacyStaff $staff)
+    {
+        $this->staffService->toggleStatus($staff);
+
+        return redirect()->back()->with('success', 'Status staff berhasil diperbarui');
+    }
+
+    public function generateInvitation(Request $request)
+    {
+        $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $url = $this->staffService->generateInvitationUrl($pharmacyId);
+
+        return response()->json(['url' => $url]);
     }
 }

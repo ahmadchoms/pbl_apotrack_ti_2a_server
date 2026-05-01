@@ -46,8 +46,6 @@ class AuthService
             ]);
         }
 
-
-
         return true;
     }
 

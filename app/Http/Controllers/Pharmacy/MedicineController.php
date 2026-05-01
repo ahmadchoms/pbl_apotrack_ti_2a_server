@@ -59,11 +59,24 @@ class MedicineController extends Controller
             ->with('success', 'Obat berhasil ditambahkan');
     }
 
+    public function show(Medicine $medicine)
+    {
+        $this->authorize('view', $medicine);
+
+        $medicine->load(['category', 'unit', 'type', 'form', 'batches']);
+        $history = $this->medicineService->getStockHistory($medicine->id);
+
+        return response()->json([
+            'medicine' => new MedicineResource($medicine),
+            'history' => $history
+        ]);
+    }
+
     public function edit(Request $request, Medicine $medicine)
     {
         $this->authorize('update', $medicine);
 
-        $medicine->load(['category', 'unit', 'type', 'form', 'images', 'batches']);
+        $medicine->load(['category', 'unit', 'type', 'form', 'batches']);
 
         return Inertia::render('pharmacy/medicine/edit', [
             'medicine' => new MedicineResource($medicine),
@@ -90,5 +103,36 @@ class MedicineController extends Controller
 
         $medicine->delete();
         return redirect()->back()->with('success', 'Obat berhasil dihapus');
+    }
+
+    public function addBatch(Request $request, Medicine $medicine)
+    {
+        $this->authorize('update', $medicine);
+
+        $validated = $request->validate([
+            'batch_number' => 'required|string|max:50',
+            'expired_date' => 'required|date|after:today',
+            'stock' => 'required|integer|min:0',
+            'note' => 'nullable|string'
+        ]);
+
+        $this->medicineService->addBatch($medicine->id, $validated, $request->user()->id);
+
+        return redirect()->back()->with('success', 'Batch baru berhasil ditambahkan');
+    }
+
+    public function adjustStock(Request $request, string $batchId)
+    {
+        $batch = \App\Models\MedicineBatch::with('medicine')->findOrFail($batchId);
+        $this->authorize('update', $batch->medicine);
+
+        $validated = $request->validate([
+            'new_stock' => 'required|integer|min:0',
+            'note' => 'nullable|string'
+        ]);
+
+        $this->medicineService->adjustStock($batchId, $validated, $request->user()->id);
+
+        return redirect()->back()->with('success', 'Stok berhasil disesuaikan');
     }
 }

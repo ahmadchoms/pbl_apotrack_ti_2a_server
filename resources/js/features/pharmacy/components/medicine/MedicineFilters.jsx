@@ -1,18 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import {
-    Search,
-    PlusCircle,
-    SlidersHorizontal,
-    CheckCircle2,
-    X,
-} from "lucide-react";
-import { Link } from "@inertiajs/react";
-import {
-    InputGroup,
-    InputGroupAddon,
-    InputGroupInput,
-} from "@/components/ui/input-group";
+import { CheckCircle2, X } from "lucide-react";
 import {
     FILTER_TABS,
     CATEGORY_COLORS,
@@ -20,8 +8,6 @@ import {
 } from "@/features/pharmacy/lib/constants";
 
 export function MedicineFilters({
-    search,
-    setSearch,
     activeFilter,
     setActiveFilter,
     selectedCategory,
@@ -32,42 +18,7 @@ export function MedicineFilters({
 }) {
     return (
         <div className="flex flex-col gap-6 mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.18em] mb-1">
-                        Inventaris Medis
-                    </p>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                        Katalog Obat
-                    </h2>
-                </div>
-                <div className="flex items-center gap-2.5">
-                    <InputGroup className="rounded-xl min-w-60">
-                        <InputGroupInput
-                            placeholder="Cari nama obat, kategori..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="h-10 text-sm"
-                        />
-                        <InputGroupAddon>
-                            <Search className="w-4 h-4 text-slate-400" />
-                        </InputGroupAddon>
-                    </InputGroup>
-                    <Link
-                        href={route("pharmacy.medicines.create")}
-                        className="inline-flex items-center gap-2 bg-linear-to-r from-primary to-[#0055a5] text-white px-4 h-10 rounded-xl font-bold text-xs shadow-md shadow-primary/25 hover:from-[#002a58] hover:to-[#00469a] transition-all whitespace-nowrap"
-                    >
-                        <PlusCircle className="w-4 h-4" />
-                        Tambah Obat
-                    </Link>
-                </div>
-            </div>
-
             <div className="flex items-center gap-2 flex-wrap">
-                <button className="w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-500 shadow-sm transition-colors">
-                    <SlidersHorizontal className="w-4 h-4" />
-                </button>
-
                 {FILTER_TABS.map((tab) => {
                     const isActive = activeFilter === tab.key;
                     const count =

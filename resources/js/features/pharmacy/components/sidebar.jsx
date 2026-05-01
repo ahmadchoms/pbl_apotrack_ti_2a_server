@@ -9,14 +9,9 @@ import {
     ChevronRight,
     ShieldCheck,
     ShoppingCart,
-    ClipboardList,
-    ListOrdered,
-    Scan,
     Pill,
-    ShoppingBag,
-    PackagePlus,
+    FileText,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Link, usePage } from "@inertiajs/react";
 
 const NAV_STRUCTURE = [
@@ -33,45 +28,22 @@ const NAV_STRUCTURE = [
     {
         label: "Pesanan",
         icon: ShoppingCart,
-        children: [
-            {
-                label: "Manajemen",
-                icon: ClipboardList,
-                route: "pharmacy.orders.index",
-            },
-            {
-                label: "Riwayat",
-                icon: ListOrdered,
-                route: "pharmacy.orders.list",
-            },
-            {
-                label: "Kasir POS",
-                icon: Scan,
-                route: "pharmacy.orders.pos",
-                badge: "POS",
-            },
-        ],
+        route: "pharmacy.orders.index",
     },
     {
-        label: "Inventaris",
+        label: "Inventori",
         icon: Pill,
-        children: [
-            {
-                label: "Katalog Obat",
-                icon: ShoppingBag,
-                route: "pharmacy.medicines.index",
-            },
-            {
-                label: "Tambah Stok",
-                icon: PackagePlus,
-                route: "pharmacy.medicines.create",
-            },
-        ],
+        route: "pharmacy.medicines.index",
     },
     {
         label: "Profil Saya",
         icon: UserCircle,
         route: "pharmacy.profile.index",
+    },
+    {
+        label: "Laporan",
+        icon: FileText,
+        route: "pharmacy.reports.index",
     },
 ];
 
@@ -203,7 +175,10 @@ export function Sidebar() {
     const isApoteker = userRole === USER_ROLE.APOTEKER;
 
     const filteredNav = NAV_STRUCTURE.filter((item) => {
-        if (item.route === "pharmacy.staff.index") {
+        if (
+            item.route === "pharmacy.staff.index" ||
+            item.route === "pharmacy.reports.index"
+        ) {
             return isApoteker;
         }
         return true;

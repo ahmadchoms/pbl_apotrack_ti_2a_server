@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+use Illuminate\Support\Facades\URL;
+
 class PharmacyStaffService
 {
     public function list(string $pharmacyId, array $filters)
@@ -67,5 +69,37 @@ class PharmacyStaffService
             $staff->delete();
             return $user->delete();
         });
+    }
+
+    public function toggleStatus(PharmacyStaff $staff)
+    {
+        $newStatus = !$staff->is_active;
+        
+        return DB::transaction(function () use ($staff, $newStatus) {
+            $staff->update(['is_active' => $newStatus]);
+            $staff->user->update(['is_active' => $newStatus]);
+            
+            return $staff;
+        });
+    }
+
+    public function getActivityLogs(string $pharmacyId)
+    {
+        // Combine audit logs and stock movements for all staff in this pharmacy
+        $staffUserIds = PharmacyStaff::where('pharmacy_id', $pharmacyId)->pluck('user_id');
+
+        return \App\Models\AuditLog::with('user')
+            ->whereIn('user_id', $staffUserIds)
+            ->latest()
+            ->paginate(15);
+    }
+
+    public function generateInvitationUrl(string $pharmacyId)
+    {
+        return URL::temporarySignedRoute(
+            'auth.register.staff',
+            now()->addHours(24),
+            ['pharmacy_id' => $pharmacyId]
+        );
     }
 }

@@ -24,7 +24,7 @@ class Pharmacy extends Model
         return $this->hasMany(PharmacyStaff::class);
     }
 
-    public function hours()
+    public function operatingHours()
     {
         return $this->hasMany(PharmacyOperatingHour::class);
     }

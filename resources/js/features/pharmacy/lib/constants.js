@@ -71,11 +71,6 @@ export const FILTER_TABS = [
 ];
 
 export const STATUS_CONFIG = {
-    COMPLETED: {
-        label: "Selesai",
-        dot: "bg-emerald-500",
-        badge: "bg-emerald-50 text-emerald-700 border-emerald-200/80 ring-1 ring-emerald-300/30",
-    },
     PENDING: {
         label: "Menunggu",
         dot: "bg-amber-500",
@@ -88,8 +83,8 @@ export const STATUS_CONFIG = {
     },
     READY_FOR_PICKUP: {
         label: "Siap Diambil",
-        dot: "bg-green-500",
-        badge: "bg-green-50 text-green-700 border-green-200/80 ring-1 ring-green-300/30",
+        dot: "bg-purple-500",
+        badge: "bg-purple-50 text-purple-700 border-purple-200/80 ring-1 ring-purple-300/30",
     },
     SHIPPED: {
         label: "Dikirim",
@@ -97,9 +92,19 @@ export const STATUS_CONFIG = {
         badge: "bg-indigo-50 text-indigo-700 border-indigo-200/80 ring-1 ring-indigo-300/30",
     },
     DELIVERED: {
-        label: "Terkirim",
+        label: "Sampai",
+        dot: "bg-teal-500",
+        badge: "bg-teal-50 text-teal-700 border-teal-200/80 ring-1 ring-teal-300/30",
+    },
+    COMPLETED: {
+        label: "Selesai",
         dot: "bg-emerald-500",
         badge: "bg-emerald-50 text-emerald-700 border-emerald-200/80 ring-1 ring-emerald-300/30",
+    },
+    CANCELLED: {
+        label: "Dibatalkan",
+        dot: "bg-rose-500",
+        badge: "bg-rose-50 text-rose-700 border-rose-200/80 ring-1 ring-rose-300/30",
     },
 };
 

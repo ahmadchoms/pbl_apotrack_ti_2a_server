@@ -17,7 +17,6 @@ use App\Models\MedicineForm;
 use App\Models\MedicineType;
 use App\Models\MedicineUnit;
 use App\Models\Medicine;
-use App\Models\MedicineImage;
 use App\Models\MedicineBatch;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -261,15 +260,13 @@ class DatabaseSeeder extends Seeder
                     'requires_prescription' => $med['requires_prescription'],
                     'description' => $med['desc'],
                     'dosage_info' => $med['dosage'],
+                    'image_url' => $medicineUrl,
                     'is_active' => $isActive
                 ]);
 
                 $insertedMedicines[$pModel->id][$med['name']] = $m;
 
-                MedicineImage::firstOrCreate(['medicine_id' => $m->id], [
-                    'image_url' => $medicineUrl,
-                    'is_primary' => true
-                ]);
+
 
                 // Buat 2 batch untuk setiap obat (untuk test expired date & pergerakan stok)
                 $batchCode1 = 'BCH1-' . strtoupper(substr(md5($med['name'] . '1'), 0, 5));

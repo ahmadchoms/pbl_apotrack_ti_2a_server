@@ -20,6 +20,17 @@ class RegisterController extends Controller
         return Inertia::render('auth/register');
     }
 
+    public function staffRegister(Request $request)
+    {
+        if (! $request->hasValidSignature()) {
+            abort(403, 'Link undangan tidak valid atau sudah kedaluwarsa.');
+        }
+
+        return Inertia::render('auth/register-staff', [
+            'pharmacy_id' => $request->query('pharmacy_id')
+        ]);
+    }
+
     public function store(CompleteRegisterRequest $request)
     {
         $result = $this->authService->registerWithPharmacy($request->validated());

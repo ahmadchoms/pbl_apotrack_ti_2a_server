@@ -9,6 +9,24 @@ class Order extends Model
 {
     use HasUuids;
 
+    const STATUS_PENDING = 'PENDING';
+    const STATUS_PROCESSING = 'PROCESSING';
+    const STATUS_READY_FOR_PICKUP = 'READY_FOR_PICKUP';
+    const STATUS_SHIPPED = 'SHIPPED';
+    const STATUS_DELIVERED = 'DELIVERED';
+    const STATUS_COMPLETED = 'COMPLETED';
+    const STATUS_CANCELLED = 'CANCELLED';
+
+    const STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_PROCESSING,
+        self::STATUS_READY_FOR_PICKUP,
+        self::STATUS_SHIPPED,
+        self::STATUS_DELIVERED,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
+
     protected $guarded = [];
 
     public function user()
@@ -60,7 +78,8 @@ class Order extends Model
     public function scopeFilterStatus($query, $status)
     {
         return $query->when($status && $status !== 'ALL', function ($q) use ($status) {
-            $q->where('order_status', strtoupper($status));
+            $statuses = is_array($status) ? $status : explode(',', $status);
+            $q->whereIn('order_status', array_map('strtoupper', $statuses));
         });
     }
 }

@@ -23,7 +23,7 @@ class MedicineResource extends JsonResource
             'form' => $this->form?->name,
             'type' => $this->type?->name,
             'unit' => $this->unit?->name,
-            'image_url' => $this->primaryImage?->image_url,
+            'image_url' => $this->image_url,
             'batches' => $this->batches,
             'weight_in_grams' => (float) $this->weight_in_grams,
             'total_active_stock' => (int) $this->total_active_stock,

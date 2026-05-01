@@ -5,126 +5,141 @@ namespace App\Services\Pharmacy;
 use App\Models\Medicine;
 use App\Models\MedicineBatch;
 use App\Models\Order;
-use App\Models\Prescription;
+use App\Models\PharmacyStaff;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 class PharmacyDashboardService
 {
     public function getDashboardData(string $pharmacyId)
     {
-        $totalOrders = Order::where('pharmacy_id', $pharmacyId)->count();
-        $totalMedicines = Medicine::where('pharmacy_id', $pharmacyId)->count();
-        
-        $criticalStocks = $this->getCriticalStocks($pharmacyId);
-        
-        $prescriptionQueue = Prescription::whereHas('order', fn($q) => $q->where('pharmacy_id', $pharmacyId))
-            ->where('status', 'PENDING')
-            ->count();
+        // return Cache::tags(['pharmacy_dashboard', "pharmacy_{$pharmacyId}"])->remember("dashboard_data_{$pharmacyId}", now()->addMinutes(10), function () use ($pharmacyId) {
+        return Cache::remember("dashboard_data_{$pharmacyId}", now()->addMinutes(10), function () use ($pharmacyId) {
+            return [
+                'kpi' => $this->getKpiStats($pharmacyId),
+                'charts' => [
+                    'revenue_trend' => $this->getRevenueTrend($pharmacyId),
+                    'top_medicines' => $this->getTopMedicines($pharmacyId),
+                ],
+                'widgets' => [
+                    'stock_alerts' => $this->getStockAlerts($pharmacyId),
+                    'recent_orders' => $this->getRecentOrders($pharmacyId),
+                ],
+            ];
+        });
+    }
 
-        $totalRevenue = Order::where('pharmacy_id', $pharmacyId)
+    protected function getKpiStats(string $pharmacyId)
+    {
+        $now = Carbon::now();
+
+        $totalRevenueMonth = Order::where('pharmacy_id', $pharmacyId)
             ->where('order_status', 'COMPLETED')
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
             ->sum('grand_total');
 
+        $activeOrdersCount = Order::where('pharmacy_id', $pharmacyId)
+            ->whereIn('order_status', ['PENDING', 'PROCESSING'])
+            ->count();
+
+        $totalMedicinesCount = Medicine::where('pharmacy_id', $pharmacyId)
+            ->where('is_active', true)
+            ->count();
+
+        $totalStaffCount = PharmacyStaff::where('pharmacy_id', $pharmacyId)
+            ->where('is_active', true)
+            ->count();
+
         return [
-            'totalOrders' => $totalOrders,
-            'totalMedicines' => $totalMedicines,
-            'criticalStocksCount' => $criticalStocks->count(),
-            'prescriptionQueue' => $prescriptionQueue,
-            'totalRevenue' => (float)$totalRevenue,
-            'revenueData' => $this->getRevenueChartData($pharmacyId),
-            'trendData' => $this->getOrderTrendData($pharmacyId),
-            'userActivities' => $this->getRecentActivities($pharmacyId),
-            'criticalStocks' => $criticalStocks,
+            'total_revenue_month' => (float) $totalRevenueMonth,
+            'active_orders_count' => $activeOrdersCount,
+            'total_medicines_count' => $totalMedicinesCount,
+            'total_staff_count' => $totalStaffCount,
         ];
     }
 
-    protected function getCriticalStocks(string $pharmacyId)
+    protected function getRevenueTrend(string $pharmacyId)
     {
-        return MedicineBatch::whereHas('medicine', fn($q) => $q->where('pharmacy_id', $pharmacyId))
-            ->with(['medicine.type'])
-            ->where('stock', '<', 10)
+        $days = 30;
+        $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
+
+        $revenueDataRaw = Order::where('pharmacy_id', $pharmacyId)
+            ->where('order_status', 'COMPLETED')
+            ->where('created_at', '>=', $startDate)
+            ->select(
+                DB::raw("DATE(created_at) as date"),
+                DB::raw("SUM(grand_total) as revenue")
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $trend = [];
+        for ($i = 0; $i < $days; $i++) {
+            $date = $startDate->copy()->addDays($i)->toDateString();
+            $stat = $revenueDataRaw->firstWhere('date', $date);
+
+            $trend[] = [
+                'date' => Carbon::parse($date)->format('d M'),
+                'revenue' => $stat ? (float) $stat->revenue : 0,
+            ];
+        }
+
+        return $trend;
+    }
+
+    protected function getTopMedicines(string $pharmacyId)
+    {
+        return DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('medicines', 'order_items.medicine_id', '=', 'medicines.id')
+            ->where('orders.pharmacy_id', $pharmacyId)
+            ->where('orders.order_status', 'COMPLETED')
+            ->select(
+                'medicines.name',
+                DB::raw('SUM(order_items.quantity) as total_sold')
+            )
+            ->groupBy('medicines.id', 'medicines.name')
+            ->orderByDesc('total_sold')
+            ->limit(5)
             ->get()
-            ->map(fn($batch) => [
-                'id' => $batch->id,
-                'name' => $batch->medicine->name ?? 'Unknown',
-                'type' => $batch->medicine->type->name ?? 'Obat',
-                'sisa' => $batch->stock,
-                'critical' => $batch->stock < 5
+            ->map(fn($item) => [
+                'name' => $item->name,
+                'value' => (int) $item->total_sold,
             ]);
     }
 
-    protected function getRevenueChartData(string $pharmacyId)
+    protected function getStockAlerts(string $pharmacyId)
     {
-        $revenueDataRaw = Order::where('pharmacy_id', $pharmacyId)
-            ->where('order_status', 'COMPLETED')
-            ->select(
-                DB::raw("SUM(grand_total) as revenue"),
-                DB::raw("COUNT(*) as orders"),
-                DB::raw("EXTRACT(DOW FROM created_at) as day")
-            )
-            ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('day')
-            ->get();
-
-        $daysMap = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
-
-        return collect(range(0, 6))->map(function ($day) use ($revenueDataRaw, $daysMap) {
-            $stat = $revenueDataRaw->firstWhere('day', (string)$day) ?? $revenueDataRaw->firstWhere('day', $day);
-
-            return [
-                'name' => $daysMap[$day],
-                'revenue' => $stat ? (float)$stat->revenue : 0,
-                'orders' => $stat ? (int)$stat->orders : 0
-            ];
-        })->values();
+        return MedicineBatch::whereHas('medicine', fn($q) => $q->where('pharmacy_id', $pharmacyId))
+            ->with('medicine:id,name')
+            ->where('stock', '<=', 15)
+            ->orderBy('stock')
+            ->limit(5)
+            ->get()
+            ->map(fn($batch) => [
+                'medicine_name' => $batch->medicine->name,
+                'batch_number' => $batch->batch_number,
+                'stock' => $batch->stock,
+                'status' => $batch->stock <= 5 ? 'Critical' : 'Low',
+            ]);
     }
 
-    protected function getOrderTrendData(string $pharmacyId)
+    protected function getRecentOrders(string $pharmacyId)
     {
-        $startOfMonth = now()->startOfMonth();
-        $endOfMonth = now()->endOfMonth();
-
-        // Calculate dates for week boundaries
-        $week2Start = $startOfMonth->copy()->addDays(7);
-        $week3Start = $startOfMonth->copy()->addDays(14);
-        $week4Start = $startOfMonth->copy()->addDays(21);
-
-        $data = Order::where('pharmacy_id', $pharmacyId)
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->select(
-                DB::raw("CASE 
-                    WHEN created_at < '{$week2Start->toDateTimeString()}' THEN 1
-                    WHEN created_at < '{$week3Start->toDateTimeString()}' THEN 2
-                    WHEN created_at < '{$week4Start->toDateTimeString()}' THEN 3
-                    ELSE 4
-                END as week_number"),
-                DB::raw("COUNT(*) as count")
-            )
-            ->groupBy('week_number')
-            ->get();
-
-        return collect([1, 2, 3, 4])->map(function ($weekNum) use ($data) {
-            $stat = $data->firstWhere('week_number', $weekNum);
-            return [
-                'week' => "Minggu $weekNum",
-                'pesanan' => $stat ? (int)$stat->count : 0
-            ];
-        })->values();
-    }
-
-    protected function getRecentActivities(string $pharmacyId)
-    {
-        return Order::with('user')
+        return Order::with('user:id,username')
             ->where('pharmacy_id', $pharmacyId)
             ->latest()
-            ->take(6)
+            ->limit(5)
             ->get()
             ->map(fn($order) => [
                 'id' => $order->id,
-                'name' => $order->user->username ?? 'Guest',
-                'status' => $order->created_at ? $order->created_at->diffForHumans() : 'Baru saja',
-                'amount' => 'Rp ' . number_format($order->grand_total, 0, ',', '.'),
-                'avatar' => strtoupper(substr($order->user->username ?? 'GU', 0, 2))
+                'customer' => $order->user->username ?? 'Guest',
+                'amount' => (float) $order->grand_total,
+                'status' => $order->order_status,
+                'time' => $order->created_at->diffForHumans(),
             ]);
     }
 }

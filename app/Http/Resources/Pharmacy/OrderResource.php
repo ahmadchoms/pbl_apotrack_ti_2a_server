@@ -26,8 +26,10 @@ class OrderResource extends JsonResource
                 'phone' => $this->user->phone,
             ],
             'prescription' => $this->whenLoaded('prescription'),
+            'requires_prescription' => $this->items->contains('requires_prescription', true),
             'items' => $this->whenLoaded('items'),
             'tracking' => $this->whenLoaded('tracking'),
+            'address' => $this->whenLoaded('address'),
         ];
     }
 }

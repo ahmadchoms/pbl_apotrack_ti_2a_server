@@ -20,7 +20,8 @@ use App\Http\Controllers\Pharmacy\{
     ProfileController as PharmacyProfileController,
     StaffController,
     OrderController,
-    MedicineController
+    MedicineController,
+    ReportController
 };
 
 /*
@@ -54,6 +55,7 @@ Route::prefix('auth')
 
         Route::controller(RegisterController::class)->group(function () {
             Route::get('/register', 'index')->name('register');
+            Route::get('/register/staff', 'staffRegister')->name('register.staff');
             Route::post('/register', 'store')->name('register.store');
         });
 
@@ -165,6 +167,8 @@ Route::prefix('pharmacy')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::post('/', 'store')->name('store');
+                Route::patch('/{staff}/toggle', 'toggleStatus')->name('toggle-status');
+                Route::post('/invitation', 'generateInvitation')->name('invitation');
                 Route::put('/{staff}', 'update')->name('update');
                 Route::delete('/{staff}', 'destroy')->name('destroy');
             });
@@ -181,6 +185,9 @@ Route::prefix('pharmacy')
                 Route::get('/pos', 'pos')->name('pos');
                 Route::post('/', 'store')->name('store');
                 Route::get('/{id}', 'show')->name('show');
+                Route::patch('/{id}/status', 'updateStatus')->name('status.update');
+                Route::patch('/{id}/reject', 'reject')->name('reject');
+                Route::patch('/prescriptions/{id}/validate', 'validatePrescription')->name('prescription.validate');
             });
 
         /*
@@ -193,8 +200,23 @@ Route::prefix('pharmacy')
                 Route::get('/', 'index')->name('index');
                 Route::get('/create', 'create')->name('create');
                 Route::post('/', 'store')->name('store');
-                Route::get('/{id}/edit', 'edit')->name('edit');
-                Route::put('/{id}', 'update')->name('update');
-                Route::delete('/{id}', 'destroy')->name('destroy');
+                Route::get('/{medicine}', 'show')->name('show');
+                Route::get('/{medicine}/edit', 'edit')->name('edit');
+                Route::put('/{medicine}', 'update')->name('update');
+                Route::delete('/{medicine}', 'destroy')->name('destroy');
+                Route::post('/{medicine}/batches', 'addBatch')->name('batches.store');
+                Route::patch('/batches/{batchId}/adjust', 'adjustStock')->name('batches.adjust');
+            });
+
+        /*
+        | Reports
+        */
+        Route::prefix('reports')
+            ->name('reports.')
+            ->controller(ReportController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/sales/export', 'exportSales')->name('sales.export');
+                Route::get('/stock/export', 'exportStock')->name('stock.export');
             });
     });

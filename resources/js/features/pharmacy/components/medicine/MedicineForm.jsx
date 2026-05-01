@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, router } from "@inertiajs/react";
 import {
     Save,
     ArrowLeft,
@@ -57,12 +57,16 @@ export function MedicineForm({
     forms = [],
 }) {
     const [images, setImages] = useState(
-        medicine.images?.map((img) => ({
-            id: img.id,
-            file: null,
-            preview: img.image_url,
-            isExisting: true,
-        })) || [],
+        medicine.image_url
+            ? [
+                  {
+                      id: "primary",
+                      file: null,
+                      preview: medicine.image_url,
+                      isExisting: true,
+                  },
+              ]
+            : [],
     );
     const [primaryIndex, setPrimaryIndex] = useState(0);
 
@@ -108,25 +112,27 @@ export function MedicineForm({
             preview: URL.createObjectURL(file),
             isExisting: false,
         }));
-        setImages((prev) => [...prev, ...newImages].slice(0, 5));
-    };
-
-    const removeImage = (id) => {
-        setImages((prev) => {
-            const next = prev.filter((img) => img.id !== id);
-            if (primaryIndex >= next.length)
-                setPrimaryIndex(Math.max(0, next.length - 1));
-            return next;
-        });
+        setImages([newImages[0]]);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        isEdit
-            ? put(`/pharmacy/medicines/${medicine.id}/edit`, {
-                  preserveScroll: true,
-              })
-            : post("/pharmacy/medicines/new");
+
+        // Prepare multipart data if there is a new file
+        const formData = { ...data };
+        const newImage = images.find((img) => !img.isExisting);
+        if (newImage) {
+            formData.image = newImage.file;
+        }
+
+        if (isEdit) {
+            router.post(route("pharmacy.medicines.update", medicine.id), {
+                ...formData,
+                _method: "PUT",
+            });
+        } else {
+            router.post(route("pharmacy.medicines.store"), formData);
+        }
     };
 
     return (
@@ -166,8 +172,6 @@ export function MedicineForm({
                                 images={images}
                                 primaryIndex={primaryIndex}
                                 onUpload={handleImageUpload}
-                                onRemove={removeImage}
-                                onSetPrimary={setPrimaryIndex}
                             />
                         </motion.div>
 

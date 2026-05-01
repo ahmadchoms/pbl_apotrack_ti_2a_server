@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar } from "lucide-react";
+import { Calendar, RefreshCw } from "lucide-react";
+import { router } from "@inertiajs/react";
 import {
     Select,
     SelectContent,
@@ -8,12 +9,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
-import { DashboardStatsGrid } from "@/features/pharmacy/components/dashboard/DashboardStatsGrid";
-import { RevenueChartCard } from "@/features/pharmacy/components/dashboard/RevenueChartCard";
-import { UserActivityCard } from "@/features/pharmacy/components/dashboard/UserActivityCard";
-import { CriticalStockCard } from "@/features/pharmacy/components/dashboard/CriticalStockCard";
-import { OrderTrendCard } from "@/features/pharmacy/components/dashboard/OrderTrendCard";
+import { DashboardKpiCards } from "@/features/pharmacy/components/dashboard/DashboardKpiCards";
+import { DashboardCharts } from "@/features/pharmacy/components/dashboard/DashboardCharts";
+import { DashboardTables } from "@/features/pharmacy/components/dashboard/DashboardTables";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -21,69 +21,114 @@ const containerVariants = {
 };
 
 export default function PharmacistDashboard({
-    totalOrders = 0,
-    totalMedicines = 0,
-    criticalStocksCount = 0,
-    prescriptionQueue = 0,
-    totalRevenue = 0,
-    revenueData = [],
-    trendData = [],
-    userActivities = [],
-    criticalStocks = [],
+    kpi = {},
+    charts = {},
+    widgets = {},
 }) {
+    const [isSpinning, setIsSpinning] = useState(false);
+    const handleRefresh = () => {
+        setIsSpinning(true);
+        router.reload({ only: ["kpi", "charts", "widgets"] });
+        setTimeout(() => {
+            setIsSpinning(false);
+        }, 1000);
+    };
+
     return (
         <DashboardPharmacyLayout activeMenu="Dasbor Utama">
-            <div className="space-y-8">
-                <div className="flex justify-between items-center">
+            <div className="space-y-10 pb-20">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-800">
-                            Ikhtisar Apotek
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="px-3 py-1 rounded-full bg-blue-50 text-[#0b3b60] text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                                Real-time Analysis
+                            </span>
+                        </div>
+                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+                            Dasbor Utama Apotek
                         </h2>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Pantau performa dan inventori secara real-time.
+                        <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-wide">
+                            Ringkasan Kinerja & Operasional Apotek Anda
                         </p>
                     </div>
 
-                    <Select defaultValue="30days">
-                        <SelectTrigger className="w-47.5 h-10 rounded-xl bg-white border-slate-200 text-slate-600 focus:ring-[#0b3b60]">
-                            <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4" />
-                                <SelectValue placeholder="Pilih Periode" />
-                            </div>
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl">
-                            <SelectItem value="week">Minggu Ini</SelectItem>
-                            <SelectItem value="30days">
-                                Terakhir 30 Hari
-                            </SelectItem>
-                            <SelectItem value="month">Bulan Ini</SelectItem>
-                            <SelectItem value="year">Tahun Ini</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-4">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleRefresh}
+                            className="rounded-2xl border-slate-200 bg-white hover:bg-slate-50 transition-all active:scale-95"
+                        >
+                            <motion.div
+                                animate={{ rotate: isSpinning ? 360 : 0 }}
+                                transition={{
+                                    duration: 0.8,
+                                    ease: "easeInOut",
+                                }}
+                            >
+                                <RefreshCw className="h-5 w-5 text-slate-400" />
+                            </motion.div>
+                        </Button>
+
+                        <Select defaultValue="month">
+                            <SelectTrigger className="w-56 h-12 rounded-2xl bg-white border-slate-200 text-slate-600 font-black text-[10px] uppercase tracking-widest focus:ring-[#0b3b60]/20 shadow-sm transition-all">
+                                <div className="flex items-center gap-3">
+                                    <Calendar className="h-4 w-4 text-slate-400" />
+                                    <SelectValue placeholder="Pilih Periode" />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-slate-100 shadow-2xl p-2">
+                                <SelectItem
+                                    value="week"
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
+                                >
+                                    Minggu Ini
+                                </SelectItem>
+                                <SelectItem
+                                    value="30days"
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
+                                >
+                                    30 Hari Terakhir
+                                </SelectItem>
+                                <SelectItem
+                                    value="month"
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
+                                >
+                                    Bulan Ini
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="space-y-6"
+                    className="space-y-12"
                 >
-                    <DashboardStatsGrid
-                        totalOrders={totalOrders}
-                        totalMedicines={totalMedicines}
-                        criticalStocksCount={criticalStocksCount}
-                        prescriptionQueue={prescriptionQueue}
-                        totalRevenue={totalRevenue}
-                    />
+                    <DashboardKpiCards kpi={kpi} />
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <RevenueChartCard revenueData={revenueData} />
-                        <UserActivityCard userActivities={userActivities} />
+                    <div className="space-y-8">
+                        <div className="flex items-center gap-4 px-2">
+                            <div className="h-px flex-1 bg-slate-100" />
+                            <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em]">
+                                Visualisasi Data
+                            </h3>
+                            <div className="h-px flex-1 bg-slate-100" />
+                        </div>
+                        <DashboardCharts charts={charts} />
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <CriticalStockCard criticalStocks={criticalStocks} />
-                        <OrderTrendCard trendData={trendData} />
+                    <div className="space-y-8">
+                        <div className="flex items-center gap-4 px-2">
+                            <div className="h-px flex-1 bg-slate-100" />
+                            <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em]">
+                                Kontrol Operasional
+                            </h3>
+                            <div className="h-px flex-1 bg-slate-100" />
+                        </div>
+                        <DashboardTables widgets={widgets} />
                     </div>
                 </motion.div>
             </div>
