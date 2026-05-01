@@ -10,6 +10,11 @@ use App\Services\Pharmacy\MedicineService;
 use App\Services\Pharmacy\OrderService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Enums\OrderStatus;
+use Illuminate\Validation\Rules\Rule;
+use App\Models\Order;
+use App\Models\Prescription;
+use Illuminate\Validation\Rule as ValidationRule;
 
 class OrderController extends Controller
 {
@@ -22,7 +27,7 @@ class OrderController extends Controller
     {
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $filters = $request->only(['search', 'status']);
-        
+
         $orders = OrderResource::collection(
             $this->orderService->list($pharmacyId, $filters)
         );
@@ -55,9 +60,7 @@ class OrderController extends Controller
     {
         $order = $this->orderService->getOrderDetail($id);
 
-        if ($order->pharmacy_id !== $request->user()->pharmacyStaff->pharmacy_id) {
-            abort(403);
-        }
+        $this->authorize('view', $order);
 
         return Inertia::render('pharmacy/orders/show', [
             'order' => new OrderResource($order)
@@ -94,18 +97,24 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, string $id)
     {
+        $order = Order::findOrFail($id);
+        $this->authorize('update', $order);
+
         $request->validate([
-            'status' => 'required|string|in:PENDING,PROCESSING,READY_FOR_PICKUP,SHIPPED,DELIVERED,COMPLETED,CANCELLED',
+            'status' => ['required', ValidationRule::enum(OrderStatus::class)],
             'note' => 'nullable|string'
         ]);
 
-        $this->orderService->updateStatus($id, $request->status, $request->note);
+        $this->orderService->updateStatus($id, OrderStatus::from($request->status), $request->note);
 
         return redirect()->back()->with('success', "Status pesanan berhasil diupdate ke {$request->status}");
     }
 
     public function reject(Request $request, string $id)
     {
+        $order = Order::findOrFail($id);
+        $this->authorize('update', $order);
+
         $request->validate([
             'reason' => 'required|string'
         ]);
@@ -117,6 +126,9 @@ class OrderController extends Controller
 
     public function validatePrescription(Request $request, string $id)
     {
+        $prescription = Prescription::with('order')->findOrFail($id);
+        $this->authorize('update', $prescription->order);
+
         $request->validate([
             'status' => 'required|string|in:VERIFIED,REJECTED',
             'note' => 'nullable|string'

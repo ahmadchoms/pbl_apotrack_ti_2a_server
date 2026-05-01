@@ -10,6 +10,8 @@ use App\Models\PharmacyStaff;
 use App\Services\Pharmacy\PharmacyStaffService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Enums\UserRole;
+use Illuminate\Validation\Rules\Rule;
 
 class StaffController extends Controller
 {
@@ -44,6 +46,7 @@ class StaffController extends Controller
 
     public function update(UpdateStaffRequest $request, PharmacyStaff $staff)
     {
+        $this->authorize('update', $staff);
         $this->staffService->update($staff, $request->validated());
 
         return redirect()->back()->with('success', 'Staff berhasil diperbarui');
@@ -51,6 +54,7 @@ class StaffController extends Controller
 
     public function destroy(PharmacyStaff $staff)
     {
+        $this->authorize('update', $staff); // Usually delete also needs update permission
         $this->staffService->delete($staff);
 
         return redirect()->back()->with('success', 'Staff berhasil dihapus');
@@ -58,6 +62,7 @@ class StaffController extends Controller
 
     public function toggleStatus(PharmacyStaff $staff)
     {
+        $this->authorize('toggleStatus', $staff);
         $this->staffService->toggleStatus($staff);
 
         return redirect()->back()->with('success', 'Status staff berhasil diperbarui');

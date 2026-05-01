@@ -432,7 +432,7 @@ export function MedicineForm({
                             <motion.div whileTap={{ scale: 0.97 }}>
                                 <Button
                                     type="submit"
-                                    className="h-11 px-7 bg-linear-to-r from-[#00346C] to-[#0055a5] text-white rounded-xl font-bold text-sm shadow-lg flex items-center gap-2"
+                                    className="h-11 px-7 bg-linear-to-r from-primary to-[#0055a5] text-white rounded-xl font-bold text-sm shadow-lg flex items-center gap-2"
                                 >
                                     <Save className="w-4 h-4" />{" "}
                                     {isEdit

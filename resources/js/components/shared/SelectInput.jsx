@@ -22,7 +22,7 @@ export function SelectInput({
         <FormField label={label} required={required} hint={hint}>
             <Select value={value} onValueChange={onChange}>
                 <SelectTrigger
-                    className={`h-10 text-sm border-slate-200 bg-slate-50/50 focus:bg-white data-[state=open]:border-[#00346C]/40 rounded-xl w-full ${className || ""}`}
+                    className={`h-10 text-sm border-slate-200 bg-slate-50/50 focus:bg-white data-[state=open]:border-primary/40 rounded-xl w-full ${className || ""}`}
                 >
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

@@ -166,25 +166,25 @@ export function MedicineDetailModal({
                     <Tabs
                         value={activeTab}
                         onValueChange={setActiveTab}
-                        className="flex-1 flex flex-col"
+                        className="flex-1 flex flex-col min-h-0"
                     >
                         <div className="px-8 pt-4 bg-white border-b border-slate-50">
                             <TabsList className="bg-slate-100/50 p-1 rounded-2xl w-full max-w-sm mb-4">
                                 <TabsTrigger
                                     value="detail"
-                                    className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-[#00346C] data-[state=active]:text-white"
+                                    className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white"
                                 >
                                     Detail
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="batches"
-                                    className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-[#00346C] data-[state=active]:text-white"
+                                    className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white"
                                 >
                                     Batch & Stok
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="history"
-                                    className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-[#00346C] data-[state=active]:text-white"
+                                    className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white"
                                 >
                                     Riwayat
                                 </TabsTrigger>
@@ -199,7 +199,7 @@ export function MedicineDetailModal({
                                     className="m-0 space-y-6"
                                 >
                                     <div className="flex items-center justify-between">
-                                        <p className="text-3xl font-black text-[#00346C] tabular-nums">
+                                        <p className="text-3xl font-black text-primary tabular-nums">
                                             {formatRupiah(medicine.price)}
                                         </p>
                                         <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export function MedicineDetailModal({
                                                     className="bg-slate-50/50 border border-slate-100 rounded-2xl px-5 py-4 flex items-start gap-4 hover:bg-slate-50 transition-colors"
                                                 >
                                                     <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                                                        <Icon className="w-5 h-5 text-[#00346C]" />
+                                                        <Icon className="w-5 h-5 text-primary" />
                                                     </div>
                                                     <div>
                                                         <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-0.5">
@@ -261,8 +261,8 @@ export function MedicineDetailModal({
                                     <div className="space-y-4">
                                         <div className="p-6 rounded-2xl bg-blue-50/40 border border-blue-100">
                                             <div className="flex items-center gap-3 mb-3">
-                                                <Info className="w-4 h-4 text-[#00346C]" />
-                                                <p className="text-[10px] text-[#00346C] font-black uppercase tracking-widest">
+                                                <Info className="w-4 h-4 text-primary" />
+                                                <p className="text-[10px] text-primary font-black uppercase tracking-widest">
                                                     Deskripsi
                                                 </p>
                                             </div>
@@ -369,7 +369,7 @@ export function MedicineDetailModal({
                                                 >
                                                     <div className="flex items-center justify-between mb-4">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center font-mono text-[10px] font-black text-[#00346C]">
+                                                            <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center font-mono text-[10px] font-black text-primary">
                                                                 {batch.batch_number.substring(
                                                                     0,
                                                                     2,
@@ -414,7 +414,7 @@ export function MedicineDetailModal({
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <p className="text-xl font-black text-[#00346C] tabular-nums">
+                                                            <p className="text-xl font-black text-primary tabular-nums">
                                                                 {batch.stock}
                                                             </p>
                                                             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
@@ -435,7 +435,7 @@ export function MedicineDetailModal({
                                                                     batch.stock,
                                                                 );
                                                             }}
-                                                            className="w-full h-10 rounded-xl bg-slate-50 hover:bg-blue-50 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[#00346C] transition-all"
+                                                            className="w-full h-10 rounded-xl bg-slate-50 hover:bg-blue-50 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-primary transition-all"
                                                         >
                                                             Penyesuaian Stok
                                                             Manual
@@ -498,7 +498,7 @@ export function MedicineDetailModal({
                                                                 disabled={
                                                                     processingAdjust
                                                                 }
-                                                                className="w-full h-11 rounded-xl bg-[#00346C] text-white font-black text-[10px] uppercase tracking-widest"
+                                                                className="w-full h-11 rounded-xl bg-primary text-white font-black text-[10px] uppercase tracking-widest"
                                                             >
                                                                 Simpan Perubahan
                                                             </Button>
@@ -530,7 +530,7 @@ export function MedicineDetailModal({
                                                             ? "bg-emerald-50 text-emerald-600"
                                                             : log.type === "OUT"
                                                               ? "bg-rose-50 text-rose-600"
-                                                              : "bg-blue-50 text-[#00346C]"
+                                                              : "bg-blue-50 text-primary"
                                                     }`}
                                                     >
                                                         {log.type === "IN" ? (
@@ -624,7 +624,7 @@ export function MedicineDetailModal({
                                 route("pharmacy.medicines.edit", medicine.id),
                             )
                         }
-                        className="flex-1 bg-[#00346C] hover:bg-[#002a58] text-white h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-900/20"
+                        className="flex-1 bg-primary hover:bg-primary/80 text-white h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-900/20"
                     >
                         <Pencil className="mr-3 w-4 h-4" />
                         Edit Master Data

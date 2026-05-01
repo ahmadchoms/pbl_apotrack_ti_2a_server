@@ -77,7 +77,7 @@ export default function PharmacistMedicineCatalog({
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="px-3 py-1 rounded-full bg-[#00346C] text-white text-[10px] font-black uppercase tracking-widest border border-blue-900 shadow-sm">
+                            <span className="px-3 py-1 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-widest border border-blue-900 shadow-sm">
                                 Inventory Control
                             </span>
                         </div>
@@ -102,7 +102,7 @@ export default function PharmacistMedicineCatalog({
                             </InputGroupAddon>
                         </InputGroup>
                         <Link href={route("pharmacy.medicines.create")}>
-                            <Button className="py-5 px-8 rounded-2xl bg-linear-to-r from-[#00346C] to-[#0055a5] text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3 group">
+                            <Button className="py-5 px-8 rounded-2xl bg-linear-to-r from-primary to-[#0055a5] text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3 group">
                                 <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
                                 Tambah Obat Baru
                             </Button>
@@ -127,7 +127,7 @@ export default function PharmacistMedicineCatalog({
                 <div className="space-y-4">
                     <div className="flex items-center justify-between px-2">
                         <div className="flex items-center gap-2">
-                            <Info className="w-4 h-4 text-[#00346C]" />
+                            <Info className="w-4 h-4 text-primary" />
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                 Menampilkan{" "}
                                 <span className="text-slate-800">

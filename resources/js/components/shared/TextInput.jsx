@@ -25,7 +25,7 @@ export function TextInput({
                     </span>
                 )}
                 <Input
-                    className={`h-10 text-sm border-slate-200 bg-slate-50/50 focus:bg-white focus:border-[#00346C]/40 focus:ring-2 focus:ring-[#00346C]/10 rounded-xl transition-all placeholder:text-slate-300 w-full ${hasLeftElement ? "pl-9" : ""} ${props.type === "number" ? "tabular-nums" : ""} ${className || ""}`}
+                    className={`h-10 text-sm border-slate-200 bg-slate-50/50 focus:bg-white focus:border-primary/40 focus:ring-2 focus:ring-primary/10 rounded-xl transition-all placeholder:text-slate-300 w-full ${hasLeftElement ? "pl-9" : ""} ${props.type === "number" ? "tabular-nums" : ""} ${className || ""}`}
                     {...props}
                 />
             </div>

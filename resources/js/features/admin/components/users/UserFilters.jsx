@@ -118,7 +118,7 @@ export function UserFilters({
                 </Button>
                 <Button
                     onClick={() => router.get("/admin/users/create")}
-                    className="h-11 px-6 rounded-2xl bg-[#00346C] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-[#00346C]/20 flex-1 lg:flex-none"
+                    className="h-11 px-6 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-primary/20 flex-1 lg:flex-none"
                 >
                     <UserPlus className="w-4 h-4" /> Tambah Pengguna Baru
                 </Button>

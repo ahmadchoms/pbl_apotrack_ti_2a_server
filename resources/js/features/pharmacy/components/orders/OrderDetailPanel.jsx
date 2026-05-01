@@ -48,7 +48,7 @@ export function OrderDetailPanel({ order }) {
         >
             <div className="p-6 space-y-6 flex-1">
                 <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-[#00346C] to-[#0055a5] flex items-center justify-center shadow-lg shadow-[#00346C]/20">
+                    <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-primary to-[#0055a5] flex items-center justify-center shadow-lg shadow-primary/20">
                         <ShoppingBag className="w-6 h-6 text-white" />
                     </div>
                     <div className="min-w-0">
@@ -137,11 +137,11 @@ export function OrderDetailPanel({ order }) {
                                 </span>
                             </div>
                         ))}
-                        <div className="flex items-center justify-between px-4 py-3 bg-[#00346C]/5">
-                            <span className="text-[10px] font-black text-[#00346C]/60 uppercase tracking-widest">
+                        <div className="flex items-center justify-between px-4 py-3 bg-primary/5">
+                            <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
                                 Total Tagihan
                             </span>
-                            <span className="text-sm font-black text-[#00346C]">
+                            <span className="text-sm font-black text-primary">
                                 {formatRupiah(order.grand_total)}
                             </span>
                         </div>
@@ -157,8 +157,8 @@ export function OrderDetailPanel({ order }) {
                                     key={item.id}
                                     className="flex items-center gap-3 bg-white rounded-xl border border-slate-100 px-3.5 py-3"
                                 >
-                                    <div className="w-8 h-8 rounded-xl bg-[#00346C]/8 flex items-center justify-center shrink-0">
-                                        <Pill className="w-4 h-4 text-[#00346C]" />
+                                    <div className="w-8 h-8 rounded-xl bg-primary/8 flex items-center justify-center shrink-0">
+                                        <Pill className="w-4 h-4 text-primary" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-semibold text-slate-800 truncate">
@@ -281,13 +281,13 @@ export function OrderDetailPanel({ order }) {
                         </>
                     )}
                     {isProcessing && (
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-[#00346C]/20">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-primary/20">
                             <CheckCircle2 className="mr-2 h-4 w-4" />
                             Tandai Siap Diambil
                         </Button>
                     )}
                     {isReady && (
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-[#00346C]/20">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-primary/20">
                             <CheckCircle2 className="mr-2 h-4 w-4" />
                             {order.service_type === "DELIVERY"
                                 ? "Tandai Sudah Dikirim"
@@ -295,13 +295,13 @@ export function OrderDetailPanel({ order }) {
                         </Button>
                     )}
                     {isShipped && (
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-[#00346C]/20">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-primary/20">
                             <CheckCircle2 className="mr-2 h-4 w-4" />
                             Tandai Sudah Diterima
                         </Button>
                     )}
                     {isDelivered && (
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-[#00346C]/20">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-primary/20">
                             <CheckCircle2 className="mr-2 h-4 w-4" />
                             Selesaikan Pesanan
                         </Button>

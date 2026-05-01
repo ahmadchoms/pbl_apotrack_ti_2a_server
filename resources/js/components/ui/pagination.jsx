@@ -25,13 +25,21 @@ export function Pagination({ links }) {
                         preserveScroll
                         className={`
                             h-9 min-w-[36px] px-2 rounded-xl flex items-center justify-center text-xs font-black transition-all
-                            ${link.active 
-                                ? "bg-[#00346C] text-white shadow-lg shadow-[#00346C]/20" 
-                                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"}
+                            ${
+                                link.active
+                                    ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                    : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                            }
                             ${!link.url ? "opacity-40 cursor-not-allowed pointer-events-none" : ""}
                         `}
                     >
-                        {isPrev ? <ChevronLeft className="w-4 h-4" /> : isNext ? <ChevronRight className="w-4 h-4" /> : label}
+                        {isPrev ? (
+                            <ChevronLeft className="w-4 h-4" />
+                        ) : isNext ? (
+                            <ChevronRight className="w-4 h-4" />
+                        ) : (
+                            label
+                        )}
                     </Link>
                 );
             })}

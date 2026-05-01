@@ -111,7 +111,7 @@ export default function PharmacistPOS({ medicines }) {
                             Sistem Kasir
                         </p>
                         <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-[#00346C] to-[#0055a5] flex items-center justify-center shadow-md shadow-[#00346C]/20">
+                            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-primary to-[#0055a5] flex items-center justify-center shadow-md shadow-primary/20">
                                 <Scan className="w-4 h-4 text-white" />
                             </div>
                             Point of Sale
@@ -128,7 +128,7 @@ export default function PharmacistPOS({ medicines }) {
 
                         <button
                             onClick={() => setMobileCartOpen(true)}
-                            className="lg:hidden relative w-10 h-10 rounded-xl bg-[#00346C] text-white flex items-center justify-center shadow-md shadow-[#00346C]/25"
+                            className="lg:hidden relative w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-md shadow-primary/25"
                         >
                             <ShoppingCart className="w-4.5 h-4.5" />
                             {totalCartItems > 0 && (

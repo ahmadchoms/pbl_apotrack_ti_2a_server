@@ -177,7 +177,7 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                                         <Plus className="w-2.5 h-2.5" />
                                                     </button>
                                                 </div>
-                                                <span className="text-sm font-black text-[#00346C] tabular-nums">
+                                                <span className="text-sm font-black text-primary tabular-nums">
                                                     {formatRupiah(
                                                         item.price * item.qty,
                                                     )}
@@ -203,7 +203,7 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                             initial={{ scale: 1.06, color: "#00346C" }}
                             animate={{ scale: 1 }}
                             transition={{ duration: 0.2 }}
-                            className="text-xl font-black text-[#00346C] tabular-nums tracking-tight"
+                            className="text-xl font-black text-primary tabular-nums tracking-tight"
                         >
                             {formatRupiah(subtotal)}
                         </motion.span>
@@ -238,16 +238,16 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                 <DropdownMenuItem
                                     key={method.id}
                                     onClick={() => setPaymentMethod(method)}
-                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer ${isSelected ? "bg-[#00346C]/8 text-[#00346C]" : ""}`}
+                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer ${isSelected ? "bg-primary/8 text-primary" : ""}`}
                                 >
                                     <Icon className="w-4 h-4 shrink-0" />
                                     <span
-                                        className={`text-sm font-bold ${isSelected ? "text-[#00346C]" : ""}`}
+                                        className={`text-sm font-bold ${isSelected ? "text-primary" : ""}`}
                                     >
                                         {method.label}
                                     </span>
                                     {isSelected && (
-                                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00346C]" />
+                                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
                                     )}
                                 </DropdownMenuItem>
                             );
@@ -258,7 +258,7 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                 <motion.button
                     disabled={cart.length === 0}
                     whileTap={{ scale: 0.97 }}
-                    className="w-full h-13 bg-primary hover:bg-primary/90 text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-[#00346C]/30 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
+                    className="w-full h-13 bg-primary hover:bg-primary/90 text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
                 >
                     <span>Proses Sekarang</span>
                     {cart.length > 0 && (

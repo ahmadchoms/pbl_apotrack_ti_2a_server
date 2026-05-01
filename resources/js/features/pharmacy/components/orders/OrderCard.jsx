@@ -1,8 +1,22 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Truck, Package, Clock, ChevronDown, ChevronUp, FileText, User, CreditCard, Pill } from "lucide-react";
+import {
+    Truck,
+    Package,
+    Clock,
+    ChevronDown,
+    ChevronUp,
+    FileText,
+    User,
+    CreditCard,
+    Pill,
+} from "lucide-react";
 import { formatRupiah, formatTime } from "@/lib/utils";
-import { STATUS_CONFIG, SERVICE_ICON, cardVariants } from "@/features/pharmacy/lib/constants";
+import {
+    STATUS_CONFIG,
+    SERVICE_ICON,
+    cardVariants,
+} from "@/features/pharmacy/lib/constants";
 
 function SectionLabel({ children }) {
     return (
@@ -24,7 +38,7 @@ function InfoRow({ icon: Icon, label, value, highlight }) {
                     {label}
                 </p>
                 <p
-                    className={`text-sm font-semibold ${highlight ? "text-[#00346C]" : "text-slate-700"}`}
+                    className={`text-sm font-semibold ${highlight ? "text-primary" : "text-slate-700"}`}
                 >
                     {value}
                 </p>
@@ -34,12 +48,14 @@ function InfoRow({ icon: Icon, label, value, highlight }) {
 }
 
 export function OrderCard({ order, index, isSelected, onSelect }) {
-    const statusCfg = STATUS_CONFIG[order.order_status] ?? STATUS_CONFIG.PENDING;
+    const statusCfg =
+        STATUS_CONFIG[order.order_status] ?? STATUS_CONFIG.PENDING;
     const iconMapping = {
         Truck: Truck,
-        Package: Package
+        Package: Package,
     };
-    const ServiceIcon = iconMapping[SERVICE_ICON[order.service_type]] ?? Package;
+    const ServiceIcon =
+        iconMapping[SERVICE_ICON[order.service_type]] ?? Package;
     const shortNum = order.order_number;
     const hasPrescription = !!order.prescription;
 
@@ -51,7 +67,7 @@ export function OrderCard({ order, index, isSelected, onSelect }) {
             animate="visible"
             className={`rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer group ${
                 isSelected
-                    ? "border-[#00346C]/40 shadow-lg shadow-[#00346C]/8 ring-1 ring-[#00346C]/15 bg-white"
+                    ? "border-primary/40 shadow-lg shadow-primary/8 ring-1 ring-primary/15 bg-white"
                     : "border-slate-200/80 hover:border-slate-300 hover:shadow-md bg-slate-50/30 hover:bg-white"
             }`}
             onClick={() => onSelect(order)}
@@ -62,7 +78,7 @@ export function OrderCard({ order, index, isSelected, onSelect }) {
                         <div
                             className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${
                                 isSelected
-                                    ? "bg-[#00346C] text-white shadow-lg shadow-[#00346C]/20 scale-105"
+                                    ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105"
                                     : "bg-white border border-slate-100 text-slate-500 group-hover:border-slate-200"
                             }`}
                         >
@@ -80,7 +96,9 @@ export function OrderCard({ order, index, isSelected, onSelect }) {
                                     </span>
                                 )}
                             </div>
-                            <h3 className={`text-sm font-bold transition-colors mb-1.5 ${isSelected ? "text-slate-900" : "text-slate-700 group-hover:text-slate-900"}`}>
+                            <h3
+                                className={`text-sm font-bold transition-colors mb-1.5 ${isSelected ? "text-slate-900" : "text-slate-700 group-hover:text-slate-900"}`}
+                            >
                                 {order.buyer?.username || "Guest"}
                             </h3>
                             <div className="flex items-center gap-2 flex-wrap">
@@ -92,16 +110,22 @@ export function OrderCard({ order, index, isSelected, onSelect }) {
                                     />
                                     {statusCfg.label}
                                 </span>
-                                <span className="text-xs text-slate-300">·</span>
+                                <span className="text-xs text-slate-300">
+                                    ·
+                                </span>
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    {order.service_type === "DELIVERY" ? "Antar" : "Ambil"}
+                                    {order.service_type === "DELIVERY"
+                                        ? "Antar"
+                                        : "Ambil"}
                                 </span>
                             </div>
                         </div>
                     </div>
 
                     <div className="flex flex-col items-end gap-2 shrink-0">
-                        <p className={`text-base font-black transition-colors tabular-nums ${isSelected ? "text-[#00346C]" : "text-slate-900"}`}>
+                        <p
+                            className={`text-base font-black transition-colors tabular-nums ${isSelected ? "text-primary" : "text-slate-900"}`}
+                        >
                             {formatRupiah(order.grand_total)}
                         </p>
                         <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider">

@@ -171,7 +171,10 @@ export default function PharmacyDetail({ pharmacy, pharmacist, stats }) {
                                                     Nomor Lisensi (SIA)
                                                 </p>
                                                 <p className="text-sm font-black text-slate-900 tracking-wider">
-                                                    {pharmacy.legality?.sia_number}
+                                                    {
+                                                        pharmacy.legality
+                                                            ?.sia_number
+                                                    }
                                                 </p>
                                             </div>
                                         </div>
@@ -298,7 +301,7 @@ export default function PharmacyDetail({ pharmacy, pharmacist, stats }) {
                                 <ChevronLeft className="w-4 h-4" />
                                 Kembali ke Daftar
                             </Button>
-                            <Button className="w-full h-14 rounded-2xl bg-[#00346C] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#00346C]/20">
+                            <Button className="w-full h-14 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all flex items-center justify-center gap-2 shadow-xl shadow-primary/20">
                                 <Edit3 className="w-4 h-4" />
                                 Edit Data Apotek
                             </Button>

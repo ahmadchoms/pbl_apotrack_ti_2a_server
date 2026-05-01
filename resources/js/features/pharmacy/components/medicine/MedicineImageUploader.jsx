@@ -24,7 +24,7 @@ export function MedicineImageUploader({ images, primaryIndex, onUpload }) {
                 onClick={() => fileInputRef.current?.click()}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="w-full aspect-4/3 rounded-2xl border-2 border-dashed border-slate-200 hover:border-[#00346C]/40 bg-slate-50/60 hover:bg-[#00346C]/3 flex flex-col items-center justify-center gap-3 transition-all duration-200 group relative overflow-hidden"
+                className="w-full aspect-4/3 rounded-2xl border-2 border-dashed border-slate-200 hover:border-primary/40 bg-slate-50/60 hover:bg-primary/3 flex flex-col items-center justify-center gap-3 transition-all duration-200 group relative overflow-hidden"
             >
                 {images.length > 0 && images[primaryIndex] ? (
                     <>
@@ -42,11 +42,11 @@ export function MedicineImageUploader({ images, primaryIndex, onUpload }) {
                     </>
                 ) : (
                     <>
-                        <div className="w-14 h-14 rounded-2xl bg-slate-200/80 group-hover:bg-[#00346C]/10 flex items-center justify-center transition-colors">
-                            <ImagePlus className="w-6 h-6 text-slate-400 group-hover:text-[#00346C] transition-colors" />
+                        <div className="w-14 h-14 rounded-2xl bg-slate-200/80 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                            <ImagePlus className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
                         </div>
                         <div className="text-center">
-                            <p className="text-xs font-bold text-slate-500 group-hover:text-[#00346C] transition-colors">
+                            <p className="text-xs font-bold text-slate-500 group-hover:text-primary transition-colors">
                                 Klik untuk unggah gambar
                             </p>
                             <p className="text-[10px] text-slate-400 mt-1">

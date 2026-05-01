@@ -49,7 +49,7 @@ export default function PharmacistOrderManagement({
 
     const handleStatusChange = (status) => {
         router.get(
-            "/pharmacy/orders/list",
+            "/pharmacy/orders",
             { status },
             {
                 preserveState: true,
@@ -73,13 +73,13 @@ export default function PharmacistOrderManagement({
                 >
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="px-3 py-1 bg-blue-50 text-[#00346C] text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
+                            <div className="px-3 py-1 bg-blue-50 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
                                 Apothecary Hub
                             </div>
                         </div>
                         <h2 className="text-4xl font-black text-slate-900 tracking-tight">
                             Manajemen{" "}
-                            <span className="text-[#00346C]">Pesanan</span>
+                            <span className="text-primary">Pesanan</span>
                         </h2>
                         <p className="text-sm text-slate-500 mt-2 font-medium max-w-xl">
                             Validasi resep, kelola status pengiriman, dan pantau
@@ -90,7 +90,7 @@ export default function PharmacistOrderManagement({
 
                     <Link
                         href={route("pharmacy.orders.pos")}
-                        className="inline-flex items-center gap-3 bg-linear-to-r from-[#00346C] to-[#0055a5] text-white px-8 h-14 rounded-[1.25rem] font-bold text-sm shadow-xl shadow-blue-900/20 hover:shadow-blue-900/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                        className="inline-flex items-center gap-3 bg-linear-to-r from-primary to-[#0055a5] text-white px-8 h-14 rounded-[1.25rem] font-bold text-sm shadow-xl shadow-blue-900/20 hover:shadow-blue-900/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
                     >
                         <PlusCircle className="w-5 h-5" />
                         Buat Pesanan Manual (POS)
@@ -123,7 +123,7 @@ export default function PharmacistOrderManagement({
                                 <TabsTrigger
                                     key={s.value}
                                     value={s.value}
-                                    className="rounded-xl px-5 text-[10px] font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                                    className="rounded-xl px-5 text-[10px] font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                                 >
                                     {s.label}
                                 </TabsTrigger>
@@ -184,7 +184,7 @@ export default function PharmacistOrderManagement({
                                                     className="group hover:bg-slate-50/50 transition-colors border-slate-100"
                                                 >
                                                     <TableCell className="py-5 pl-8">
-                                                        <span className="text-xs font-bold text-[#00346C] font-mono tracking-tight">
+                                                        <span className="text-xs font-bold text-primary font-mono tracking-tight">
                                                             {order.order_number}
                                                         </span>
                                                         <p className="text-[9px] text-slate-400 font-medium mt-1 uppercase tracking-wider">
@@ -257,7 +257,7 @@ export default function PharmacistOrderManagement({
                                                                 "pharmacy.orders.show",
                                                                 order.id,
                                                             )}
-                                                            className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-[#00346C] text-slate-400 hover:text-white flex items-center justify-center transition-all group-hover:scale-110 shadow-sm"
+                                                            className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-primary text-slate-400 hover:text-white flex items-center justify-center transition-all group-hover:scale-110 shadow-sm"
                                                         >
                                                             <ChevronRight className="w-4 h-4" />
                                                         </Link>

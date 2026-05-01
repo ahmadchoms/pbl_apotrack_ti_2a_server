@@ -7,6 +7,7 @@ use App\Models\Pharmacy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Enums\OrderStatus;
 
 class OrderService
 {
@@ -98,19 +99,19 @@ class OrderService
             ->count();
     }
 
-    public function updateStatus(string $orderId, string $status, ?string $note = null)
+    public function updateStatus(string $orderId, OrderStatus $status, ?string $note = null)
     {
         return DB::transaction(function () use ($orderId, $status, $note) {
             $order = Order::findOrFail($orderId);
             $oldStatus = $order->order_status;
 
-            $order->update(['order_status' => $status]);
+            $order->update(['order_status' => $status->value]);
 
             // Create log
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
-                'status' => $status,
-                'description' => $note ?? "Status changed from $oldStatus to $status",
+                'status' => $status->value,
+                'description' => $note ?? "Status changed from $oldStatus to {$status->value}",
                 'source' => 'PHARMACY_WEB'
             ]);
 
@@ -120,7 +121,7 @@ class OrderService
 
     public function rejectOrder(string $orderId, string $reason)
     {
-        return $this->updateStatus($orderId, 'CANCELLED', "Pesanan ditolak: $reason");
+        return $this->updateStatus($orderId, OrderStatus::CANCELLED, "Pesanan ditolak: $reason");
     }
 
     public function validatePrescription(string $prescriptionId, string $status, ?string $note = null)

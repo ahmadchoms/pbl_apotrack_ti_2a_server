@@ -196,7 +196,7 @@ export function MedicineCard({ medicine, index, onView }) {
                             Stok
                         </p>
                         <p
-                            className={`text-sm font-black tabular-nums ${stockStatus === "ok" ? "text-[#00346C]" : stockStatus === "low" ? "text-amber-600" : "text-red-500"}`}
+                            className={`text-sm font-black tabular-nums ${stockStatus === "ok" ? "text-primary" : stockStatus === "low" ? "text-amber-600" : "text-red-500"}`}
                         >
                             {medicine.total_active_stock}{" "}
                             <span className="text-xs font-semibold text-slate-400">
@@ -208,7 +208,7 @@ export function MedicineCard({ medicine, index, onView }) {
                         <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-widest">
                             Harga
                         </p>
-                        <p className="text-sm font-black text-[#00346C] tabular-nums">
+                        <p className="text-sm font-black text-primary tabular-nums">
                             {formatRupiah(medicine.price)}
                         </p>
                     </div>
@@ -216,7 +216,7 @@ export function MedicineCard({ medicine, index, onView }) {
 
                 <button
                     onClick={() => onView(medicine)}
-                    className="mt-3 w-full h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-[#00346C] hover:border-[#00346C] hover:text-white text-slate-500 text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5"
+                    className="mt-3 w-full h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-primary hover:border-primary hover:text-white text-slate-500 text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5"
                 >
                     <Eye className="w-3 h-3" />
                     Lihat Detail

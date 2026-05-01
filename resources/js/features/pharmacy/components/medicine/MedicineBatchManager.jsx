@@ -96,7 +96,7 @@ export function MedicineBatchManager({
                     type="button"
                     onClick={onAdd}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full h-10 rounded-xl border-2 border-dashed border-slate-200 hover:border-[#00346C]/40 bg-transparent hover:bg-[#00346C]/3 text-slate-400 hover:text-[#00346C] text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200"
+                    className="w-full h-10 rounded-xl border-2 border-dashed border-slate-200 hover:border-primary/40 bg-transparent hover:bg-primary/3 text-slate-400 hover:text-primary text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200"
                 >
                     <Plus className="w-3.5 h-3.5" /> Tambah Batch Baru
                 </motion.button>

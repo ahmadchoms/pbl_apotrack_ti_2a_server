@@ -105,14 +105,14 @@ export default function ReportsPage({ reportData, filters }) {
                         <TabsList className="bg-white p-1.5 rounded-[1.5rem] border border-slate-200/60 shadow-sm h-14">
                             <TabsTrigger
                                 value="sales"
-                                className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                                className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                             >
                                 <TrendingUp className="w-4 h-4 mr-2" />{" "}
                                 Penjualan
                             </TabsTrigger>
                             <TabsTrigger
                                 value="stock"
-                                className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                                className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                             >
                                 <ArrowLeftRight className="w-4 h-4 mr-2" />{" "}
                                 Mutasi Stok
@@ -235,7 +235,7 @@ function SalesReportTable({ data, onExport }) {
                                     className="hover:bg-slate-50/50 transition-colors border-slate-100"
                                 >
                                     <TableCell className="py-5 pl-8">
-                                        <span className="text-xs font-black text-[#00346C] font-mono">
+                                        <span className="text-xs font-black text-primary font-mono">
                                             {order.order_number}
                                         </span>
                                     </TableCell>

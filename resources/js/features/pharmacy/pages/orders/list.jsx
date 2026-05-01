@@ -50,8 +50,8 @@ export default function OrdersList({ orders, currentStatus }) {
             <div className="space-y-8 pb-12">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <p className="text-[10px] font-black text-[#00346C] uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                            <span className="w-8 h-px bg-[#00346C]/30" />
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                            <span className="w-8 h-px bg-primary/30" />
                             Arsip Transaksi
                         </p>
                         <h2 className="text-3xl font-black text-slate-900 tracking-tight">
@@ -88,7 +88,7 @@ export default function OrdersList({ orders, currentStatus }) {
                                 <TabsTrigger
                                     key={s.value}
                                     value={s.value}
-                                    className="rounded-xl px-5 text-[10px] font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                                    className="rounded-xl px-5 text-[10px] font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                                 >
                                     {s.label}
                                 </TabsTrigger>
@@ -149,7 +149,7 @@ export default function OrdersList({ orders, currentStatus }) {
                                                     className="group hover:bg-slate-50/50 transition-colors border-slate-100"
                                                 >
                                                     <TableCell className="py-5 pl-8">
-                                                        <span className="text-xs font-bold text-[#00346C] font-mono tracking-tight">
+                                                        <span className="text-xs font-bold text-primary font-mono tracking-tight">
                                                             {order.order_number}
                                                         </span>
                                                         <p className="text-[9px] text-slate-400 font-medium mt-1 uppercase tracking-wider">
@@ -226,7 +226,7 @@ export default function OrdersList({ orders, currentStatus }) {
                                                                     },
                                                                 )
                                                             }
-                                                            className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-[#00346C] text-slate-400 hover:text-white flex items-center justify-center transition-all group-hover:scale-110 shadow-sm"
+                                                            className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-primary text-slate-400 hover:text-white flex items-center justify-center transition-all group-hover:scale-110 shadow-sm"
                                                         >
                                                             <ChevronRight className="w-4 h-4" />
                                                         </button>

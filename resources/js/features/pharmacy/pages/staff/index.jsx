@@ -88,13 +88,13 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                 <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="px-3 py-1 bg-blue-50 text-[#00346C] text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
+                            <div className="px-3 py-1 bg-blue-50 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
                                 Human Resource Center
                             </div>
                         </div>
                         <h2 className="text-4xl font-black text-slate-900 tracking-tight">
                             Manajemen{" "}
-                            <span className="text-[#00346C]">Pegawai</span>
+                            <span className="text-primary">Pegawai</span>
                         </h2>
                         <p className="text-sm text-slate-500 mt-2 font-medium max-w-xl">
                             Kelola tim apotek Anda, pantau aktivitas
@@ -107,7 +107,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                         <Button
                             onClick={generateInvitation}
                             disabled={isGenerating}
-                            className="h-14 px-8 rounded-2xl bg-[#00346C] hover:bg-[#002a58] text-white font-black text-sm shadow-xl shadow-blue-900/20 transition-all hover:-translate-y-0.5"
+                            className="h-14 px-8 rounded-2xl bg-primary hover:bg-primary/80 text-white font-black text-sm shadow-xl shadow-blue-900/20 transition-all hover:-translate-y-0.5"
                         >
                             <QrCode className="w-5 h-5 mr-3" />
                             {isGenerating
@@ -121,13 +121,13 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                     <TabsList className="bg-white p-1.5 rounded-[1.5rem] border border-slate-200/60 shadow-sm h-14">
                         <TabsTrigger
                             value="list"
-                            className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                            className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                         >
                             <Users className="w-4 h-4 mr-2" /> Daftar Pegawai
                         </TabsTrigger>
                         <TabsTrigger
                             value="logs"
-                            className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                            className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                         >
                             <Activity className="w-4 h-4 mr-2" /> Audit Log
                             Aktivitas
@@ -353,7 +353,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                 <DialogContent className="min-w-4xl max-h-[90vh] overflow-hidden rounded-[2.5rem] border-slate-100 shadow-2xl flex flex-col p-0">
                     <div className="p-8 overflow-y-auto flex-1">
                         <DialogHeader>
-                            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-[#00346C] mb-4 shadow-inner">
+                            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-primary mb-4 shadow-inner">
                                 <QrCode className="w-8 h-8" />
                             </div>
                             <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">
@@ -383,7 +383,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                                 </p>
 
                                 <div className="bg-white rounded-xl p-3 border border-slate-200">
-                                    <p className="text-xs font-mono text-[#00346C] line-clamp-3 break-all">
+                                    <p className="text-xs font-mono text-primary line-clamp-3 break-all">
                                         {invitationUrl}
                                     </p>
                                 </div>
@@ -395,7 +395,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
 
                                     <Button
                                         size="sm"
-                                        className="h-9 rounded-xl bg-[#00346C] hover:bg-[#002a58] text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                                        className="h-9 rounded-xl bg-primary hover:bg-primary/80 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
                                         onClick={copyToClipboard}
                                     >
                                         <Copy className="w-3.5 h-3.5" />

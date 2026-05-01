@@ -45,8 +45,7 @@ export default function PharmacistProfile({ user, pharmacy, auditLogs }) {
 
     return (
         <DashboardPharmacyLayout activeMenu="Profil Saya">
-            <div className="max-w-[1200px] mx-auto pb-20 px-4">
-                {/* Header Section */}
+            <div className="pb-20 px-4">
                 <div className="mb-10">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-100">
@@ -67,7 +66,7 @@ export default function PharmacistProfile({ user, pharmacy, auditLogs }) {
                     <TabsList className="bg-white p-1.5 rounded-[1.5rem] border border-slate-200/60 shadow-sm h-14 w-full md:w-auto">
                         <TabsTrigger
                             value="personal"
-                            className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                            className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                         >
                             <User className="w-4 h-4 mr-2" /> Profil Saya
                         </TabsTrigger>
@@ -75,14 +74,14 @@ export default function PharmacistProfile({ user, pharmacy, auditLogs }) {
                             <>
                                 <TabsTrigger
                                     value="pharmacy"
-                                    className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                                    className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                                 >
                                     <Store className="w-4 h-4 mr-2" /> Informasi
                                     Apotek
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="hours"
-                                    className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-[#00346C] data-[state=active]:text-white transition-all"
+                                    className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-wider data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
                                 >
                                     <Clock className="w-4 h-4 mr-2" /> Jam
                                     Operasional
@@ -134,8 +133,8 @@ function PersonalForm({ user }) {
     };
 
     return (
-        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
-            <CardHeader className="p-8 border-b border-slate-50">
+        <Card className="py-0 gap-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+            <CardHeader className="p-8 border-b border-slate-10">
                 <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                     Detail Akun Personal
                 </CardTitle>
@@ -154,7 +153,7 @@ function PersonalForm({ user }) {
                             onChange={(e) =>
                                 setData("username", e.target.value)
                             }
-                            className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white"
+                            className="h-12 font-bold rounded-xl bg-slate-50 border-slate-200 focus:bg-white"
                         />
                     </div>
                     <div className="space-y-2">
@@ -169,7 +168,7 @@ function PersonalForm({ user }) {
                     </div>
                 </div>
                 <Button
-                    className="h-12 px-8 rounded-xl bg-[#00346C] hover:bg-[#002a58] text-white font-black text-[10px] uppercase tracking-widest"
+                    className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/80 text-white font-black text-[10px] uppercase tracking-widest"
                     onClick={submit}
                 >
                     Simpan Perubahan
@@ -197,7 +196,7 @@ function PasswordForm() {
     };
 
     return (
-        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+        <Card className="py-0 gap-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
             <CardHeader className="p-8 border-b border-slate-50">
                 <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                     Keamanan & Password
@@ -216,6 +215,7 @@ function PasswordForm() {
                         <Input
                             type="password"
                             value={data.current_password}
+                            placeholder="Minimal 8 karakter"
                             onChange={(e) =>
                                 setData("current_password", e.target.value)
                             }
@@ -234,6 +234,7 @@ function PasswordForm() {
                         <Input
                             type="password"
                             value={data.password}
+                            placeholder="Minimal 8 karakter"
                             onChange={(e) =>
                                 setData("password", e.target.value)
                             }
@@ -252,6 +253,7 @@ function PasswordForm() {
                         <Input
                             type="password"
                             value={data.password_confirmation}
+                            placeholder="Minimal 8 karakter"
                             onChange={(e) =>
                                 setData("password_confirmation", e.target.value)
                             }
@@ -286,7 +288,7 @@ function PharmacyForm({ pharmacy }) {
     };
 
     return (
-        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+        <Card className="py-0 gap-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
             <CardHeader className="p-8 border-b border-slate-50">
                 <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                     Informasi Publik Apotek
@@ -424,7 +426,6 @@ function OperatingHoursForm({ pharmacy }) {
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-8">
-                                    {/* Status Toggles */}
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center gap-3">
                                             <Switch
@@ -470,7 +471,6 @@ function OperatingHoursForm({ pharmacy }) {
                                         </div>
                                     </div>
 
-                                    {/* Time Inputs */}
                                     <div
                                         className={`flex items-center gap-3 transition-opacity ${isDisabled ? "opacity-30 pointer-events-none" : "opacity-100"}`}
                                     >
@@ -515,7 +515,7 @@ function OperatingHoursForm({ pharmacy }) {
                 </div>
                 <div className="mt-10 flex justify-end">
                     <Button
-                        className="h-14 px-10 rounded-2xl bg-[#00346C] hover:bg-[#002a58] text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20"
+                        className="h-14 px-10 rounded-2xl bg-primary hover:bg-primary/80 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20"
                         onClick={submit}
                     >
                         <Save className="w-5 h-5 mr-3" /> Simpan Jam Operasional
@@ -528,7 +528,7 @@ function OperatingHoursForm({ pharmacy }) {
 
 function AuditLogSection({ logs }) {
     return (
-        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+        <Card className="py-0 gap-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
             <CardHeader className="p-6 border-b border-slate-50 flex items-center justify-between flex-row">
                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                     Audit History

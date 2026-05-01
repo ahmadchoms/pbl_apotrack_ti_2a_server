@@ -84,7 +84,7 @@ export function OrderDetailModal({ order, open, onClose }) {
                 <div className="flex-1 overflow-y-auto p-8 bg-white no-scrollbar">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-[#00346C] to-[#0055a5] flex items-center justify-center shadow-lg shadow-[#00346C]/20">
+                            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-primary to-[#0055a5] flex items-center justify-center shadow-lg shadow-primary/20">
                                 <ShoppingBag className="w-6 h-6 text-white" />
                             </div>
                             <div>
@@ -171,17 +171,17 @@ export function OrderDetailModal({ order, open, onClose }) {
                                                 x {formatRupiah(item.price)}
                                             </p>
                                         </div>
-                                        <p className="text-[11px] font-black text-[#00346C]">
+                                        <p className="text-[11px] font-black text-primary">
                                             {formatRupiah(item.subtotal)}
                                         </p>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-4 p-4 bg-[#00346C]/5 rounded-2xl border border-[#00346C]/10 flex items-center justify-between">
-                                <span className="text-[10px] font-black text-[#00346C]/60 uppercase tracking-widest">
+                            <div className="mt-4 p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-center justify-between">
+                                <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
                                     Total Pembayaran
                                 </span>
-                                <span className="text-base font-black text-[#00346C]">
+                                <span className="text-base font-black text-primary">
                                     {formatRupiah(order.grand_total)}
                                 </span>
                             </div>
@@ -294,7 +294,7 @@ export function OrderDetailModal({ order, open, onClose }) {
 
                             {order.order_status === "PROCESSING" && (
                                 <Button
-                                    className="w-full h-12 rounded-xl bg-[#00346C] hover:bg-[#002a58] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-900/20"
+                                    className="w-full h-12 rounded-xl bg-primary hover:bg-primary/80 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-900/20"
                                     onClick={() =>
                                         handleUpdateStatus(
                                             isDelivery

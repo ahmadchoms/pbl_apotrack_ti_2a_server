@@ -110,7 +110,7 @@ export function OrderCatalog({
                         placeholder="Cari nama obat, kategori, generik..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 h-11 rounded-2xl border-slate-200 bg-white text-sm shadow-sm focus:ring-2 focus:ring-[#00346C]/10 focus:border-[#00346C]/40 placeholder:text-slate-300"
+                        className="pl-10 h-11 rounded-2xl border-slate-200 bg-white text-sm shadow-sm focus:ring-2 focus:ring-primary/10 focus:border-primary/40 placeholder:text-slate-300"
                     />
                     {searchQuery && (
                         <button
@@ -199,7 +199,7 @@ export function OrderCatalog({
                                         layout
                                         className={`bg-white rounded-3xl border overflow-hidden flex flex-col group transition-all duration-300 ${
                                             inCart
-                                                ? "border-[#00346C]/25 shadow-lg shadow-[#00346C]/8 ring-1 ring-[#00346C]/10"
+                                                ? "border-primary/25 shadow-lg shadow-primary/8 ring-1 ring-primary/10"
                                                 : "border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300"
                                         } ${isOutOfStock ? "opacity-60" : ""}`}
                                     >
@@ -240,7 +240,7 @@ export function OrderCatalog({
                                             </div>
 
                                             {inCart && (
-                                                <div className="absolute inset-0 bg-[#00346C]/5" />
+                                                <div className="absolute inset-0 bg-primary/5" />
                                             )}
                                         </div>
 
@@ -256,7 +256,7 @@ export function OrderCatalog({
                                                         {drug.category}
                                                     </span>
                                                 </div>
-                                                <h4 className="text-sm font-black text-slate-900 leading-snug mt-1.5 group-hover:text-[#00346C] transition-colors">
+                                                <h4 className="text-sm font-black text-slate-900 leading-snug mt-1.5 group-hover:text-primary transition-colors">
                                                     {drug.name}
                                                 </h4>
                                                 <p className="text-[10px] text-slate-400 font-medium mt-0.5">
@@ -272,7 +272,7 @@ export function OrderCatalog({
                                                     {formatRupiah(drug.price)}
                                                 </p>
                                                 {inCart ? (
-                                                    <div className="flex items-center bg-[#00346C]/5 border border-[#00346C]/15 rounded-xl p-0.5">
+                                                    <div className="flex items-center bg-primary/5 border border-primary/15 rounded-xl p-0.5">
                                                         <button
                                                             onClick={() =>
                                                                 addToCart(
@@ -280,11 +280,11 @@ export function OrderCatalog({
                                                                     -1,
                                                                 )
                                                             }
-                                                            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#00346C] hover:bg-[#00346C] hover:text-white transition-all text-sm font-black"
+                                                            className="w-7 h-7 flex items-center justify-center rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-sm font-black"
                                                         >
                                                             −
                                                         </button>
-                                                        <span className="w-7 text-center text-xs font-black text-[#00346C] tabular-nums">
+                                                        <span className="w-7 text-center text-xs font-black text-primary tabular-nums">
                                                             {cartQty}
                                                         </span>
                                                         <button
@@ -297,7 +297,7 @@ export function OrderCatalog({
                                                             disabled={
                                                                 isOutOfStock
                                                             }
-                                                            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#00346C] hover:bg-[#00346C] hover:text-white transition-all text-sm font-black disabled:opacity-40"
+                                                            className="w-7 h-7 flex items-center justify-center rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-sm font-black disabled:opacity-40"
                                                         >
                                                             +
                                                         </button>
@@ -311,7 +311,7 @@ export function OrderCatalog({
                                                         whileTap={{
                                                             scale: 0.93,
                                                         }}
-                                                        className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-[#00346C] text-white px-3.5 py-2 rounded-xl font-bold text-[11px] transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                                                        className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-primary text-white px-3.5 py-2 rounded-xl font-bold text-[11px] transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                                                     >
                                                         <Plus className="w-3.5 h-3.5" />
                                                         Tambah
