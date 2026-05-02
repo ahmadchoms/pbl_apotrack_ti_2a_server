@@ -69,7 +69,13 @@ class User extends Authenticatable
     public function scopeFilterRole($query, $role)
     {
         return $query->when($role && $role !== 'all', function ($q) use ($role) {
-            $q->where('role', $role);
+            if ($role === 'APOTEKER' || $role === 'STAFF') {
+                $q->whereHas('pharmacyStaff', function ($sq) use ($role) {
+                    $sq->where('role', $role);
+                });
+            } else {
+                $q->where('role', $role);
+            }
         });
     }
 }

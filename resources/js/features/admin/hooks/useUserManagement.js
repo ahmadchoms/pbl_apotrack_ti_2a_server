@@ -27,6 +27,12 @@ export function useUserManagement({ users, filters: serverFilters }) {
         }
     };
 
+    const resetPassword = (user) => {
+        if (confirm(`Apakah Anda yakin ingin mereset password user ${user.username} menjadi default (Apotrack2026!)?`)) {
+            router.patch(`/admin/users/${user.id}/reset-password`);
+        }
+    };
+
     return {
         search, setSearch,
         role, setRole,
@@ -35,6 +41,7 @@ export function useUserManagement({ users, filters: serverFilters }) {
         handleFilter,
         onPageChange,
         confirmDelete,
+        resetPassword,
         userList: users?.data || [],
         pagination: users,
     };

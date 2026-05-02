@@ -66,7 +66,7 @@ export function UserFilters({
                             Apoteker
                         </SelectItem>
                         <SelectItem
-                            value="PHARMACY_STAFF"
+                            value="STAFF"
                             className="text-xs font-bold"
                         >
                             Staff

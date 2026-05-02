@@ -42,13 +42,13 @@ class PharmacyController extends Controller
     {
         $this->pharmacyService->store($request->validated());
 
-        return redirect()->route('admin.pharmacies')
+        return redirect()->route('admin.pharmacies.index')
             ->with('success', 'Apotek berhasil ditambahkan');
     }
 
     public function edit(Pharmacy $pharmacy)
     {
-        $pharmacy->load(['legality', 'staffs.user', 'hours', 'images']);
+        $pharmacy->load(['legality', 'staffs.user', 'operatingHours']);
 
         return Inertia::render('admin/pharmacies/edit', [
             'pharmacy' => new PharmacyResource($pharmacy),
@@ -62,7 +62,7 @@ class PharmacyController extends Controller
     {
         $this->pharmacyService->update($pharmacy, $request->validated());
 
-        return redirect()->route('admin.pharmacies')
+        return redirect()->route('admin.pharmacies.index')
             ->with('success', 'Apotek berhasil diperbarui');
     }
 
@@ -70,30 +70,44 @@ class PharmacyController extends Controller
     {
         $this->pharmacyService->delete($pharmacy);
 
-        return redirect()->route('admin.pharmacies')
+        return redirect()->route('admin.pharmacies.index')
             ->with('success', 'Apotek berhasil dihapus');
     }
 
     public function detail(Pharmacy $pharmacy)
     {
-        $pharmacy->load(['legality', 'staffs.user'])
-            ->loadCount([
-                'orders as monthly_orders_count' => fn($q) => $q
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
-            ]);
+        $pharmacy = $this->pharmacyService->getDetail($pharmacy->id);
 
         return Inertia::render('admin/pharmacies/detail', [
             'pharmacy' => new PharmacyDetailResource($pharmacy),
         ]);
     }
 
+    public function verifyLegality(Request $request, Pharmacy $pharmacy)
+    {
+        $request->validate([
+            'status' => 'required|in:APPROVED,REJECTED',
+            'note' => 'required_if:status,REJECTED|nullable|string'
+        ]);
+
+        $this->pharmacyService->verifyLegality($pharmacy, $request->status, $request->note);
+
+        return redirect()->back()->with('success', 'Verifikasi legalitas berhasil diperbarui');
+    }
+
+    public function toggleSuspend(Pharmacy $pharmacy)
+    {
+        $this->pharmacyService->toggleSuspend($pharmacy);
+
+        return redirect()->back()->with('success', 'Status suspensi apotek berhasil diubah');
+    }
+
     public function export()
     {
         $pharmacies = Pharmacy::with('legality')->get();
         $csvHeader = ['ID', 'Name', 'Address', 'Phone', 'SIA Number', 'Status', 'Rating', 'Created At'];
-        
-        $callback = function() use ($pharmacies, $csvHeader) {
+
+        $callback = function () use ($pharmacies, $csvHeader) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $csvHeader);
 

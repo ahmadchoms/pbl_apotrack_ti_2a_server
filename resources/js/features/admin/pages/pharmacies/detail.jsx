@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
-import { DashboardAdminLayout } from "@/layouts/admin-layout";
+import { AdminLayout } from "@/layouts/admin-layout";
 import {
     ChevronLeft,
     ShieldCheck,
@@ -141,10 +141,11 @@ export default function PharmacyDetail({ pharmacy }) {
     };
 
     return (
-        <DashboardAdminLayout activeMenu="Apotek">
+        <AdminLayout activeMenu="Apotek">
             <Head title={`Detail Apotek - ${data.name}`} />
 
             <div className="max-w-350 mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-1">
                         <Link
@@ -173,10 +174,8 @@ export default function PharmacyDetail({ pharmacy }) {
                         >
                             Edit Profil
                         </Link>
-                        <Link
-                            href={route("admin.profile.audit-history", {
-                                search: data.name,
-                            })}
+                        <Link 
+                            href={route("admin.profile.audit-history", { search: data.name })}
                             className="inline-flex items-center justify-center rounded-2xl h-12 px-6 bg-[#00346C] hover:bg-[#002a58] text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/20 transition-all"
                         >
                             Log Aktivitas
@@ -184,13 +183,14 @@ export default function PharmacyDetail({ pharmacy }) {
                     </div>
                 </div>
 
+                {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                     >
-                        <Card className="py-0 gap-0 rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
+                        <Card className="rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
                             <CardContent className="p-8 relative">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
                                     <TrendingUp className="w-20 h-20 text-indigo-600" />
@@ -198,7 +198,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
                                     Total Omset
                                 </p>
-                                <h3 className="text-xl font-black text-slate-900">
+                                <h3 className="text-3xl font-black text-slate-900">
                                     {formatCurrency(data.stats.total_revenue)}
                                 </h3>
                                 <div className="mt-4 flex items-center gap-2">
@@ -216,7 +216,7 @@ export default function PharmacyDetail({ pharmacy }) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <Card className="py-0 gap-0 rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
+                        <Card className="rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
                             <CardContent className="p-8 relative">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
                                     <ShoppingBag className="w-20 h-20 text-amber-600" />
@@ -224,7 +224,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
                                     Total Pesanan
                                 </p>
-                                <h3 className="text-xl font-black text-slate-900">
+                                <h3 className="text-3xl font-black text-slate-900">
                                     {data.stats.total_orders}
                                 </h3>
                                 <div className="mt-4 flex items-center gap-2">
@@ -241,7 +241,7 @@ export default function PharmacyDetail({ pharmacy }) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                     >
-                        <Card className="py-0 gap-0 rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
+                        <Card className="rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
                             <CardContent className="p-8 relative">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
                                     <Calendar className="w-20 h-20 text-emerald-600" />
@@ -249,7 +249,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
                                     Bergabung Sejak
                                 </p>
-                                <h3 className="text-xl font-black text-slate-900">
+                                <h3 className="text-3xl font-black text-slate-900">
                                     {data.stats.joined_at}
                                 </h3>
                                 <div className="mt-4 flex items-center gap-2">
@@ -266,7 +266,7 @@ export default function PharmacyDetail({ pharmacy }) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                     >
-                        <Card className="py-0 gap-0 rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
+                        <Card className="rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
                             <CardContent className="p-8 relative">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
                                     <ShieldCheck className="w-20 h-20 text-indigo-600" />
@@ -274,7 +274,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
                                     Rating Platform
                                 </p>
-                                <h3 className="text-xl font-black text-slate-900">
+                                <h3 className="text-3xl font-black text-slate-900">
                                     {data.rating || "0.0"}
                                 </h3>
                                 <div className="mt-4 flex items-center gap-2">
@@ -288,6 +288,7 @@ export default function PharmacyDetail({ pharmacy }) {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column - Details */}
                     <div className="lg:col-span-2 space-y-8">
                         <Tabs defaultValue="legality" className="w-full">
                             <TabsList className="bg-white p-1.5 rounded-[1.5rem] border border-slate-200 shadow-sm h-14 mb-6">
@@ -309,7 +310,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                 value="legality"
                                 className="mt-0 space-y-8 outline-none"
                             >
-                                <Card className="py-0 gap-0 rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                                <Card className="rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                                     <CardHeader className="p-8 border-b border-slate-50">
                                         <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                                             Verifikasi Dokumen Legal
@@ -483,15 +484,11 @@ export default function PharmacyDetail({ pharmacy }) {
                                                                         )
                                                                     }
                                                                     disabled={
-                                                                        !rejectionNote ||
-                                                                        isProcessing
+                                                                        !rejectionNote || isProcessing
                                                                     }
                                                                 >
                                                                     {isProcessing ? (
-                                                                        <>
-                                                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                                                            Memproses...
-                                                                        </>
+                                                                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</>
                                                                     ) : (
                                                                         "Kirim Penolakan"
                                                                     )}
@@ -541,40 +538,33 @@ export default function PharmacyDetail({ pharmacy }) {
                                                                     platform.
                                                                 </DialogDescription>
                                                             </DialogHeader>
-                                                            <DialogFooter className="mt-6">
-                                                                <div className="w-full space-y-3">
-                                                                    <Button
-                                                                        className="w-full h-12 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20"
-                                                                        onClick={() =>
-                                                                            handleVerify(
-                                                                                "APPROVED",
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            isProcessing
-                                                                        }
-                                                                    >
-                                                                        {isProcessing ? (
-                                                                            <>
-                                                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                                                                Memproses...
-                                                                            </>
-                                                                        ) : (
-                                                                            "Ya, Setujui Sekarang"
-                                                                        )}
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        className="w-full h-12 rounded-2xl font-bold text-xs uppercase tracking-widest text-slate-400"
-                                                                        onClick={() =>
-                                                                            setIsVerifyDialogOpen(
-                                                                                false,
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        Batal
-                                                                    </Button>
-                                                                </div>
+                                                            <DialogFooter className="mt-6 flex-col gap-3">
+                                                                <Button
+                                                                    className="w-full h-12 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20"
+                                                                    onClick={() =>
+                                                                        handleVerify(
+                                                                            "APPROVED",
+                                                                        )
+                                                                    }
+                                                                    disabled={isProcessing}
+                                                                >
+                                                                    {isProcessing ? (
+                                                                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</>
+                                                                    ) : (
+                                                                        "Ya, Setujui Sekarang"
+                                                                    )}
+                                                                </Button>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    className="w-full h-12 rounded-2xl font-bold text-xs uppercase tracking-widest text-slate-400"
+                                                                    onClick={() =>
+                                                                        setIsVerifyDialogOpen(
+                                                                            false,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Batal
+                                                                </Button>
                                                             </DialogFooter>
                                                         </DialogContent>
                                                     </Dialog>
@@ -589,7 +579,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                 value="staff"
                                 className="mt-0 outline-none"
                             >
-                                <Card className="py-0 gap-0 rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                                <Card className="rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                                     <CardHeader className="p-8 border-b border-slate-50">
                                         <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                                             Daftar Staf Terdaftar
@@ -613,9 +603,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                                                     src={
                                                                         staff.avatar
                                                                     }
-                                                                    alt={
-                                                                        staff.username
-                                                                    }
+                                                                    alt={staff.username}
                                                                     className="w-full h-full object-cover"
                                                                 />
                                                             ) : (
@@ -646,7 +634,8 @@ export default function PharmacyDetail({ pharmacy }) {
                             </TabsContent>
                         </Tabs>
 
-                        <Card className="py-0 gap-0 rounded-[2.5rem] border-2 border-dashed border-rose-100 bg-rose-50/20 overflow-hidden">
+                        {/* Danger Zone */}
+                        <Card className="rounded-[2.5rem] border-2 border-dashed border-rose-100 bg-rose-50/20 overflow-hidden">
                             <CardHeader className="p-8">
                                 <CardTitle className="text-sm font-black uppercase tracking-widest text-rose-500 flex items-center gap-2">
                                     <AlertTriangle className="w-4 h-4" /> Danger
@@ -684,7 +673,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                                     ? "default"
                                                     : "destructive"
                                             }
-                                            className={`rounded-2xl h-14 px-8 font-black text-white text-[11px] uppercase tracking-widest shadow-xl ${data.verification_status === "SUSPENDED" ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" : "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20"}`}
+                                            className={`rounded-2xl h-14 px-8 font-black text-[11px] uppercase tracking-widest shadow-xl ${data.verification_status === "SUSPENDED" ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" : "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20"}`}
                                         >
                                             {data.verification_status ===
                                             "SUSPENDED" ? (
@@ -735,8 +724,8 @@ export default function PharmacyDetail({ pharmacy }) {
                                                 </p>
                                             </div>
                                         </div>
-                                        <DialogFooter>
-                                            <div className="space-y-3 w-full">
+                                        <DialogFooter className="bg-red-300">
+                                            <div className="space-y-3 bg-red-200">
                                                 <Button
                                                     className={`w-full h-12 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl ${data.verification_status === "SUSPENDED" ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" : "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20"}`}
                                                     onClick={
@@ -745,10 +734,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                                     disabled={isProcessing}
                                                 >
                                                     {isProcessing ? (
-                                                        <>
-                                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                                            Memproses...
-                                                        </>
+                                                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</>
                                                     ) : (
                                                         "Ya, Konfirmasi Tindakan"
                                                     )}
@@ -772,8 +758,9 @@ export default function PharmacyDetail({ pharmacy }) {
                         </Card>
                     </div>
 
+                    {/* Right Column - Quick Info */}
                     <div className="space-y-8">
-                        <Card className="py-0 gap-0 rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                        <Card className="rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                             <CardHeader className="p-8 border-b border-slate-50">
                                 <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                                     Info Pemilik
@@ -838,7 +825,7 @@ export default function PharmacyDetail({ pharmacy }) {
                                     </div>
 
                                     <a
-                                        href={`https://wa.me/${data.pharmacist?.phone?.replace(/\D/g, "")}`}
+                                        href={`https://wa.me/${data.pharmacist?.phone?.replace(/\D/g, '')}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center justify-center w-full h-12 rounded-2xl bg-slate-50 hover:bg-indigo-50 text-indigo-600 font-bold text-[10px] uppercase tracking-widest transition-colors"
@@ -849,7 +836,7 @@ export default function PharmacyDetail({ pharmacy }) {
                             </CardContent>
                         </Card>
 
-                        <Card className="py-0 gap-0 rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                        <Card className="rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                             <CardHeader className="p-8 border-b border-slate-50">
                                 <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                                     Lokasi & Kontak
@@ -857,6 +844,7 @@ export default function PharmacyDetail({ pharmacy }) {
                             </CardHeader>
                             <CardContent className="p-8 space-y-6">
                                 <div className="aspect-video rounded-3xl bg-slate-100 border border-slate-200 relative overflow-hidden group">
+                                    {/* Placeholder for map */}
                                     <div className="absolute inset-0 bg-indigo-50 flex items-center justify-center">
                                         <MapPin className="w-10 h-10 text-indigo-200 animate-bounce" />
                                     </div>
@@ -891,6 +879,6 @@ export default function PharmacyDetail({ pharmacy }) {
                     </div>
                 </div>
             </div>
-        </DashboardAdminLayout>
+        </AdminLayout>
     );
 }

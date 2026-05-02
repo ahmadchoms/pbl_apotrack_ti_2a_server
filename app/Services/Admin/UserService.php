@@ -61,6 +61,19 @@ class UserService
         });
     }
 
+    public function toggleActive(User $user)
+    {
+        $user->update(['is_active' => !$user->is_active]);
+        return $user;
+    }
+
+    public function resetPassword(User $user)
+    {
+        $password = 'Apotrack2026!';
+        $user->update(['password_hash' => \Hash::make($password)]);
+        return $password;
+    }
+
     public function delete(User $user)
     {
         return $user->delete();

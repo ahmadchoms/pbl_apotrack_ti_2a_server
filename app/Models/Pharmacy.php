@@ -10,14 +10,10 @@ class Pharmacy extends Model
 {
     use HasUuids, SoftDeletes, \App\Models\Traits\HasSearchScope;
 
-    protected $fillable = ['name', 'address', 'phone', 'latitude', 'longitude', 'rating', 'total_reviews', 'verification_status', 'is_active', 'is_force_closed'];
+    protected $fillable = ['name', 'address', 'phone', 'logo_url', 'latitude', 'longitude', 'rating', 'total_reviews', 'verification_status', 'is_active', 'is_force_closed'];
 
     protected array $searchColumns = ['name', 'address', 'phone'];
 
-    public function images()
-    {
-        return $this->hasMany(PharmacyImage::class);
-    }
 
     public function staffs()
     {

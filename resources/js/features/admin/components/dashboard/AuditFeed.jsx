@@ -1,5 +1,5 @@
-import React from "react";
 import { ShieldCheck } from "lucide-react";
+import { Link } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function AuditFeed({ auditLogs = [] }) {
@@ -28,9 +28,12 @@ export function AuditFeed({ auditLogs = [] }) {
                         </div>
                     ))}
                 </div>
-                <button className="w-full mt-8 h-12 rounded-2xl bg-slate-50 hover:bg-[#0b3b60] text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+                <Link 
+                    href={route('admin.profile.audit-history')}
+                    className="flex items-center justify-center w-full mt-8 h-12 rounded-2xl bg-slate-50 hover:bg-[#0b3b60] text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all duration-300"
+                >
                     Lihat Semua Aktivitas
-                </button>
+                </Link>
             </CardContent>
         </Card>
     );

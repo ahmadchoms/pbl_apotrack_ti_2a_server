@@ -107,6 +107,7 @@ Route::prefix('admin')
                 Route::get('/{user}/edit', 'edit')->name('edit');
                 Route::put('/{user}', 'update')->name('update');
                 Route::delete('/{user}', 'destroy')->name('destroy');
+                Route::patch('/{user}/reset-password', 'resetPassword')->name('reset-password');
             });
 
         /*
@@ -120,10 +121,12 @@ Route::prefix('admin')
                 Route::get('/export', 'export')->name('export');
                 Route::get('/create', 'create')->name('create');
                 Route::post('/', 'store')->name('store');
-                Route::get('/{id}', 'detail')->name('show');
-                Route::get('/{id}/edit', 'edit')->name('edit');
-                Route::put('/{id}', 'update')->name('update');
-                Route::delete('/{id}', 'destroy')->name('destroy');
+                Route::get('/{pharmacy}', 'detail')->name('show');
+                Route::get('/{pharmacy}/edit', 'edit')->name('edit');
+                Route::put('/{pharmacy}', 'update')->name('update');
+                Route::delete('/{pharmacy}', 'destroy')->name('destroy');
+                Route::patch('/{pharmacy}/verify-legality', 'verifyLegality')->name('verify-legality');
+                Route::patch('/{pharmacy}/toggle-suspend', 'toggleSuspend')->name('toggle-suspend');
             });
     });
 

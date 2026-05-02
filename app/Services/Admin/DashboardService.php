@@ -31,24 +31,48 @@ class DashboardService
         ];
     }
 
-    public function getChartData()
+    public function getChartData($year, $month = null)
     {
         $monthsMapping = [1 => 'JAN', 2 => 'FEB', 3 => 'MAR', 4 => 'APR', 5 => 'MEI', 6 => 'JUN', 7 => 'JUL', 8 => 'AGU', 9 => 'SEP', 10 => 'OKT', 11 => 'NOV', 12 => 'DES'];
-        $monthQuery = "EXTRACT(MONTH FROM created_at)";
+        
+        $userQuery = User::whereYear('created_at', $year);
+        $pharmacyQuery = Pharmacy::whereYear('created_at', $year);
 
-        $userGrowthData = User::select(DB::raw("COUNT(*) as count"), DB::raw("$monthQuery as month"))
-            ->whereYear('created_at', now()->year)
+        if ($month) {
+            $userQuery->whereMonth('created_at', $month);
+            $pharmacyQuery->whereMonth('created_at', $month);
+            
+            $dayQuery = "EXTRACT(DAY FROM created_at)";
+            
+            $userData = $userQuery->select(DB::raw("COUNT(*) as count"), DB::raw("$dayQuery as day"))
+                ->groupBy('day')
+                ->get();
+            
+            $pharmacyData = $pharmacyQuery->select(DB::raw("COUNT(*) as count"), DB::raw("$dayQuery as day"))
+                ->groupBy('day')
+                ->get();
+                
+            $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+            
+            return [
+                'userGrowth' => $this->formatDailyTimeSeries($userData, $daysInMonth),
+                'pharmacyGrowth' => $this->formatDailyTimeSeries($pharmacyData, $daysInMonth),
+            ];
+        }
+
+        $monthQuery = "EXTRACT(MONTH FROM created_at)";
+        
+        $userData = $userQuery->select(DB::raw("COUNT(*) as count"), DB::raw("$monthQuery as month"))
             ->groupBy('month')
             ->get();
 
-        $pharmacyGrowthData = Pharmacy::select(DB::raw("COUNT(*) as count"), DB::raw("$monthQuery as month"))
-            ->whereYear('created_at', now()->year)
+        $pharmacyData = $pharmacyQuery->select(DB::raw("COUNT(*) as count"), DB::raw("$monthQuery as month"))
             ->groupBy('month')
             ->get();
 
         return [
-            'userGrowth' => $this->formatTimeSeries($userGrowthData, $monthsMapping),
-            'pharmacyGrowth' => $this->formatTimeSeries($pharmacyGrowthData, $monthsMapping),
+            'userGrowth' => $this->formatTimeSeries($userData, $monthsMapping),
+            'pharmacyGrowth' => $this->formatTimeSeries($pharmacyData, $monthsMapping),
         ];
     }
 
@@ -70,10 +94,20 @@ class DashboardService
     protected function formatTimeSeries($data, $mapping)
     {
         return collect(range(1, 12))->map(function($m) use ($mapping, $data) {
-            $existing = $data->firstWhere('month', str_pad($m, 2, '0', STR_PAD_LEFT)) 
-                       ?? $data->firstWhere('month', (int)$m);
+            $existing = $data->firstWhere('month', (int)$m) ?? $data->firstWhere('month', str_pad($m, 2, '0', STR_PAD_LEFT));
             return [
                 'name' => $mapping[$m],
+                'value' => $existing ? (int)$existing->count : 0
+            ];
+        })->values();
+    }
+
+    protected function formatDailyTimeSeries($data, $daysInMonth)
+    {
+        return collect(range(1, $daysInMonth))->map(function($d) use ($data) {
+            $existing = $data->firstWhere('day', (int)$d) ?? $data->firstWhere('day', str_pad($d, 2, '0', STR_PAD_LEFT));
+            return [
+                'name' => "Tgl $d",
                 'value' => $existing ? (int)$existing->count : 0
             ];
         })->values();

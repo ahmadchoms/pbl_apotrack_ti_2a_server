@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { UserPlus, ShieldCheck, Mail, Phone, User, Lock, Building2, CheckCircle2, Save, Camera } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { router } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 import { SectionHeader } from "@/features/admin/components/shared/SectionHeader";
 import { FormField } from "@/features/admin/components/shared/FormField";
@@ -16,21 +18,42 @@ import { InfoBox } from "@/features/admin/components/shared/InfoBox";
 import { containerVariants, itemVariants } from "@/features/admin/lib/constants";
 
 export default function AdminUserCreate({ pharmacies = [], roles = [] }) {
-    const [formData, setFormData] = useState({
-        username: "", email: "", phone: "", password: "", role: "", pharmacy_id: "",
+    const { data, setData, post, processing, errors } = useForm({
+        username: "",
+        email: "",
+        phone: "",
+        password: "",
+        role: "",
+        pharmacy_id: "",
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setData(name, value);
     };
 
     const handleSelectChange = (name, value) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setData(name, value);
+    };
+
+    const submit = (e) => {
+        e.preventDefault();
+        post(route("admin.users.store"), {
+            onSuccess: () => toast.success("Akun pengguna berhasil dibuat"),
+            onError: () => toast.error("Gagal membuat akun pengguna"),
+        });
     };
 
     const totalFields = 5;
-    const filledFields = [formData.username, formData.email, formData.password, formData.role, formData.role === "PHARMACY_STAFF" || formData.role === "APOTEKER" ? formData.pharmacy_id : true].filter((v) => v && v !== "").length;
+    const filledFields = [
+        data.username,
+        data.email,
+        data.password,
+        data.role,
+        data.role === "PHARMACY_STAFF" || data.role === "APOTEKER"
+            ? data.pharmacy_id
+            : true,
+    ].filter((v) => v && v !== "").length;
     const completionPercentage = Math.round((filledFields / totalFields) * 100);
 
     return (
@@ -38,8 +61,21 @@ export default function AdminUserCreate({ pharmacies = [], roles = [] }) {
             <div className="space-y-10 pb-20">
                 <PageHeader subtitle="Otentikasi Sistem" title="Tambah Pengguna Baru" description="Buat kredensial akses baru untuk personel atau pelanggan dalam ekosistem.">
                     <Button variant="ghost" onClick={() => router.get("/admin/users")} className="text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-[#0b3b60]">Batalkan</Button>
-                    <Button className="h-14 px-10 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-[#0b3b60]/20 flex items-center gap-2">
-                        <Save className="w-4 h-4" /> Buat Akun Pengguna
+                    <Button 
+                        disabled={processing}
+                        onClick={submit} 
+                        className="h-14 px-10 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-[#0b3b60]/20 flex items-center gap-2"
+                    >
+                        {processing ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Membuat...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4" /> Buat Akun Pengguna
+                            </>
+                        )}
                     </Button>
                 </PageHeader>
                 <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -60,22 +96,22 @@ export default function AdminUserCreate({ pharmacies = [], roles = [] }) {
                                             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Avatar Default</p>
                                         </div>
                                         <div className="flex-1 space-y-8">
-                                            <FormField label="Nama Lengkap / Username">
-                                                <div className="relative"><User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="username" value={formData.username} onChange={handleInputChange} placeholder="Masukkan nama pengguna..." className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
+                                            <FormField label="Nama Lengkap / Username" error={errors.username}>
+                                                <div className="relative"><User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="username" value={data.username} onChange={handleInputChange} placeholder="Masukkan nama pengguna..." className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
                                             </FormField>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <FormField label="Email Connection">
-                                                    <div className="relative"><Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="admin@example.com" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
+                                                <FormField label="Email Connection" error={errors.email}>
+                                                    <div className="relative"><Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="email" type="email" value={data.email} onChange={handleInputChange} placeholder="admin@example.com" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
                                                 </FormField>
-                                                <FormField label="Phone Number">
-                                                    <div className="relative"><Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+62 812..." className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
+                                                <FormField label="Phone Number" error={errors.phone}>
+                                                    <div className="relative"><Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="phone" value={data.phone} onChange={handleInputChange} placeholder="+62 812..." className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
                                                 </FormField>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="space-y-2 pt-4 border-t border-slate-50">
-                                        <FormField label="Password Initial">
-                                            <div className="relative"><Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="password" type="password" value={formData.password} onChange={handleInputChange} placeholder="••••••••" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
+                                        <FormField label="Password Initial" error={errors.password}>
+                                            <div className="relative"><Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" /><Input name="password" type="password" value={data.password} onChange={handleInputChange} placeholder="••••••••" className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" /></div>
                                         </FormField>
                                     </div>
                                 </CardContent>
@@ -86,18 +122,18 @@ export default function AdminUserCreate({ pharmacies = [], roles = [] }) {
                             <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
                                 <CardContent className="p-10 space-y-8">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormField label="Tingkat Otoritas (Role)">
-                                            <Select value={formData.role} onValueChange={(v) => handleSelectChange("role", v)}>
+                                        <FormField label="Tingkat Otoritas (Role)" error={errors.role}>
+                                            <Select value={data.role} onValueChange={(v) => handleSelectChange("role", v)}>
                                                 <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"><SelectValue placeholder="Pilih Role" /></SelectTrigger>
                                                 <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
                                                     {roles.map((r) => (<SelectItem key={r} value={r} className="text-xs font-bold">{r.replace("_", " ")}</SelectItem>))}
                                                 </SelectContent>
                                             </Select>
                                         </FormField>
-                                        {(formData.role === "PHARMACY_STAFF" || formData.role === "APOTEKER") && (
+                                        {(data.role === "PHARMACY_STAFF" || data.role === "APOTEKER") && (
                                             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                                                <FormField label="Afiliasi Apotek">
-                                                    <Select value={formData.pharmacy_id} onValueChange={(v) => handleSelectChange("pharmacy_id", v)}>
+                                                <FormField label="Afiliasi Apotek" error={errors.pharmacy_id}>
+                                                    <Select value={data.pharmacy_id} onValueChange={(v) => handleSelectChange("pharmacy_id", v)}>
                                                         <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"><SelectValue placeholder="Pilih Unit Apotek" /></SelectTrigger>
                                                         <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
                                                             {pharmacies.map((p) => (<SelectItem key={p.id} value={p.id} className="text-xs font-bold">{p.name}</SelectItem>))}
@@ -123,10 +159,31 @@ export default function AdminUserCreate({ pharmacies = [], roles = [] }) {
                                         </div>
                                         <Progress value={completionPercentage} className="h-2.5 rounded-full" />
                                         <div className="space-y-5">
-                                            {[{ check: formData.username && formData.email, label: "Data Identitas Lengkap" }, { check: formData.password, label: "Kredensial Aman" }, { check: formData.role, label: "Otoritas Ditetapkan" }].map((item, i) => (
+                                            {[
+                                                {
+                                                    check: data.username && data.email,
+                                                    label: "Data Identitas Lengkap",
+                                                },
+                                                {
+                                                    check: data.password,
+                                                    label: "Kredensial Aman",
+                                                },
+                                                {
+                                                    check: data.role,
+                                                    label: "Otoritas Ditetapkan",
+                                                },
+                                            ].map((item, i) => (
                                                 <div key={i} className="flex items-center gap-4">
-                                                    <div className={`w-6 h-6 rounded-xl flex items-center justify-center ${item.check ? "bg-emerald-100 text-emerald-600" : "bg-slate-50 text-slate-300"}`}><CheckCircle2 className="w-4 h-4" /></div>
-                                                    <p className={`text-[10px] font-black uppercase tracking-widest ${item.check ? "text-slate-600" : "text-slate-300"}`}>{item.label}</p>
+                                                    <div
+                                                        className={`w-6 h-6 rounded-xl flex items-center justify-center ${item.check ? "bg-emerald-100 text-emerald-600" : "bg-slate-50 text-slate-300"}`}
+                                                    >
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                    </div>
+                                                    <p
+                                                        className={`text-[10px] font-black uppercase tracking-widest ${item.check ? "text-slate-600" : "text-slate-300"}`}
+                                                    >
+                                                        {item.label}
+                                                    </p>
                                                 </div>
                                             ))}
                                         </div>

@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 import { UserFilters } from "@/features/admin/components/users/UserFilters";
 import { UserTable } from "@/features/admin/components/users/UserTable";
-import { DeleteUserDialog } from "@/features/admin/components/users/DeleteUserDialog";
+import { SuspendUserDialog } from "@/features/admin/components/users/SuspendUserDialog";
 import { AdminPagination } from "@/features/admin/components/shared/AdminPagination";
 import { useUserManagement } from "@/features/admin/hooks/useUserManagement";
 
@@ -24,6 +24,7 @@ export default function AdminUserList(props) {
         setDeleteTarget,
         handleFilter,
         confirmDelete,
+        resetPassword,
         userList,
         pagination,
     } = useUserManagement(props);
@@ -49,12 +50,13 @@ export default function AdminUserList(props) {
                         <UserTable
                             users={userList}
                             onDelete={setDeleteTarget}
+                            onResetPassword={resetPassword}
                         />
                     </CardContent>
                 </Card>
                 <AdminPagination pagination={pagination} itemLabel="pengguna" />
             </div>
-            <DeleteUserDialog
+            <SuspendUserDialog
                 user={deleteTarget}
                 onClose={() => setDeleteTarget(null)}
                 onConfirm={confirmDelete}

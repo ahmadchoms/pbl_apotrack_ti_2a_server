@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { router } from "@inertiajs/react";
 import { Card } from "@/components/ui/card";
+import { ChevronDown } from "lucide-react";
 
 const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -13,26 +15,59 @@ const CustomTooltip = ({ active, payload }) => {
     return null;
 };
 
-export function GrowthChart({ data = [] }) {
-    const [filter, setFilter] = useState("Bulanan");
+export function GrowthChart({ data = [], filters = {} }) {
+    const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
+    const months = [
+        { val: null, label: "Semua Bulan" },
+        { val: 1, label: "Januari" }, { val: 2, label: "Februari" },
+        { val: 3, label: "Maret" }, { val: 4, label: "April" },
+        { val: 5, label: "Mei" }, { val: 6, label: "Juni" },
+        { val: 7, label: "Juli" }, { val: 8, label: "Agustus" },
+        { val: 9, label: "September" }, { val: 10, label: "Oktober" },
+        { val: 11, label: "November" }, { val: 12, label: "Desember" }
+    ];
+
+    const handleFilterChange = (key, val) => {
+        const newFilters = { ...filters, [key]: val };
+        router.get(route('admin.dashboard'), newFilters, {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['charts', 'filters']
+        });
+    };
 
     return (
         <Card className="border-0 shadow-2xl shadow-slate-200/50 rounded-[2.5rem] bg-white p-10">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-10 gap-6">
                 <div>
                     <h3 className="text-xl font-black text-slate-900 tracking-tight">Pertumbuhan Lintas Platform</h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">Statistik bulanan pendaftaran pengguna baru</p>
+                    <p className="text-xs text-slate-400 mt-1 font-bold">Statistik pertumbuhan pendaftaran pengguna</p>
                 </div>
-                <div className="flex bg-slate-50 p-1.5 rounded-2xl mt-4 sm:mt-0">
-                    {["Bulanan", "Tahunan"].map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${filter === f ? "bg-white text-[#0b3b60] shadow-md shadow-slate-200/50" : "text-slate-400 hover:text-slate-600"}`}
+                
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Year Select */}
+                    <div className="relative group">
+                        <select 
+                            value={filters.year} 
+                            onChange={(e) => handleFilterChange('year', e.target.value)}
+                            className="appearance-none h-11 pl-5 pr-10 rounded-2xl bg-slate-50 border-none text-[10px] font-black uppercase tracking-wider text-[#0b3b60] focus:ring-2 focus:ring-[#0b3b60]/10 transition-all cursor-pointer"
                         >
-                            {f}
-                        </button>
-                    ))}
+                            {years.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 text-[#0b3b60] pointer-events-none transition-transform group-hover:translate-y-[-40%]" />
+                    </div>
+
+                    {/* Month Select */}
+                    <div className="relative group">
+                        <select 
+                            value={filters.month || ""} 
+                            onChange={(e) => handleFilterChange('month', e.target.value || null)}
+                            className="appearance-none h-11 pl-5 pr-10 rounded-2xl bg-slate-50 border-none text-[10px] font-black uppercase tracking-wider text-[#0b3b60] focus:ring-2 focus:ring-[#0b3b60]/10 transition-all cursor-pointer"
+                        >
+                            {months.map(m => <option key={m.val} value={m.val || ""}>{m.label}</option>)}
+                        </select>
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 text-[#0b3b60] pointer-events-none transition-transform group-hover:translate-y-[-40%]" />
+                    </div>
                 </div>
             </div>
             <div className="h-80 w-full">

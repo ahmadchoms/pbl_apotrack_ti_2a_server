@@ -27,7 +27,14 @@ class ProfileController extends Controller
 
     public function auditHistory(Request $request)
     {
-        $filters = $request->only(['search', 'status', 'action_type', 'date_from', 'date_to']);
+        $dateFrom = $request->date_from ?? now()->subDays(7)->format('Y-m-d');
+        $dateTo = $request->date_to ?? now()->format('Y-m-d');
+
+        $filters = array_merge($request->only(['search', 'status', 'action_type']), [
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo
+        ]);
+
         $logs = $this->profileService->getAuditHistory($filters);
         $actionTypes = $this->profileService->getActionTypes();
 

@@ -81,9 +81,17 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $this->userService->delete($user);
+        $this->userService->toggleActive($user);
+        $status = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
-        return redirect()->back()->with('success', 'User berhasil dihapus');
+        return redirect()->back()->with('success', "User berhasil {$status}");
+    }
+
+    public function resetPassword(User $user)
+    {
+        $newPassword = $this->userService->resetPassword($user);
+
+        return redirect()->back()->with('success', "Password user {$user->username} telah direset menjadi: {$newPassword}");
     }
 
     public function export()
