@@ -1,29 +1,72 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, UserPlus, X, Users } from "lucide-react";
+import { Search, UserPlus, X, Users, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FormField } from "@/features/admin/components/shared/FormField";
 import { InfoBox } from "@/features/admin/components/shared/InfoBox";
+import axios from "axios";
 
-export function StaffPicker({ staffs, staffSearch, setStaffSearch, filteredAvailableStaff, addStaff, removeStaff, updateStaffRole }) {
+export function StaffPicker({ staffs, staffSearch, setStaffSearch, addStaff, removeStaff, updateStaffRole }) {
+    const [availableStaff, setAvailableStaff] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (staffSearch.length < 2) {
+            setAvailableStaff([]);
+            return;
+        }
+
+        const delayDebounceFn = setTimeout(async () => {
+            setIsLoading(true);
+            try {
+                const response = await axios.get(route('admin.pharmacies.search-staff'), {
+                    params: { search: staffSearch }
+                });
+                setAvailableStaff(response.data);
+            } catch (error) {
+                console.error("Error fetching staff:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [staffSearch]);
+
+    // Filter out already added staff from the search results
+    const filteredResults = availableStaff.filter(
+        (user) => !staffs.find((s) => s.user_id === user.id)
+    );
+
     return (
         <div className="space-y-8">
             <div className="relative">
                 <FormField label="Cari Staf (Username atau Email)">
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-                        <Input value={staffSearch} onChange={(e) => setStaffSearch(e.target.value)} placeholder="Ketik nama atau email..." className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" />
+                        <Input 
+                            value={staffSearch} 
+                            onChange={(e) => setStaffSearch(e.target.value)} 
+                            placeholder="Ketik nama atau email..." 
+                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold" 
+                        />
+                        {isLoading && (
+                            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 animate-spin" />
+                        )}
                     </div>
                 </FormField>
                 <AnimatePresence>
                     {staffSearch.length >= 2 && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute z-50 left-0 right-0 top-full mt-2 bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-64 overflow-y-auto p-2 space-y-1">
-                            {filteredAvailableStaff.length > 0 ? (
-                                filteredAvailableStaff.map((user) => (
-                                    <button key={user.id} type="button" onClick={() => addStaff(user)} className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group">
+                            {filteredResults.length > 0 ? (
+                                filteredResults.map((user) => (
+                                    <button key={user.id} type="button" onClick={() => {
+                                        addStaff(user);
+                                        setAvailableStaff([]);
+                                    }} className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group">
                                         <div className="flex items-center gap-3">
                                             <Avatar className="h-10 w-10 rounded-xl border border-white shadow-sm">
                                                 <AvatarImage src={user.avatar_url} />
@@ -42,15 +85,16 @@ export function StaffPicker({ staffs, staffSearch, setStaffSearch, filteredAvail
                                         </div>
                                     </button>
                                 ))
-                            ) : (
+                            ) : !isLoading ? (
                                 <div className="p-8 text-center">
-                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Staf tidak ditemukan</p>
+                                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Staf tidak ditemukan atau sudah ditugaskan</p>
                                 </div>
-                            )}
+                            ) : null}
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
+            {/* Rest of the component remains the same */}
             <div className="space-y-4">
                 <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staf Terdaftar ({staffs.length})</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

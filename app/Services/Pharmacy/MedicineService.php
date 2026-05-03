@@ -124,8 +124,6 @@ class MedicineService
                 ]
             );
         }
-
-        $this->updateTotalStock($medicine);
     }
 
     public function addBatch(string $medicineId, array $data, string $userId)
@@ -147,8 +145,6 @@ class MedicineService
                 'note' => $data['note'] ?? 'Initial batch stock',
                 'created_by' => $userId,
             ]);
-
-            $this->updateTotalStock($medicine);
 
             return $batch;
         });
@@ -175,8 +171,6 @@ class MedicineService
                 'created_by' => $userId,
             ]);
 
-            $this->updateTotalStock($batch->medicine);
-
             return $batch;
         });
     }
@@ -187,15 +181,6 @@ class MedicineService
             ->where('medicine_id', $medicineId)
             ->latest()
             ->paginate(10);
-    }
-
-    protected function updateTotalStock(Medicine $medicine)
-    {
-        $total = $medicine->batches()
-            ->where('expired_date', '>', now())
-            ->sum('stock');
-
-        $medicine->update(['total_active_stock' => $total]);
     }
 
     public function getActiveMedicines(string $pharmacyId)

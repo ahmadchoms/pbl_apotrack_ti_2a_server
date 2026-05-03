@@ -1,4 +1,5 @@
-import PharmacistCreateMedicine from "@/features/pharmacy/pages/medicines/create";
+import { MedicineForm } from "@/features/pharmacy/components/medicine/MedicineForm";
+import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
 
 export default function CreateMedicinePage({
     categories = [],
@@ -7,11 +8,14 @@ export default function CreateMedicinePage({
     forms = [],
 }) {
     return (
-        <PharmacistCreateMedicine
-            categories={categories}
-            units={units}
-            types={types}
-            forms={forms}
-        />
+        <DashboardPharmacyLayout activeMenu="Daftar Obat">
+            <MedicineForm
+                isEdit={false}
+                categories={categories}
+                units={units}
+                types={types}
+                forms={forms}
+            />
+        </DashboardPharmacyLayout>
     );
 }

@@ -19,7 +19,13 @@ export const CATEGORY_COLORS = {
         border: "border-amber-200",
         dot: "bg-amber-500",
     },
-    "Antasida & GERD": {
+    Antihipertensi: {
+        bg: "bg-yellow-50",
+        text: "text-yellow-700",
+        border: "border-yellow-200",
+        dot: "bg-yellow-500",
+    },
+    Antidiabetes: {
         bg: "bg-lime-50",
         text: "text-lime-700",
         border: "border-lime-200",
@@ -31,11 +37,41 @@ export const CATEGORY_COLORS = {
         border: "border-emerald-200",
         dot: "bg-emerald-500",
     },
-    "P3K & Antiseptik": {
+    Antihistamin: {
+        bg: "bg-teal-50",
+        text: "text-teal-700",
+        border: "border-teal-200",
+        dot: "bg-teal-500",
+    },
+    "Antasida & GERD": {
+        bg: "bg-cyan-50",
+        text: "text-cyan-700",
+        border: "border-cyan-200",
+        dot: "bg-cyan-500",
+    },
+    "Batuk & Flu": {
         bg: "bg-sky-50",
         text: "text-sky-600",
         border: "border-sky-200",
         dot: "bg-sky-500",
+    },
+    "P3K & Antiseptik": {
+        bg: "bg-blue-50",
+        text: "text-blue-600",
+        border: "border-blue-200",
+        dot: "bg-blue-500",
+    },
+    "Kesehatan Mata": {
+        bg: "bg-indigo-50",
+        text: "text-indigo-600",
+        border: "border-indigo-200",
+        dot: "bg-indigo-500",
+    },
+    "Ibu & Bayi": {
+        bg: "bg-pink-50",
+        text: "text-pink-600",
+        border: "border-pink-200",
+        dot: "bg-pink-500",
     },
 };
 

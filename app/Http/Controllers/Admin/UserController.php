@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Http\Resources\Admin\UserResource;
 use App\Models\Pharmacy;
 use App\Models\User;
@@ -19,6 +20,8 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
+
         $filters = $request->only(['search', 'role', 'status']);
         $users = $this->userService->list($filters);
 
@@ -30,50 +33,40 @@ class UserController extends Controller
 
     public function create()
     {
+        $this->authorize('create', User::class);
+
         return Inertia::render('admin/users/create', [
             'pharmacies' => Pharmacy::select('id', 'name')->get(),
-            'roles' => array_column(UserRole::cases(), 'value')
+            'roles' => array_column(\App\Enums\UserRole::cases(), 'value')
         ]);
     }
 
     public function edit(User $user)
     {
+        $this->authorize('view', $user);
+
         return Inertia::render('admin/users/edit', [
             'user' => new UserResource($user->load('pharmacyStaff.pharmacy')),
             'pharmacies' => Pharmacy::select('id', 'name')->get(),
-            'roles' => array_column(UserRole::cases(), 'value')
+            'roles' => array_column(\App\Enums\UserRole::cases(), 'value')
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $data = $request->validate([
-            'username' => 'required|string|max:50|unique:users',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|string',
-            'phone' => 'nullable|string|max:20',
-            'is_active' => 'boolean'
-        ]);
+        $this->authorize('create', User::class);
 
-        $this->userService->store($data);
+        $this->userService->store($request->validated());
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dibuat');
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $data = $request->validate([
-            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8',
-            'role' => 'required|string',
-            'phone' => 'nullable|string|max:20',
-            'is_active' => 'boolean'
-        ]);
+        $this->authorize('update', $user);
 
-        $this->userService->update($user, $data);
+        $this->userService->update($user, $request->validated());
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil diperbarui');
@@ -81,6 +74,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
+
         $this->userService->toggleActive($user);
         $status = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
@@ -89,6 +84,8 @@ class UserController extends Controller
 
     public function resetPassword(User $user)
     {
+        $this->authorize('update', $user);
+
         $newPassword = $this->userService->resetPassword($user);
 
         return redirect()->back()->with('success', "Password user {$user->username} telah direset menjadi: {$newPassword}");
@@ -96,32 +93,8 @@ class UserController extends Controller
 
     public function export()
     {
-        $users = User::all();
-        $csvHeader = ['ID', 'Username', 'Email', 'Role', 'Status', 'Created At'];
-        
-        $callback = function() use ($users, $csvHeader) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $csvHeader);
+        $this->authorize('viewAny', User::class);
 
-            foreach ($users as $user) {
-                fputcsv($file, [
-                    $user->id,
-                    $user->username,
-                    $user->email,
-                    $user->role,
-                    $user->is_active ? 'Active' : 'Inactive',
-                    $user->created_at
-                ]);
-            }
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, [
-            "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=users_export_" . now()->format('YmdHis') . ".csv",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
-        ]);
+        return $this->userService->export();
     }
 }

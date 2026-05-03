@@ -19,14 +19,14 @@ class OrderResource extends JsonResource
             'grand_total' => (float)$this->grand_total,
             'notes' => $this->notes,
             'created_at' => $this->created_at?->format('d M Y H:i'),
-            'buyer' => [
+            'buyer' => $this->whenLoaded('user', fn() => [
                 'id' => $this->user->id,
                 'username' => $this->user->username,
                 'email' => $this->user->email,
                 'phone' => $this->user->phone,
-            ],
+            ]),
             'prescription' => $this->whenLoaded('prescription'),
-            'requires_prescription' => $this->items->contains('requires_prescription', true),
+            'requires_prescription' => $this->relationLoaded('items') ? $this->items->contains('requires_prescription', true) : false,
             'items' => $this->whenLoaded('items'),
             'tracking' => $this->whenLoaded('tracking'),
             'address' => $this->whenLoaded('address'),

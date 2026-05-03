@@ -9,12 +9,13 @@ export function AdminPagination({ pagination, itemLabel = "item" }) {
     const onPageChange = (url) => {
         if (url) router.get(url, {}, { preserveState: true });
     };
+    console.log(pagination);
 
     return (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-4">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest order-2 sm:order-1">
-                Menampilkan {pagination.from} – {pagination.to} dari{" "}
-                {pagination.total} {itemLabel}
+                Menampilkan {pagination.meta.from} – {pagination.meta.to} dari{" "}
+                {pagination.meta.total} {itemLabel}
             </p>
             <div className="flex items-center gap-2 order-1 sm:order-2">
                 <Button

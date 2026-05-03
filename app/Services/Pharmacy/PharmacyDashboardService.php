@@ -12,15 +12,17 @@ use Carbon\Carbon;
 
 class PharmacyDashboardService
 {
-    public function getDashboardData(string $pharmacyId)
+    public function getDashboardData(string $pharmacyId, array $filters = [])
     {
-        // return Cache::tags(['pharmacy_dashboard', "pharmacy_{$pharmacyId}"])->remember("dashboard_data_{$pharmacyId}", now()->addMinutes(10), function () use ($pharmacyId) {
-        return Cache::remember("dashboard_data_{$pharmacyId}", now()->addMinutes(10), function () use ($pharmacyId) {
+        $year = $filters['year'] ?? now()->year;
+        $month = $filters['month'] ?? now()->month;
+
+        return Cache::remember("dashboard_data_{$pharmacyId}_{$year}_{$month}", now()->addMinutes(10), function () use ($pharmacyId, $year, $month) {
             return [
-                'kpi' => $this->getKpiStats($pharmacyId),
+                'kpi' => $this->getKpiStats($pharmacyId, $year, $month),
                 'charts' => [
-                    'revenue_trend' => $this->getRevenueTrend($pharmacyId),
-                    'top_medicines' => $this->getTopMedicines($pharmacyId),
+                    'revenue_trend' => $this->getRevenueTrend($pharmacyId, $year, $month),
+                    'top_medicines' => $this->getTopMedicines($pharmacyId, $year, $month),
                 ],
                 'widgets' => [
                     'stock_alerts' => $this->getStockAlerts($pharmacyId),
@@ -30,14 +32,14 @@ class PharmacyDashboardService
         });
     }
 
-    protected function getKpiStats(string $pharmacyId)
+    protected function getKpiStats(string $pharmacyId, int $year, int $month)
     {
-        $now = Carbon::now();
+        $date = Carbon::create($year, $month, 1);
 
         $totalRevenueMonth = Order::where('pharmacy_id', $pharmacyId)
             ->where('order_status', 'COMPLETED')
-            ->whereMonth('created_at', $now->month)
-            ->whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
             ->sum('grand_total');
 
         $activeOrdersCount = Order::where('pharmacy_id', $pharmacyId)
@@ -57,17 +59,20 @@ class PharmacyDashboardService
             'active_orders_count' => $activeOrdersCount,
             'total_medicines_count' => $totalMedicinesCount,
             'total_staff_count' => $totalStaffCount,
+            'period' => $date->format('F Y'),
         ];
     }
 
-    protected function getRevenueTrend(string $pharmacyId)
+    protected function getRevenueTrend(string $pharmacyId, int $year, int $month)
     {
-        $days = 30;
-        $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
+        $date = Carbon::create($year, $month, 1);
+        $daysInMonth = $date->daysInMonth;
+        $startDate = $date->copy()->startOfMonth();
 
         $revenueDataRaw = Order::where('pharmacy_id', $pharmacyId)
             ->where('order_status', 'COMPLETED')
-            ->where('created_at', '>=', $startDate)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->select(
                 DB::raw("DATE(created_at) as date"),
                 DB::raw("SUM(grand_total) as revenue")
@@ -77,12 +82,12 @@ class PharmacyDashboardService
             ->get();
 
         $trend = [];
-        for ($i = 0; $i < $days; $i++) {
-            $date = $startDate->copy()->addDays($i)->toDateString();
-            $stat = $revenueDataRaw->firstWhere('date', $date);
+        for ($i = 0; $i < $daysInMonth; $i++) {
+            $currentDate = $startDate->copy()->addDays($i)->toDateString();
+            $stat = $revenueDataRaw->firstWhere('date', $currentDate);
 
             $trend[] = [
-                'date' => Carbon::parse($date)->format('d M'),
+                'date' => Carbon::parse($currentDate)->format('d M'),
                 'revenue' => $stat ? (float) $stat->revenue : 0,
             ];
         }
@@ -90,13 +95,15 @@ class PharmacyDashboardService
         return $trend;
     }
 
-    protected function getTopMedicines(string $pharmacyId)
+    protected function getTopMedicines(string $pharmacyId, int $year, int $month)
     {
         return DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('medicines', 'order_items.medicine_id', '=', 'medicines.id')
             ->where('orders.pharmacy_id', $pharmacyId)
             ->where('orders.order_status', 'COMPLETED')
+            ->whereYear('orders.created_at', $year)
+            ->whereMonth('orders.created_at', $month)
             ->select(
                 'medicines.name',
                 DB::raw('SUM(order_items.quantity) as total_sold')

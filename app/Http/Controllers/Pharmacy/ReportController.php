@@ -18,7 +18,9 @@ class ReportController extends Controller
 
     public function index(Request $request)
     {
-        $pharmacyId = $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $this->authorize('viewAny', \App\Models\User::class); // Or a specific Report 'model' if we had one.
+        
+        $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $type = $request->input('type', 'sales'); // sales or stock

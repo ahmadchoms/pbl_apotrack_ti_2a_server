@@ -17,9 +17,11 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $filters = $request->only(['year', 'month']);
 
-        return Inertia::render('pharmacy/dashboard', 
-            $this->dashboardService->getDashboardData($pharmacyId)
-        );
+        return Inertia::render('pharmacy/dashboard', array_merge(
+            $this->dashboardService->getDashboardData($pharmacyId, $filters),
+            ['filters' => $filters]
+        ));
     }
 }

@@ -24,7 +24,6 @@ class Medicine extends Model
         'price',
         'requires_prescription',
         'weight_in_grams',
-        'total_active_stock',
         'image_url',
         'is_active',
     ];

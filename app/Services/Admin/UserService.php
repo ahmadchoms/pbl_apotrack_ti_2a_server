@@ -3,6 +3,8 @@
 namespace App\Services\Admin;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -24,11 +26,11 @@ class UserService
 
     public function store(array $data)
     {
-        return \DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data) {
             $user = User::create([
                 'username' => $data['username'],
                 'email' => $data['email'],
-                'password_hash' => \Hash::make($data['password']),
+                'password_hash' => Hash::make($data['password']),
                 'role' => $data['role'],
                 'phone' => $data['phone'] ?? null,
                 'avatar_url' => $data['avatar_url'] ?? null,
@@ -41,7 +43,7 @@ class UserService
 
     public function update(User $user, array $data)
     {
-        return \DB::transaction(function () use ($user, $data) {
+        return DB::transaction(function () use ($user, $data) {
             $updateData = [
                 'username' => $data['username'],
                 'email' => $data['email'],
@@ -52,7 +54,7 @@ class UserService
             ];
 
             if (!empty($data['password'])) {
-                $updateData['password_hash'] = \Hash::make($data['password']);
+                $updateData['password_hash'] = Hash::make($data['password']);
             }
 
             $user->update($updateData);
@@ -70,12 +72,43 @@ class UserService
     public function resetPassword(User $user)
     {
         $password = 'Apotrack2026!';
-        $user->update(['password_hash' => \Hash::make($password)]);
+        $user->update(['password_hash' => Hash::make($password)]);
         return $password;
     }
 
     public function delete(User $user)
     {
         return $user->delete();
+    }
+
+    public function export()
+    {
+        $users = User::all();
+        $csvHeader = ['ID', 'Username', 'Email', 'Role', 'Status', 'Created At'];
+
+        $callback = function () use ($users, $csvHeader) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $csvHeader);
+
+            foreach ($users as $user) {
+                fputcsv($file, [
+                    $user->id,
+                    $user->username,
+                    $user->email,
+                    $user->role,
+                    $user->is_active ? 'Active' : 'Inactive',
+                    $user->created_at
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=users_export_" . now()->format('YmdHis') . ".csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ]);
     }
 }

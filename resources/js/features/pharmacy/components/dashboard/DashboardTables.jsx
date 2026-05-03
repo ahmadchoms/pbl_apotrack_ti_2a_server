@@ -26,9 +26,12 @@ const getStatusStyles = (status) => {
     }
 };
 
+import { Link } from "@inertiajs/react";
+
 export function DashboardTables({ widgets = {} }) {
     const stockAlerts = widgets.stock_alerts || [];
     const recentOrders = widgets.recent_orders || [];
+    console.log(stockAlerts);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -49,14 +52,15 @@ export function DashboardTables({ widgets = {} }) {
                                     </p>
                                 </div>
                             </div>
-                            <Button
-                                variant="ghost"
+                            <Link
+                                href={route("pharmacy.medicines.index")}
                                 className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#0b3b60]"
                             >
                                 Lihat Semua
-                            </Button>
+                            </Link>
                         </div>
                     </CardHeader>
+                    {/* ... content ... */}
                     <CardContent className="p-10 pt-4">
                         <div className="max-h-105 overflow-y-auto pr-2 space-y-4 no-scrollbar">
                             {stockAlerts.length > 0 ? (
@@ -117,12 +121,12 @@ export function DashboardTables({ widgets = {} }) {
                                     </p>
                                 </div>
                             </div>
-                            <Button
-                                variant="ghost"
+                            <Link
+                                href={route("pharmacy.orders.index")}
                                 className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#0b3b60]"
                             >
                                 Riwayat Pesanan
-                            </Button>
+                            </Link>
                         </div>
                     </CardHeader>
                     <CardContent className="p-10 pt-4">
@@ -167,10 +171,13 @@ export function DashboardTables({ widgets = {} }) {
                         </div>
 
                         {recentOrders.length > 0 && (
-                            <Button className="w-full mt-6 h-14 rounded-2xl bg-[#0b3b60] hover:bg-[#082a45] text-white text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20 group">
+                            <Link
+                                href={route("pharmacy.orders.index")}
+                                className="flex items-center justify-center w-full mt-6 h-14 rounded-2xl bg-[#0b3b60] hover:bg-[#082a45] text-white text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20 group"
+                            >
                                 Buka Semua Pesanan{" "}
                                 <ArrowRight className="h-3 w-3 ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Button>
+                            </Link>
                         )}
                     </CardContent>
                 </Card>

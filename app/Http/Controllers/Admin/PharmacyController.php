@@ -19,8 +19,28 @@ class PharmacyController extends Controller
         protected PharmacyService $pharmacyService
     ) {}
 
+    public function searchAvailableStaff(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $users = User::whereIn('role', ['PHARMACY_STAFF', 'APOTEKER'])
+            ->whereDoesntHave('pharmacyStaff')
+            ->when($search, function($q) use ($search) {
+                $q->where(function($sub) use ($search) {
+                    $sub->where('username', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->select('id', 'username', 'email', 'role', 'avatar_url')
+            ->limit(10)
+            ->get();
+
+        return response()->json($users);
+    }
+
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Pharmacy::class);
         $pharmacies = $this->pharmacyService->list($request->only(['search', 'status']));
 
         return Inertia::render('admin/pharmacies/index', [
@@ -31,6 +51,7 @@ class PharmacyController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Pharmacy::class);
         return Inertia::render('admin/pharmacies/create', [
             'available_staff' => User::whereIn('role', ['PHARMACY_STAFF', 'APOTEKER'])
                 ->select('id', 'username', 'email', 'role', 'avatar_url')
@@ -40,6 +61,7 @@ class PharmacyController extends Controller
 
     public function store(StorePharmacyRequest $request)
     {
+        $this->authorize('create', Pharmacy::class);
         $this->pharmacyService->store($request->validated());
 
         return redirect()->route('admin.pharmacies.index')
@@ -48,6 +70,7 @@ class PharmacyController extends Controller
 
     public function edit(Pharmacy $pharmacy)
     {
+        $this->authorize('update', $pharmacy);
         $pharmacy->load(['legality', 'staffs.user', 'operatingHours']);
 
         return Inertia::render('admin/pharmacies/edit', [
@@ -60,6 +83,7 @@ class PharmacyController extends Controller
 
     public function update(UpdatePharmacyRequest $request, Pharmacy $pharmacy)
     {
+        $this->authorize('update', $pharmacy);
         $this->pharmacyService->update($pharmacy, $request->validated());
 
         return redirect()->route('admin.pharmacies.index')
@@ -68,6 +92,7 @@ class PharmacyController extends Controller
 
     public function destroy(Pharmacy $pharmacy)
     {
+        $this->authorize('delete', $pharmacy);
         $this->pharmacyService->delete($pharmacy);
 
         return redirect()->route('admin.pharmacies.index')
@@ -76,6 +101,7 @@ class PharmacyController extends Controller
 
     public function detail(Pharmacy $pharmacy)
     {
+        $this->authorize('view', $pharmacy);
         $pharmacy = $this->pharmacyService->getDetail($pharmacy->id);
 
         return Inertia::render('admin/pharmacies/detail', [
@@ -85,6 +111,7 @@ class PharmacyController extends Controller
 
     public function verifyLegality(Request $request, Pharmacy $pharmacy)
     {
+        $this->authorize('update', $pharmacy);
         $request->validate([
             'status' => 'required|in:APPROVED,REJECTED',
             'note' => 'required_if:status,REJECTED|nullable|string'
@@ -97,6 +124,7 @@ class PharmacyController extends Controller
 
     public function toggleSuspend(Pharmacy $pharmacy)
     {
+        $this->authorize('update', $pharmacy);
         $this->pharmacyService->toggleSuspend($pharmacy);
 
         return redirect()->back()->with('success', 'Status suspensi apotek berhasil diubah');
@@ -104,6 +132,7 @@ class PharmacyController extends Controller
 
     public function export()
     {
+        $this->authorize('viewAny', Pharmacy::class);
         $pharmacies = Pharmacy::with('legality')->get();
         $csvHeader = ['ID', 'Name', 'Address', 'Phone', 'SIA Number', 'Status', 'Rating', 'Created At'];
 

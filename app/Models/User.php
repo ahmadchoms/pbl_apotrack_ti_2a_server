@@ -70,8 +70,11 @@ class User extends Authenticatable
     {
         return $query->when($role && $role !== 'all', function ($q) use ($role) {
             if ($role === 'APOTEKER' || $role === 'STAFF') {
-                $q->whereHas('pharmacyStaff', function ($sq) use ($role) {
-                    $sq->where('role', $role);
+                $q->where(function($sub) use ($role) {
+                    $sub->where('role', $role)
+                        ->orWhereHas('pharmacyStaff', function ($sq) use ($role) {
+                            $sq->where('role', $role);
+                        });
                 });
             } else {
                 $q->where('role', $role);

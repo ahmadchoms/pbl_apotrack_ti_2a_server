@@ -26,20 +26,20 @@ class PharmacyResource extends JsonResource
             'orders_count' => $this->orders_count,
             'medicines_count' => $this->medicines_count,
             'logo_url' => $this->logo_url,
-            'staffs' => $this->staffs->map(fn($staff) => [
+            'staffs' => $this->relationLoaded('staffs') ? $this->staffs->map(fn($staff) => [
                 'id' => $staff->id,
                 'user_id' => $staff->user_id,
                 'role' => $staff->role,
-                'username' => $staff->user->username,
-                'avatar_url' => $staff->user->avatar_url,
-            ]),
-            'operating_hours' => $this->operatingHours->map(fn($hour) => [
+                'username' => $staff->user->username ?? '-',
+                'avatar_url' => $staff->user->avatar_url ?? null,
+            ]) : [],
+            'operating_hours' => $this->relationLoaded('operatingHours') ? $this->operatingHours->map(fn($hour) => [
                 'day' => $hour->day_of_week,
                 'open' => $hour->open_time,
                 'close' => $hour->close_time,
                 'is_closed' => $hour->is_closed,
                 'is_24_hours' => $hour->is_24_hours,
-            ]),
+            ]) : [],
         ];
     }
 }

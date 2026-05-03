@@ -30,7 +30,7 @@ export const ROLE_CONFIG = {
         variant: "secondary",
         class: "bg-blue-50 text-blue-600 border-blue-100",
     },
-    PHARMACY_STAFF: {
+    STAFF: {
         label: "STAFF",
         variant: "outline",
         class: "bg-slate-50 text-slate-600 border-slate-200",

@@ -34,13 +34,19 @@ use App\Http\Controllers\WaitingRoomController;
 
 Route::get('/', fn() => Inertia::render('index'))->name('home');
 
-Route::get('/waiting-room', [WaitingRoomController::class, 'index'])
-    ->middleware('auth')
-    ->name('waiting-room');
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes (Common)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'active.user'])->group(function () {
+    Route::get('/waiting-room', [WaitingRoomController::class, 'index'])->name('waiting-room');
+});
 
 /*
 |--------------------------------------------------------------------------
-| Auth Routes
+| Auth Routes (Guest)
 |--------------------------------------------------------------------------
 */
 
@@ -73,7 +79,7 @@ Route::prefix('auth')
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'role:SUPER_ADMIN'])
+    ->middleware(['auth', 'role:SUPER_ADMIN', 'active.user'])
     ->group(function () {
 
         // Dashboard
@@ -118,6 +124,7 @@ Route::prefix('admin')
             ->controller(PharmacyController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/search-available-staff', 'searchAvailableStaff')->name('search-staff');
                 Route::get('/export', 'export')->name('export');
                 Route::get('/create', 'create')->name('create');
                 Route::post('/', 'store')->name('store');
@@ -138,7 +145,7 @@ Route::prefix('admin')
 
 Route::prefix('pharmacy')
     ->name('pharmacy.')
-    ->middleware(['auth', 'role:APOTEKER', 'verified.pharmacy'])
+    ->middleware(['auth', 'role:APOTEKER', 'verified.pharmacy', 'active.user'])
     ->group(function () {
 
         // Dashboard
