@@ -98,6 +98,7 @@ export function MedicineForm({
         requires_prescription: medicine.requires_prescription || false,
         is_active: medicine.is_active ?? true,
         batches: batches,
+        image: null,
     });
 
     useEffect(() => {
@@ -105,33 +106,30 @@ export function MedicineForm({
     }, [batches]);
 
     const handleImageUpload = (e) => {
-        const files = Array.from(e.target.files ?? []);
-        const newImages = files.map((file) => ({
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const newImage = {
             id: Date.now() + Math.random(),
             file,
             preview: URL.createObjectURL(file),
             isExisting: false,
-        }));
-        setImages([newImages[0]]);
+        };
+        
+        setImages([newImage]);
+        setData("image", file);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Prepare multipart data if there is a new file
-        const formData = { ...data };
-        const newImage = images.find((img) => !img.isExisting);
-        if (newImage) {
-            formData.image = newImage.file;
-        }
-
         if (isEdit) {
             router.post(route("pharmacy.medicines.update", medicine.id), {
-                ...formData,
+                ...data,
                 _method: "PUT",
             });
         } else {
-            router.post(route("pharmacy.medicines.store"), formData);
+            router.post(route("pharmacy.medicines.store"), data);
         }
     };
 

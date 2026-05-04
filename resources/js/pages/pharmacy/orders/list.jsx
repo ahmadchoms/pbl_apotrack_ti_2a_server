@@ -16,7 +16,11 @@ import { OrderFilters } from "@/features/pharmacy/components/orders/OrderFilters
 import { OrderTableRow } from "@/features/pharmacy/components/orders/OrderTableRow";
 import { Pagination } from "@/components/ui/pagination";
 
-export default function OrdersList({ orders, currentStatus, filters: serverFilters }) {
+export default function OrdersList({
+    orders,
+    currentStatus,
+    filters: serverFilters,
+}) {
     const [search, setSearch] = useState(serverFilters?.search || "");
     const ordersData = orders?.data || [];
 
@@ -33,7 +37,7 @@ export default function OrdersList({ orders, currentStatus, filters: serverFilte
         router.get(
             route("pharmacy.orders.list"),
             { ...serverFilters, ...newFilters, status: currentStatus },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -41,7 +45,7 @@ export default function OrdersList({ orders, currentStatus, filters: serverFilte
         router.get(
             route("pharmacy.orders.list"),
             { ...serverFilters, status, page: 1 },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -53,7 +57,7 @@ export default function OrdersList({ orders, currentStatus, filters: serverFilte
                     onValueChange={handleStatusChange}
                     className="w-full"
                 >
-                    <OrderFilters 
+                    <OrderFilters
                         search={search}
                         setSearch={setSearch}
                         currentStatus={currentStatus}
@@ -61,7 +65,7 @@ export default function OrdersList({ orders, currentStatus, filters: serverFilte
                     />
 
                     <TabsContent value={currentStatus} className="mt-8">
-                        <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
+                        <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader className="bg-slate-50/50">
@@ -97,16 +101,17 @@ export default function OrdersList({ orders, currentStatus, filters: serverFilte
                                                     <div className="flex flex-col items-center justify-center text-slate-300">
                                                         <Package className="w-16 h-16 mb-4 opacity-10" />
                                                         <p className="text-sm font-black uppercase tracking-widest">
-                                                            Tidak ada data pesanan
+                                                            Tidak ada data
+                                                            pesanan
                                                         </p>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
                                             ordersData.map((order) => (
-                                                <OrderTableRow 
-                                                    key={order.id} 
-                                                    order={order} 
+                                                <OrderTableRow
+                                                    key={order.id}
+                                                    order={order}
                                                 />
                                             ))
                                         )}

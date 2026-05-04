@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,7 +21,7 @@ return new class extends Migration
 
         // 2. Sanctum Personal Access Tokens (UUID Compatible)
         Schema::create('personal_access_tokens', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
             $table->uuidMorphs('tokenable'); // Mendukung UUID User
             $table->string('name');
             $table->string('token', 64)->unique();

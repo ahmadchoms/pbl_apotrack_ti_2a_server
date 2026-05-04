@@ -2,11 +2,14 @@
 
 namespace App\Services\Admin;
 
-use App\Models\AuditLog;
-use App\Models\User;
+use App\Services\Core\AccountService;
 
 class ProfileService
 {
+    public function __construct(
+        protected AccountService $accountService
+    ) {}
+
     public function getProfileData()
     {
         $user = auth()->user();
@@ -26,49 +29,26 @@ class ProfileService
 
     public function getRecentLogs(int $limit = 4)
     {
-        return AuditLog::where('user_id', auth()->id())
-            ->latest()
-            ->take($limit)
-            ->get();
+        return $this->accountService->getAuditHistory(auth()->user(), ['per_page' => $limit]);
     }
 
     public function getAuditHistory(array $filters)
     {
-        return AuditLog::where('user_id', auth()->id())
-            ->select('id', 'action', 'description', 'status', 'created_at', 'metadata')
-            ->search($filters['search'] ?? null)
-            ->filterStatus($filters['status'] ?? null)
-            ->filterAction($filters['action_type'] ?? null)
-            ->filterDate($filters['date_from'] ?? null, $filters['date_to'] ?? null)
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        return $this->accountService->getAuditHistory(auth()->user(), $filters);
     }
 
     public function getActionTypes()
     {
-        return AuditLog::where('user_id', auth()->id())
-            ->distinct()
-            ->pluck('action');
+        return $this->accountService->getActionTypes(auth()->user());
     }
 
     public function updateProfile(array $data)
     {
-        $user = auth()->user();
-        $user->update([
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? $user->phone,
-        ]);
-
-        return $user;
+        return $this->accountService->updateProfile(auth()->user(), $data);
     }
 
     public function updatePassword(string $newPassword)
     {
-        $user = auth()->user();
-        $user->update([
-            'password_hash' => \Hash::make($newPassword)
-        ]);
+        $this->accountService->updatePassword(auth()->user(), $newPassword);
     }
 }

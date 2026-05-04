@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\Pharmacy;
-use App\Models\PharmacyImage;
-use App\Models\PharmacyDocument; // <-- Model Baru
 use App\Models\PharmacyOperatingHour;
 use App\Models\PharmacyStaff;
 use App\Models\MedicineCategory;
@@ -124,6 +122,7 @@ class DatabaseSeeder extends Seeder
                 'rating' => 4.8,
                 'total_reviews' => 124,
                 'sia_number' => 'SIA-2024-0001',
+                'logo_url' => $pharmacyUrl,
                 'verification_status' => 'VERIFIED',
                 'is_active' => true,
                 'is_force_closed' => false,
@@ -139,6 +138,7 @@ class DatabaseSeeder extends Seeder
                 'rating' => 4.5,
                 'total_reviews' => 89,
                 'sia_number' => 'SIA-2024-0055',
+                'logo_url' => $pharmacyUrl,
                 'verification_status' => 'VERIFIED',
                 'is_active' => true,
                 'is_force_closed' => true,
@@ -154,6 +154,7 @@ class DatabaseSeeder extends Seeder
                 'rating' => 0,
                 'total_reviews' => 0,
                 'sia_number' => 'SIA-PALSU-123',
+                'logo_url' => $pharmacyUrl,
                 'verification_status' => 'REJECTED',
                 'is_active' => false,
                 'is_force_closed' => false,
@@ -170,6 +171,7 @@ class DatabaseSeeder extends Seeder
                 'rating' => 0,
                 'total_reviews' => 0,
                 'sia_number' => 'SIA-2024-0099',
+                'logo_url' => $pharmacyUrl,
                 'verification_status' => 'PENDING',
                 'is_active' => false,
                 'is_force_closed' => false,
@@ -183,11 +185,6 @@ class DatabaseSeeder extends Seeder
             $pharmacyData = collect($p)->except('sia_number')->toArray();
             $pharmaModel = Pharmacy::firstOrCreate(['name' => $p['name']], $pharmacyData);
             $pharmaModels[] = $pharmaModel;
-
-            PharmacyImage::firstOrCreate(['pharmacy_id' => $pharmaModel->id], [
-                'image_url' => $pharmacyUrl,
-                'is_primary' => true
-            ]);
 
             // Seeding Pharmacy Documents (Implementasi Tabel Baru)
             $documents = ['SIA', 'SIPA', 'KTP_PEMILIK'];
@@ -290,9 +287,6 @@ class DatabaseSeeder extends Seeder
                     'expired_date' => Carbon::now()->addMonths(24)->format('Y-m-d'), // Masih lama
                     'stock' => $stock2
                 ]);
-
-                // Update total active stock (simulasi dari observer/trigger)
-                $m->update(['total_active_stock' => $stock1 + $stock2]);
 
                 StockMovement::firstOrCreate([
                     'medicine_id' => $m->id,

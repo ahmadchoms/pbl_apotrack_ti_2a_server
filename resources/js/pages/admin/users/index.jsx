@@ -23,14 +23,18 @@ export default function AdminUserList({ users, filters }) {
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     const handleFilter = (newFilters) => {
-        router.get(route('admin.users.index'), { ...filters, ...newFilters, page: 1 }, {
-            preserveState: true,
-            replace: true
-        });
+        router.get(
+            route("admin.users.index"),
+            { ...filters, ...newFilters, page: 1 },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     const handleReset = () => {
-        router.get(route('admin.users.index'), {}, { replace: true });
+        router.get(route("admin.users.index"), {}, { replace: true });
     };
 
     const confirmDelete = () => {
@@ -42,7 +46,11 @@ export default function AdminUserList({ users, filters }) {
     };
 
     const resetPassword = (user) => {
-        if (confirm(`Apakah Anda yakin ingin mereset password user ${user.username} menjadi default (Apotrack2026!)?`)) {
+        if (
+            confirm(
+                `Apakah Anda yakin ingin mereset password user ${user.username} menjadi default (Apotrack2026!)?`,
+            )
+        ) {
             router.patch(`/admin/users/${user.id}/reset-password`);
         }
     };
@@ -55,31 +63,39 @@ export default function AdminUserList({ users, filters }) {
                     title="Manajemen Pengguna"
                 />
 
-                <FilterBar 
+                <FilterBar
                     configs={[
-                        { type: 'search', key: 'search', placeholder: 'Cari username atau email...' },
-                        { 
-                            type: 'select', 
-                            key: 'role', 
-                            label: 'Peran', 
-                            options: Object.entries(ROLE_CONFIG).map(([k, v]) => ({ value: k, label: v.label })) 
+                        {
+                            type: "search",
+                            key: "search",
+                            placeholder: "Cari username atau email...",
                         },
-                        { 
-                            type: 'select', 
-                            key: 'status', 
-                            label: 'Status', 
+                        {
+                            type: "select",
+                            key: "role",
+                            label: "Peran",
+                            options: Object.entries(ROLE_CONFIG).map(
+                                ([k, v]) => ({ value: k, label: v.label }),
+                            ),
+                        },
+                        {
+                            type: "select",
+                            key: "status",
+                            label: "Status",
                             options: [
-                                { value: 'active', label: 'Aktif' },
-                                { value: 'inactive', label: 'Non-Aktif' }
-                            ] 
-                        }
+                                { value: "active", label: "Aktif" },
+                                { value: "inactive", label: "Non-Aktif" },
+                            ],
+                        },
                     ]}
                     currentFilters={filters}
                     onFilterChange={handleFilter}
                     onReset={handleReset}
                     actions={
                         <Button
-                            onClick={() => router.get(route('admin.users.create'))}
+                            onClick={() =>
+                                router.get(route("admin.users.create"))
+                            }
                             className="h-11 px-6 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-blue-900/20"
                         >
                             <UserPlus className="w-4 h-4" /> Tambah Pengguna
@@ -87,7 +103,7 @@ export default function AdminUserList({ users, filters }) {
                     }
                 />
 
-                <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
+                <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
                     <CardContent className="p-0">
                         <Table>
                             <TableHeader className="bg-slate-50/50">
@@ -112,20 +128,24 @@ export default function AdminUserList({ users, filters }) {
                             <TableBody>
                                 {users.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-96 text-center">
+                                        <TableCell
+                                            colSpan={5}
+                                            className="h-96 text-center"
+                                        >
                                             <div className="flex flex-col items-center justify-center text-slate-300">
                                                 <User className="w-16 h-16 mb-4 opacity-10" />
                                                 <p className="text-sm font-black uppercase tracking-widest">
-                                                    Data pengguna tidak ditemukan
+                                                    Data pengguna tidak
+                                                    ditemukan
                                                 </p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     users.data.map((user) => (
-                                        <UserTableRow 
-                                            key={user.id} 
-                                            user={user} 
+                                        <UserTableRow
+                                            key={user.id}
+                                            user={user}
                                             onSuspend={setDeleteTarget}
                                             onResetPassword={resetPassword}
                                         />

@@ -18,8 +18,8 @@ class ReportController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', \App\Models\User::class); // Or a specific Report 'model' if we had one.
-        
+        $this->authorize('viewAny', \App\Models\Report::class);
+
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
@@ -31,7 +31,7 @@ class ReportController extends Controller
             $reportData = $this->reportService->getSalesReport($pharmacyId, $startDate, $endDate);
         }
 
-        return Inertia::render('pharmacy/reports', [
+        return Inertia::render('pharmacy/reports/index', [
             'reportData' => $reportData,
             'filters' => [
                 'start_date' => $startDate,
@@ -43,7 +43,8 @@ class ReportController extends Controller
 
     public function exportSales(Request $request)
     {
-        $pharmacyId = $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $this->authorize('viewAny', \App\Models\Report::class);
+        $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
@@ -52,7 +53,8 @@ class ReportController extends Controller
 
     public function exportStock(Request $request)
     {
-        $pharmacyId = $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
+        $this->authorize('viewAny', \App\Models\Report::class);
+        $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 

@@ -8,13 +8,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Enums\OrderStatus;
+use App\Exceptions\InsufficientStockException;
+use App\Exceptions\InvalidOrderStatusTransitionException;
 
 class OrderService
 {
     public function list(string $pharmacyId, array $filters)
     {
         return Order::query()
-            ->with(['user:id,username,email,phone', 'items', 'prescription'])
+            ->with(['user:id,username,email,phone', 'items.medicine', 'prescription', 'address', 'tracking'])
             ->forPharmacy($pharmacyId)
             ->filterStatus($filters['status'] ?? 'ALL')
             ->orderBy('created_at', 'desc')
@@ -77,6 +79,11 @@ class OrderService
             ->orderBy('expired_date', 'asc')
             ->get();
 
+        $totalAvailable = $batches->sum('stock');
+        if ($totalAvailable < $quantity) {
+            throw new InsufficientStockException("Stok obat \"{$medicine->name}\" tidak mencukupi. Tersedia: {$totalAvailable}, Diminta: {$quantity}.");
+        }
+
         $remainingToReduce = $quantity;
 
         foreach ($batches as $batch) {
@@ -103,7 +110,10 @@ class OrderService
     {
         return DB::transaction(function () use ($orderId, $status, $note) {
             $order = Order::findOrFail($orderId);
-            $oldStatus = $order->order_status;
+            $oldStatus = OrderStatus::from($order->order_status);
+
+            // Validate Transition
+            $this->validateStatusTransition($oldStatus, $status);
 
             $order->update(['order_status' => $status->value]);
 
@@ -111,12 +121,49 @@ class OrderService
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
                 'status' => $status->value,
-                'description' => $note ?? "Status changed from $oldStatus to {$status->value}",
+                'description' => $note ?? "Status changed from {$oldStatus->value} to {$status->value}",
                 'source' => 'PHARMACY_WEB'
             ]);
 
             return $order;
         });
+    }
+
+    protected function validateStatusTransition(OrderStatus $from, OrderStatus $to): void
+    {
+        if ($from === $to) return;
+
+        $validTransitions = [
+            OrderStatus::PENDING->value => [
+                OrderStatus::PROCESSING->value,
+                OrderStatus::CANCELLED->value
+            ],
+            OrderStatus::PROCESSING->value => [
+                OrderStatus::READY_FOR_PICKUP->value,
+                OrderStatus::SHIPPED->value,
+                OrderStatus::CANCELLED->value
+            ],
+            OrderStatus::READY_FOR_PICKUP->value => [
+                OrderStatus::COMPLETED->value,
+                OrderStatus::SHIPPED->value
+            ],
+            OrderStatus::SHIPPED->value => [
+                OrderStatus::DELIVERED->value,
+                OrderStatus::CANCELLED->value // Delivery failed etc
+            ],
+            OrderStatus::DELIVERED->value => [
+                OrderStatus::COMPLETED->value
+            ],
+            // COMPLETED and CANCELLED are terminal states
+            OrderStatus::COMPLETED->value => [],
+            OrderStatus::CANCELLED->value => [],
+        ];
+
+        if (!in_array($to->value, $validTransitions[$from->value] ?? [])) {
+            throw new InvalidOrderStatusTransitionException(
+                "Tidak dapat mengubah status pesanan dari {$from->label()} ke {$to->label()}."
+            );
+        }
     }
 
     public function rejectOrder(string $orderId, string $reason)

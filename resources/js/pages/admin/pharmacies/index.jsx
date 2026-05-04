@@ -32,14 +32,18 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     const handleFilter = (newFilters) => {
-        router.get(route('admin.pharmacies.index'), { ...filters, ...newFilters, page: 1 }, {
-            preserveState: true,
-            replace: true
-        });
+        router.get(
+            route("admin.pharmacies.index"),
+            { ...filters, ...newFilters, page: 1 },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     const handleReset = () => {
-        router.get(route('admin.pharmacies.index'), {}, { replace: true });
+        router.get(route("admin.pharmacies.index"), {}, { replace: true });
     };
 
     const confirmDelete = () => {
@@ -58,15 +62,19 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                     title="Manajemen Apotek"
                 />
 
-                <FilterBar 
+                <FilterBar
                     configs={[
-                        { type: 'search', key: 'search', placeholder: 'Cari nama, alamat, telepon...' },
-                        { 
-                            type: 'select', 
-                            key: 'status', 
-                            label: 'Status', 
-                            options: VERIFICATION_OPTIONS 
-                        }
+                        {
+                            type: "search",
+                            key: "search",
+                            placeholder: "Cari nama, alamat, telepon...",
+                        },
+                        {
+                            type: "select",
+                            key: "status",
+                            label: "Status",
+                            options: VERIFICATION_OPTIONS,
+                        },
                     ]}
                     currentFilters={filters}
                     onFilterChange={handleFilter}
@@ -74,14 +82,20 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                     actions={
                         <>
                             <Button
-                                onClick={() => window.open(route('admin.pharmacies.export'))}
+                                onClick={() =>
+                                    window.open(
+                                        route("admin.pharmacies.export"),
+                                    )
+                                }
                                 variant="outline"
                                 className="h-11 px-6 rounded-2xl bg-blue-50 border-0 text-[#0b3b60] font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all gap-2"
                             >
                                 <Download className="w-4 h-4" /> Ekspor
                             </Button>
                             <Button
-                                onClick={() => router.get('/admin/pharmacies/create')}
+                                onClick={() =>
+                                    router.get("/admin/pharmacies/create")
+                                }
                                 className="h-11 px-6 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-primary/20"
                             >
                                 <Building2 className="w-4 h-4" /> Tambah Apotek
@@ -90,7 +104,7 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                     }
                 />
 
-                <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
+                <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
                     <CardContent className="p-0">
                         <Table>
                             <TableHeader className="bg-slate-50/50">
@@ -118,7 +132,10 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                             <TableBody>
                                 {pharmacies.data.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="h-96 text-center">
+                                        <TableCell
+                                            colSpan={6}
+                                            className="h-96 text-center"
+                                        >
                                             <div className="flex flex-col items-center justify-center text-slate-300">
                                                 <Building2 className="w-16 h-16 mb-4 opacity-10" />
                                                 <p className="text-sm font-black uppercase tracking-widest">
@@ -129,9 +146,9 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                                     </TableRow>
                                 ) : (
                                     pharmacies.data.map((pharmacy) => (
-                                        <PharmacyTableRow 
-                                            key={pharmacy.id} 
-                                            pharmacy={pharmacy} 
+                                        <PharmacyTableRow
+                                            key={pharmacy.id}
+                                            pharmacy={pharmacy}
                                             onDelete={setDeleteTarget}
                                         />
                                     ))
@@ -142,7 +159,10 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                 </Card>
 
                 {pharmacies.data.length > 0 && (
-                    <AdminPagination pagination={pharmacies} itemLabel="apotek" />
+                    <AdminPagination
+                        pagination={pharmacies}
+                        itemLabel="apotek"
+                    />
                 )}
             </div>
 
@@ -159,8 +179,12 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                             Konfirmasi Penghapusan
                         </AlertDialogTitle>
                         <AlertDialogDescription className="text-sm font-bold text-slate-400 text-center leading-relaxed">
-                            Apakah Anda yakin ingin menghapus <span className="text-slate-900 font-black">{deleteTarget?.name}</span>? 
-                            Seluruh data staf, obat, dan riwayat order terkait akan terpengaruh secara permanen.
+                            Apakah Anda yakin ingin menghapus{" "}
+                            <span className="text-slate-900 font-black">
+                                {deleteTarget?.name}
+                            </span>
+                            ? Seluruh data staf, obat, dan riwayat order terkait
+                            akan terpengaruh secara permanen.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="flex flex-row items-center justify-center gap-4 mt-10">

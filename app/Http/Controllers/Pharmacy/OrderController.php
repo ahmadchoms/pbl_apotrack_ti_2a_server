@@ -15,6 +15,8 @@ use Illuminate\Validation\Rules\Rule;
 use App\Models\Order;
 use App\Models\Prescription;
 use Illuminate\Validation\Rule as ValidationRule;
+use App\Exceptions\InsufficientStockException;
+use App\Exceptions\InvalidOrderStatusTransitionException;
 
 class OrderController extends Controller
 {
@@ -79,7 +81,18 @@ class OrderController extends Controller
         ]);
 
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
-        $this->orderService->createPOSOrder($pharmacyId, $request->all());
+        
+        try {
+            $this->orderService->createPOSOrder($pharmacyId, $request->all());
+        } catch (InsufficientStockException $e) {
+            return redirect()->back()
+                ->withErrors(['items' => $e->getMessage()])
+                ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal membuat pesanan: ' . $e->getMessage())
+                ->withInput();
+        }
 
         return redirect()->route('pharmacy.orders.index')
             ->with('success', 'Pesanan POS berhasil dibuat');
@@ -105,7 +118,13 @@ class OrderController extends Controller
             'note' => 'nullable|string'
         ]);
 
-        $this->orderService->updateStatus($id, OrderStatus::from($request->status), $request->note);
+        try {
+            $this->orderService->updateStatus($id, OrderStatus::from($request->status), $request->note);
+        } catch (InvalidOrderStatusTransitionException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memperbarui status: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', "Status pesanan berhasil diupdate ke {$request->status}");
     }

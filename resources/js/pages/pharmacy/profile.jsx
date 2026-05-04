@@ -338,21 +338,37 @@ function PharmacyForm({ pharmacy }) {
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
                         Lokasi Apotek (Peta)
                     </Label>
-                    <LocationPicker 
-                        lat={data.latitude} 
-                        lng={data.longitude} 
+                    <LocationPicker
+                        lat={data.latitude}
+                        lng={data.longitude}
                         onChange={(lat, lng) => {
-                            setData((prev) => ({ ...prev, latitude: lat, longitude: lng }));
-                        }} 
+                            setData((prev) => ({
+                                ...prev,
+                                latitude: lat,
+                                longitude: lng,
+                            }));
+                        }}
                     />
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Latitude</Label>
-                            <Input readOnly value={data.latitude} className="h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-mono" />
+                            <Label className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">
+                                Latitude
+                            </Label>
+                            <Input
+                                readOnly
+                                value={data.latitude}
+                                className="h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-mono"
+                            />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Longitude</Label>
-                            <Input readOnly value={data.longitude} className="h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-mono" />
+                            <Label className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">
+                                Longitude
+                            </Label>
+                            <Input
+                                readOnly
+                                value={data.longitude}
+                                className="h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-mono"
+                            />
                         </div>
                     </div>
                 </div>
@@ -419,7 +435,7 @@ function OperatingHoursForm({ pharmacy }) {
     };
 
     return (
-        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+        <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
             <CardHeader className="p-8 border-b border-slate-50">
                 <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800">
                     Manajemen Jam Operasional

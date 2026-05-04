@@ -53,8 +53,10 @@ class MedicineService
             ]);
 
             if (isset($data['image'])) {
-                $path = $data['image']->store('medicines', 'public');
-                $medicine->update(['image_url' => $path]);
+                $file = $data['image'];
+                $path = 'medicines/' . $file->hashName();
+                Storage::disk('s3')->put($path, file_get_contents($file));
+                $medicine->update(['image_url' => Storage::disk('s3')->url($path)]);
             }
 
             foreach ($data['batches'] as $batchData) {
@@ -93,10 +95,30 @@ class MedicineService
 
             if (isset($data['image'])) {
                 if ($medicine->image_url) {
-                    Storage::disk('public')->delete($medicine->image_url);
+                    // Extract relative path from URL for S3 deletion
+                    $urlPath = parse_url($medicine->image_url, PHP_URL_PATH);
+                    
+                    // Supabase public URLs often contain '/storage/v1/object/public/bucket/'
+                    // We need the part after the bucket name.
+                    $bucket = env('AWS_BUCKET');
+                    $search = '/' . $bucket . '/';
+                    $pos = strpos($urlPath, $search);
+                    
+                    if ($pos !== false) {
+                        $oldPath = substr($urlPath, $pos + strlen($search));
+                    } else {
+                        $oldPath = ltrim($urlPath, '/');
+                    }
+                    
+                    if (Storage::disk('s3')->exists($oldPath)) {
+                        Storage::disk('s3')->delete($oldPath);
+                    }
                 }
-                $path = $data['image']->store('medicines', 'public');
-                $medicine->update(['image_url' => $path]);
+                
+                $file = $data['image'];
+                $path = 'medicines/' . $file->hashName();
+                Storage::disk('s3')->put($path, file_get_contents($file));
+                $medicine->update(['image_url' => Storage::disk('s3')->url($path)]);
             }
 
             $this->syncBatches($medicine, $data['batches'] ?? []);

@@ -168,7 +168,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                                 color="text-[#0b3b60]"
                                 title="Informasi Dasar"
                             />
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
                                 <CardContent className="p-10 space-y-8">
                                     <FormField
                                         label="Nama Lengkap Apotek"
@@ -251,7 +251,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                                 color="text-indigo-600"
                                 title="Manajemen Staf & Akses"
                             />
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2 overflow-visible">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2 overflow-visible">
                                 <CardContent className="p-10">
                                     <StaffPicker
                                         staffs={data.staffs}
@@ -279,7 +279,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                                 color="text-rose-600"
                                 title="Lokasi Apotek (Peta)"
                             />
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
                                 <CardContent className="p-10 space-y-8">
                                     <LocationPicker
                                         lat={data.latitude}
@@ -332,7 +332,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                                 color="text-rose-600"
                                 title="Zona Berbahaya"
                             />
-                            <Card className="rounded-[2.5rem] border-2 border-rose-100 bg-rose-50/20 p-2">
+                            <Card className="pt-0 rounded-[2.5rem] border-2 border-rose-100 bg-rose-50/20 p-2">
                                 <CardContent className="p-10 flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="space-y-2">
                                         <h4 className="text-base font-black text-rose-900 leading-none">
@@ -393,7 +393,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                     {/* Sidebar */}
                     <div className="space-y-10">
                         <motion.section variants={itemVariants}>
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                                 <CardContent className="p-10 space-y-8">
                                     <SectionHeader
                                         icon={
@@ -473,7 +473,7 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                             </Card>
                         </motion.section>
                         <motion.section variants={itemVariants}>
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                                 <CardContent className="p-10 space-y-8">
                                     <SectionHeader
                                         icon={<FileUp className="w-5 h-5" />}

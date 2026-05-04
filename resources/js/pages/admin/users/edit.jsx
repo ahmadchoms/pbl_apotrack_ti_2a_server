@@ -68,7 +68,8 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
     const submit = (e) => {
         e.preventDefault();
         put(route("admin.users.update", user.data.id), {
-            onSuccess: () => toast.success("Profil pengguna berhasil diperbarui"),
+            onSuccess: () =>
+                toast.success("Profil pengguna berhasil diperbarui"),
             onError: () => toast.error("Gagal memperbarui profil pengguna"),
         });
     };
@@ -94,7 +95,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                     >
                         Batalkan
                     </Button>
-                    <Button 
+                    <Button
                         disabled={processing}
                         onClick={submit}
                         className="h-14 px-10 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-[#0b3b60]/20 flex items-center gap-2"
@@ -128,7 +129,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                 color="text-[#0b3b60]"
                                 title="Identitas Pengguna"
                             />
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
                                 <CardContent className="p-10 space-y-8">
                                     <div className="flex flex-col md:flex-row gap-10">
                                         <div className="flex flex-col items-center gap-4 shrink-0">
@@ -155,14 +156,15 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                             </p>
                                         </div>
                                         <div className="flex-1 space-y-8">
-                                            <FormField label="Nama Lengkap / Username" error={errors.username}>
+                                            <FormField
+                                                label="Nama Lengkap / Username"
+                                                error={errors.username}
+                                            >
                                                 <div className="relative">
                                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                                                     <Input
                                                         name="username"
-                                                        value={
-                                                            data.username
-                                                        }
+                                                        value={data.username}
                                                         onChange={
                                                             handleInputChange
                                                         }
@@ -172,15 +174,16 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                 </div>
                                             </FormField>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <FormField label="Email Connection" error={errors.email}>
+                                                <FormField
+                                                    label="Email Connection"
+                                                    error={errors.email}
+                                                >
                                                     <div className="relative">
                                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                                                         <Input
                                                             name="email"
                                                             type="email"
-                                                            value={
-                                                                data.email
-                                                            }
+                                                            value={data.email}
                                                             onChange={
                                                                 handleInputChange
                                                             }
@@ -189,14 +192,15 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                         />
                                                     </div>
                                                 </FormField>
-                                                <FormField label="Phone Number" error={errors.phone}>
+                                                <FormField
+                                                    label="Phone Number"
+                                                    error={errors.phone}
+                                                >
                                                     <div className="relative">
                                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                                                         <Input
                                                             name="phone"
-                                                            value={
-                                                                data.phone
-                                                            }
+                                                            value={data.phone}
                                                             onChange={
                                                                 handleInputChange
                                                             }
@@ -221,10 +225,13 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                 color="text-emerald-600"
                                 title="Keamanan & Otoritas"
                             />
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
                                 <CardContent className="p-10 space-y-8">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormField label="Tingkat Otoritas (Role)" error={errors.role}>
+                                        <FormField
+                                            label="Tingkat Otoritas (Role)"
+                                            error={errors.role}
+                                        >
                                             <Select
                                                 value={data.role}
                                                 onValueChange={(v) =>
@@ -259,11 +266,12 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                 initial={{ opacity: 0, x: -20 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                             >
-                                                <FormField label="Afiliasi Apotek" error={errors.pharmacy_id}>
+                                                <FormField
+                                                    label="Afiliasi Apotek"
+                                                    error={errors.pharmacy_id}
+                                                >
                                                     <Select
-                                                        value={
-                                                            data.pharmacy_id
-                                                        }
+                                                        value={data.pharmacy_id}
                                                         onValueChange={(v) =>
                                                             handleSelectChange(
                                                                 "pharmacy_id",
@@ -309,7 +317,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                 color="text-rose-600"
                                 title="Zona Berbahaya"
                             />
-                            <Card className="rounded-[2.5rem] border-2 border-rose-100 bg-rose-50/20 p-2">
+                            <Card className="pt-0 rounded-[2.5rem] border-2 border-rose-100 bg-rose-50/20 p-2">
                                 <CardContent className="p-10 flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="space-y-2">
                                         <h4 className="text-base font-black text-rose-900 leading-none">
@@ -374,7 +382,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                             variants={itemVariants}
                             className="space-y-6"
                         >
-                            <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                            <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                                 <CardContent className="p-10 space-y-8">
                                     <SectionHeader
                                         icon={

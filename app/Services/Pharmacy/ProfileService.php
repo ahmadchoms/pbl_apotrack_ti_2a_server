@@ -5,11 +5,15 @@ namespace App\Services\Pharmacy;
 use App\Models\Pharmacy;
 use App\Models\User;
 use App\Models\AuditLog;
-use Illuminate\Support\Facades\Hash;
+use App\Services\Core\AccountService;
 use Illuminate\Support\Facades\DB;
 
 class ProfileService
 {
+    public function __construct(
+        protected AccountService $accountService
+    ) {}
+
     public function updatePharmacy(Pharmacy $pharmacy, array $data)
     {
         return DB::transaction(function () use ($pharmacy, $data) {
@@ -20,7 +24,9 @@ class ProfileService
                 'action' => 'UPDATE_PHARMACY_PROFILE',
                 'description' => "Memperbarui profil apotek: {$pharmacy->name}",
                 'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent()
+                'user_agent' => request()->userAgent(),
+                'status' => 'SUCCESS',
+                'created_at' => now(),
             ]);
 
             return $pharmacy;
@@ -29,17 +35,7 @@ class ProfileService
 
     public function updatePassword(User $user, string $newPassword)
     {
-        $user->update([
-            'password_hash' => Hash::make($newPassword)
-        ]);
-
-        AuditLog::create([
-            'user_id' => $user->id,
-            'action' => 'CHANGE_PASSWORD',
-            'description' => 'Mengubah password akun apotek',
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent()
-        ]);
+        $this->accountService->updatePassword($user, $newPassword);
     }
 
     public function updateOperatingHours(array $hours)
@@ -64,7 +60,9 @@ class ProfileService
                 'action' => 'UPDATE_OPERATING_HOURS',
                 'description' => 'Memperbarui jam operasional apotek (Relational format)',
                 'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent()
+                'user_agent' => request()->userAgent(),
+                'status' => 'SUCCESS',
+                'created_at' => now(),
             ]);
             
             return $pharmacy;
@@ -73,23 +71,12 @@ class ProfileService
 
     public function deleteAccount()
     {
-        $user = auth()->user();
-        
-        AuditLog::create([
-            'user_id' => $user->id,
-            'action' => 'DELETE_ACCOUNT',
-            'description' => 'Menghapus akun apotek secara permanen',
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent()
-        ]);
-
-        $user->delete();
+        $this->accountService->deleteAccount(auth()->user());
     }
 
     public function getAuditLogs(string $userId)
     {
-        return AuditLog::where('user_id', $userId)
-            ->latest()
-            ->paginate(10);
+        $user = User::findOrFail($userId);
+        return $this->accountService->getAuditHistory($user);
     }
 }

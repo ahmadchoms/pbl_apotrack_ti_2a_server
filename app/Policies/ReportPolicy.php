@@ -8,6 +8,12 @@ class ReportPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->pharmacyStaff !== null;
+        // Check if user is a pharmacy staff (either by direct role or by linkage)
+        $staff = $user->pharmacyStaff;
+        if (!$staff) return false;
+
+        $role = $user->role === 'USER' ? $staff->role : $user->role;
+        
+        return in_array($role, ['APOTEKER', 'STAFF']);
     }
 }

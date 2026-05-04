@@ -47,17 +47,17 @@ return [
             'report' => false,
         ],
 
-        // 's3' => [
-        //     'driver' => 's3',
-        //     'key' => env('SUPABASE_S3_KEY'),
-        //     'secret' => env('SUPABASE_S3_SECRET'),
-        //     'region' => env('SUPABASE_S3_REGION'),
-        //     'bucket' => env('SUPABASE_BUCKET_PRIVATE'),
-        //     'url' => env('SUPABASE_URL_PRIVATE'),
-        //     'endpoint' => env('SUPABASE_S3_ENDPOINT'),
-        //     'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-        //     'throw' => false,
-        // ],
+        's3' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_S3_KEY'),
+            'secret' => env('SUPABASE_S3_SECRET'),
+            'region' => env('SUPABASE_S3_REGION'),
+            'bucket' => env('SUPABASE_BUCKET_PRIVATE'),
+            'url' => env('SUPABASE_URL_PRIVATE'),
+            'endpoint' => env('SUPABASE_S3_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'throw' => false,
+        ],
         'supabase_private' => [
             'driver' => 's3',
             'key' => env('SUPABASE_S3_KEY'),

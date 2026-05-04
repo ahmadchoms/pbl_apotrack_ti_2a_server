@@ -2,7 +2,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { AlertCircle, History, PackageSearch, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Link } from "@inertiajs/react";
+import { STATUS_CONFIG } from "../../lib/constants";
 
 const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -13,25 +14,19 @@ const itemVariants = {
     },
 };
 
-const getStatusStyles = (status) => {
-    switch (status) {
-        case "COMPLETED":
-            return "bg-emerald-50 text-emerald-600";
-        case "PROCESSING":
-            return "bg-blue-50 text-blue-600";
-        case "PENDING":
-            return "bg-orange-50 text-orange-600";
-        default:
-            return "bg-slate-50 text-slate-500";
-    }
+export const getStatusConfig = (status) => {
+    return (
+        STATUS_CONFIG[status] ?? {
+            label: status,
+            badge: "bg-slate-100 text-slate-600 border-slate-200",
+            dot: "bg-slate-400",
+        }
+    );
 };
-
-import { Link } from "@inertiajs/react";
 
 export function DashboardTables({ widgets = {} }) {
     const stockAlerts = widgets.stock_alerts || [];
     const recentOrders = widgets.recent_orders || [];
-    console.log(stockAlerts);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -132,53 +127,54 @@ export function DashboardTables({ widgets = {} }) {
                     <CardContent className="p-10 pt-4">
                         <div className="max-h-105 overflow-y-auto pr-2 space-y-4 no-scrollbar">
                             {recentOrders.length > 0 ? (
-                                recentOrders.map((order, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-300"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#0b3b60] to-[#1a6fad] flex items-center justify-center text-white text-[10px] font-black uppercase">
-                                                {order.customer.substring(0, 2)}
+                                recentOrders.map((order, idx) => {
+                                    const status = getStatusConfig(
+                                        order.status,
+                                    );
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-300"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#0b3b60] to-[#1a6fad] flex items-center justify-center text-white text-[10px] font-black uppercase">
+                                                    {order.customer.substring(
+                                                        0,
+                                                        2,
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-slate-700">
+                                                        {order.customer}
+                                                    </p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                                                        {order.time}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-black text-slate-700">
-                                                    {order.customer}
+                                            <div className="flex flex-col items-end gap-2">
+                                                <p className="text-sm font-black text-slate-800">
+                                                    Rp{" "}
+                                                    {order.amount.toLocaleString()}
                                                 </p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                                    {order.time}
-                                                </p>
+                                                <div
+                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest uppercase border ${status.badge}`}
+                                                >
+                                                    <span
+                                                        className={`w-1.5 h-1.5 rounded-full ${status.dot}`}
+                                                    />
+                                                    {status.label}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                            <p className="text-sm font-black text-slate-800">
-                                                Rp{" "}
-                                                {order.amount.toLocaleString()}
-                                            </p>
-                                            <div
-                                                className={`px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest uppercase ${getStatusStyles(order.status)}`}
-                                            >
-                                                {order.status}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <p className="text-center py-10 text-slate-400 font-bold italic">
                                     Belum ada pesanan masuk.
                                 </p>
                             )}
                         </div>
-
-                        {recentOrders.length > 0 && (
-                            <Link
-                                href={route("pharmacy.orders.index")}
-                                className="flex items-center justify-center w-full mt-6 h-14 rounded-2xl bg-[#0b3b60] hover:bg-[#082a45] text-white text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20 group"
-                            >
-                                Buka Semua Pesanan{" "}
-                                <ArrowRight className="h-3 w-3 ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                        )}
                     </CardContent>
                 </Card>
             </motion.div>

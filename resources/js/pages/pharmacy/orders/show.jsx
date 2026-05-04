@@ -136,7 +136,7 @@ export default function OrderShow({ order: orderWrapper }) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
                     {/* Left Column: Prescription Document */}
                     <div className="lg:col-span-5 xl:col-span-4">
-                        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/30 overflow-hidden sticky top-6 bg-white flex flex-col h-[calc(100vh-200px)]">
+                        <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/30 overflow-hidden sticky top-6 bg-white flex flex-col h-[calc(100vh-200px)]">
                             <div className="p-8 border-b border-slate-50 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500 shadow-inner">
@@ -223,7 +223,7 @@ export default function OrderShow({ order: orderWrapper }) {
                     <div className="lg:col-span-7 xl:col-span-8 space-y-8">
                         {/* Summary & Customer Info */}
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                            <Card className="rounded-[2.5rem] border-slate-200/80 shadow-xl shadow-slate-200/20 bg-white p-8">
+                            <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-xl shadow-slate-200/20 bg-white p-8">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                                     <ShoppingBag className="w-3.5 h-3.5" />{" "}
                                     Identitas Pesanan
@@ -268,7 +268,7 @@ export default function OrderShow({ order: orderWrapper }) {
                                 </div>
                             </Card>
 
-                            <Card className="rounded-[2.5rem] border-slate-200/80 shadow-xl shadow-slate-200/20 bg-white p-8">
+                            <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-xl shadow-slate-200/20 bg-white p-8">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                                     <User className="w-3.5 h-3.5" /> Informasi
                                     Pelanggan
@@ -319,7 +319,7 @@ export default function OrderShow({ order: orderWrapper }) {
                         </div>
 
                         {/* Order Items Table */}
-                        <Card className="rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/20 bg-white overflow-hidden">
+                        <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/20 bg-white overflow-hidden">
                             <div className="p-8 border-b border-slate-50">
                                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3">
                                     <Pill className="w-5 h-5 text-primary" />{" "}

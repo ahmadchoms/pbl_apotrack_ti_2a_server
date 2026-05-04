@@ -27,7 +27,11 @@ const itemVariants = {
 
 export default function ReportsPage({ reportData, filters }) {
     const handleFilterChange = (newFilters) => {
-        router.get(route("pharmacy.reports.index"), { ...filters, ...newFilters }, { preserveState: true });
+        router.get(
+            route("pharmacy.reports.index"),
+            { ...filters, ...newFilters },
+            { preserveState: true },
+        );
     };
 
     const handleReset = () => {
@@ -35,10 +39,11 @@ export default function ReportsPage({ reportData, filters }) {
     };
 
     const handleExport = () => {
-        const exportRoute = filters.type === 'stock' 
-            ? 'pharmacy.reports.stock.export' 
-            : 'pharmacy.reports.sales.export';
-        
+        const exportRoute =
+            filters.type === "stock"
+                ? "pharmacy.reports.stock.export"
+                : "pharmacy.reports.sales.export";
+
         window.location.href = route(exportRoute, filters);
     };
 
@@ -75,10 +80,14 @@ export default function ReportsPage({ reportData, filters }) {
                             </span>
                         </div>
                         <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-                            Laporan {filters.type === 'stock' ? 'Mutasi Stok' : 'Penjualan'}
+                            Laporan{" "}
+                            {filters.type === "stock"
+                                ? "Mutasi Stok"
+                                : "Penjualan"}
                         </h2>
                         <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-wide">
-                            Pantau performa bisnis dan pergerakan inventaris Anda
+                            Pantau performa bisnis dan pergerakan inventaris
+                            Anda
                         </p>
                     </div>
 
@@ -104,10 +113,14 @@ export default function ReportsPage({ reportData, filters }) {
                     animate="visible"
                     className="space-y-8"
                 >
-                    <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
+                    <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
                         <CardHeader className="p-8 border-b border-slate-50">
                             <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-3">
-                                {filters.type === 'stock' ? <Package className="w-5 h-5 text-indigo-500" /> : <TrendingUp className="w-5 h-5 text-emerald-500" />}
+                                {filters.type === "stock" ? (
+                                    <Package className="w-5 h-5 text-indigo-500" />
+                                ) : (
+                                    <TrendingUp className="w-5 h-5 text-emerald-500" />
+                                )}
                                 Data Detail Laporan
                             </CardTitle>
                         </CardHeader>
@@ -115,21 +128,41 @@ export default function ReportsPage({ reportData, filters }) {
                             <Table>
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        {filters.type === 'stock' ? (
+                                        {filters.type === "stock" ? (
                                             <>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Obat</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jumlah</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Sisa Stok</TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Waktu
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Obat
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Tipe
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Jumlah
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                                                    Sisa Stok
+                                                </TableHead>
                                             </>
                                         ) : (
                                             <>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">ID Pesanan</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pelanggan</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Metode</TableHead>
-                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Total</TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    ID Pesanan
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Waktu
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Pelanggan
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    Metode
+                                                </TableHead>
+                                                <TableHead className="h-14 px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                                                    Total
+                                                </TableHead>
                                             </>
                                         )}
                                     </TableRow>
@@ -137,34 +170,68 @@ export default function ReportsPage({ reportData, filters }) {
                                 <TableBody>
                                     {reportData.length > 0 ? (
                                         reportData.map((row, idx) => (
-                                            <TableRow key={idx} className="hover:bg-slate-50/50 border-slate-50 transition-colors">
-                                                {filters.type === 'stock' ? (
+                                            <TableRow
+                                                key={idx}
+                                                className="hover:bg-slate-50/50 border-slate-50 transition-colors"
+                                            >
+                                                {filters.type === "stock" ? (
                                                     <>
-                                                        <TableCell className="px-8 py-5 text-xs font-bold text-slate-500">{row.date}</TableCell>
-                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-700">{row.medicine_name}</TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-bold text-slate-500">
+                                                            {row.date}
+                                                        </TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-700">
+                                                            {row.medicine_name}
+                                                        </TableCell>
                                                         <TableCell className="px-8 py-5">
-                                                            <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${row.type === 'IN' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                                            <span
+                                                                className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${row.type === "IN" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}
+                                                            >
                                                                 {row.type}
                                                             </span>
                                                         </TableCell>
-                                                        <TableCell className="px-8 py-5 text-xs font-bold text-slate-600">{row.quantity}</TableCell>
-                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-800 text-right">{row.remaining_stock}</TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-bold text-slate-600">
+                                                            {row.quantity}
+                                                        </TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-800 text-right">
+                                                            {
+                                                                row.remaining_stock
+                                                            }
+                                                        </TableCell>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <TableCell className="px-8 py-5 text-xs font-black text-indigo-600">#{row.order_id.substring(0, 8)}</TableCell>
-                                                        <TableCell className="px-8 py-5 text-xs font-bold text-slate-500">{row.date}</TableCell>
-                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-700">{row.customer_name}</TableCell>
-                                                        <TableCell className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase">{row.payment_method}</TableCell>
-                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-800 text-right">Rp {row.total.toLocaleString()}</TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-black text-indigo-600">
+                                                            #
+                                                            {row.order_id.substring(
+                                                                0,
+                                                                8,
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-bold text-slate-500">
+                                                            {row.date}
+                                                        </TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-700">
+                                                            {row.customer_name}
+                                                        </TableCell>
+                                                        <TableCell className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase">
+                                                            {row.payment_method}
+                                                        </TableCell>
+                                                        <TableCell className="px-8 py-5 text-xs font-black text-slate-800 text-right">
+                                                            Rp{" "}
+                                                            {row.total.toLocaleString()}
+                                                        </TableCell>
                                                     </>
                                                 )}
                                             </TableRow>
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="h-40 text-center text-slate-400 font-bold italic">
-                                                Tidak ada data untuk periode ini.
+                                            <TableCell
+                                                colSpan={5}
+                                                className="h-40 text-center text-slate-400 font-bold italic"
+                                            >
+                                                Tidak ada data untuk periode
+                                                ini.
                                             </TableCell>
                                         </TableRow>
                                     )}

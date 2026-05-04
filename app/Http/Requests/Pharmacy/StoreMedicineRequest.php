@@ -31,8 +31,7 @@ class StoreMedicineRequest extends FormRequest
             'batches.*.batch_number' => 'required|string',
             'batches.*.expired_date' => 'required|date',
             'batches.*.stock' => 'required|integer|min:0',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpg,jpeg,png|max:5120',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ];
     }
 }

@@ -200,7 +200,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                             }
                         />
 
-                        <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
+                        <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader className="bg-slate-50/50">
@@ -268,7 +268,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                     </TabsContent>
 
                     <TabsContent value="activity">
-                        <Card className="rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
+                        <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
                             <CardHeader className="p-10 border-b border-slate-50 bg-slate-50/30">
                                 <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
                                     <Activity className="w-6 h-6 text-primary" />
