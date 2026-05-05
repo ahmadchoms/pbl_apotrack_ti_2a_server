@@ -128,4 +128,50 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get order history (Completed or Cancelled).
+     */
+    public function history(Request $request)
+    {
+        $orders = Order::with(['items.medicine', 'pharmacy'])
+            ->where('user_id', $request->user()->id)
+            ->whereIn('order_status', ['COMPLETED', 'CANCELLED'])
+            ->latest()
+            ->paginate(15);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Riwayat pesanan berhasil diambil',
+            'data' => $orders->items(),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'total' => $orders->total(),
+            ],
+        ]);
+    }
+
+    /**
+     * Get courier tracking details.
+     */
+    public function tracking($id, Request $request)
+    {
+        $order = Order::with(['deliveryTracking.logs'])
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($id);
+
+        if (!$order->deliveryTracking) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Informasi pengiriman tidak ditemukan untuk pesanan ini.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data pelacakan pengiriman berhasil diambil',
+            'data' => $order->deliveryTracking,
+        ]);
+    }
 }

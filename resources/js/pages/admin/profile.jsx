@@ -59,7 +59,6 @@ export default function AdminProfilePage({ user, auditLogs }) {
                             <SecurityCard user={user} />
                         </motion.div>
                         <motion.div variants={itemVariants}>
-                            {/* Additional cards like System Settings or Permissions can go here */}
                             <div className="p-10 rounded-[2.5rem] bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center">
                                 <div className="w-16 h-16 rounded-3xl bg-white flex items-center justify-center shadow-sm mb-4">
                                     <span className="text-2xl">⚙️</span>

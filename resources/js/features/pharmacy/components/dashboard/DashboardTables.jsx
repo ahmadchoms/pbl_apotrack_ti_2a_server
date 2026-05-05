@@ -55,7 +55,6 @@ export function DashboardTables({ widgets = {} }) {
                             </Link>
                         </div>
                     </CardHeader>
-                    {/* ... content ... */}
                     <CardContent className="p-10 pt-4">
                         <div className="max-h-105 overflow-y-auto pr-2 space-y-4 no-scrollbar">
                             {stockAlerts.length > 0 ? (

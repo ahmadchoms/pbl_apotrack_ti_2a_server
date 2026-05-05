@@ -44,7 +44,6 @@ return new class extends Migration
             $table->decimal('price', 12, 2);
             $table->boolean('requires_prescription')->default(false);
             $table->integer('weight_in_grams')->default(100);
-            $table->integer('total_active_stock')->default(10);
             $table->string('image_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->softDeletes();
@@ -52,9 +51,8 @@ return new class extends Migration
 
             $table->index(['pharmacy_id', 'is_active']);
             $table->index('name');
+            $table->index(['pharmacy_id', 'is_active', 'deleted_at']);
         });
-
-
 
         Schema::create('medicine_batches', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -62,13 +60,16 @@ return new class extends Migration
             $table->string('batch_number', 50);
             $table->date('expired_date');
             $table->integer('stock')->default(0);
+            $table->softDeletes();
             $table->timestamps();
 
             $table->unique(['medicine_id', 'batch_number']);
             $table->index('expired_date');
         });
 
-        DB::statement('ALTER TABLE medicine_batches ADD CONSTRAINT chk_stock_non_negative CHECK (stock >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE medicine_batches ADD CONSTRAINT chk_stock_non_negative CHECK (stock >= 0)');
+        }
 
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -83,7 +84,9 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
 
-        DB::statement('ALTER TABLE stock_movements ADD CONSTRAINT chk_movement_quantity_positive CHECK (quantity > 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE stock_movements ADD CONSTRAINT chk_movement_quantity_positive CHECK (quantity > 0)');
+        }
     }
 
     public function down(): void

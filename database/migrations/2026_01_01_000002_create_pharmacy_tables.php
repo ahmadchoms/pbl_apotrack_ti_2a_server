@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('name', 150);
             $table->text('address');
             $table->string('phone', 20)->nullable();
+            $table->string('logo_url')->nullable();
             $table->float('latitude', 10, 6);
             $table->float('longitude', 10, 6);
             $table->float('rating', 8, 2)->default(0.0);
@@ -32,16 +33,9 @@ return new class extends Migration
             $table->index('verification_status');
         });
 
-        DB::statement('ALTER TABLE pharmacies ADD CONSTRAINT chk_pharmacy_rating CHECK (rating >= 0 AND rating <= 5)');
-
-        Schema::create('pharmacy_images', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('pharmacy_id')->constrained('pharmacies')->cascadeOnDelete();
-            $table->string('image_url');
-            $table->boolean('is_primary')->default(false);
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
-        });
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE pharmacies ADD CONSTRAINT chk_pharmacy_rating CHECK (rating >= 0 AND rating <= 5)');
+        }
 
         Schema::create('pharmacy_staffs', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -49,9 +43,12 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained('users');
             $table->string('role', 20); // APOTEKER | STAFF
             $table->boolean('is_active')->default(true);
+            $table->softDeletes();
             $table->timestamps();
 
             $table->unique(['pharmacy_id', 'user_id']);
+            $table->index('user_id');
+            $table->index(['pharmacy_id', 'is_active']);
         });
 
         Schema::create('pharmacy_operating_hours', function (Blueprint $table) {
@@ -84,7 +81,6 @@ return new class extends Migration
         Schema::dropIfExists('pharmacy_operating_hours');
         Schema::dropIfExists('pharmacy_staffs');
         Schema::dropIfExists('pharmacy_legalities');
-        Schema::dropIfExists('pharmacy_images');
         Schema::dropIfExists('pharmacies');
     }
 };

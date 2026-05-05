@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PharmacyResource;
+use App\Http\Resources\Admin\PharmacyResource;
 use App\Services\Api\PharmacyService;
 use Illuminate\Http\Request;
 

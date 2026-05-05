@@ -49,7 +49,7 @@ class Pharmacy extends Model
     public function scopeFilterStatus($query, $status)
     {
         return $query->when($status && $status !== 'all', function ($q) use ($status) {
-            match ($status) {
+            match (strtolower($status)) {
                 'verified' => $q->where('verification_status', 'VERIFIED'),
                 'pending' => $q->where('verification_status', 'PENDING'),
                 'rejected' => $q->where('verification_status', 'REJECTED'),

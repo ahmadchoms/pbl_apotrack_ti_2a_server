@@ -51,9 +51,12 @@ return new class extends Migration
             $table->index('order_status');
             $table->index('payment_status');
             $table->index('created_at');
+            $table->index(['pharmacy_id', 'order_status', 'created_at']);
         });
 
-        DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_grand_total_non_negative CHECK (grand_total >= 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE orders ADD CONSTRAINT chk_grand_total_non_negative CHECK (grand_total >= 0)');
+        }
 
         Schema::table('prescriptions', function (Blueprint $table) {
             $table->foreign('order_id')->references('id')->on('orders')->nullOnDelete();
@@ -99,7 +102,9 @@ return new class extends Migration
             $table->unique(['cart_id', 'medicine_id']);
         });
 
-        DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_quantity_positive CHECK (quantity > 0)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_quantity_positive CHECK (quantity > 0)');
+        }
 
         Schema::create('delivery_trackings', function (Blueprint $table) {
             $table->uuid('id')->primary();

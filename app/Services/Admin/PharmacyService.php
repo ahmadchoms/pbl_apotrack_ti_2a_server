@@ -21,6 +21,7 @@ class PharmacyService
                 'latitude',
                 'longitude',
                 'rating',
+                'logo_url',
                 'total_reviews',
                 'verification_status',
                 'is_active',

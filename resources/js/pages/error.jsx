@@ -13,35 +13,39 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function ErrorPage({ status, message }) {
-    const title = {
-        503: "503: Service Unavailable",
-        500: "500: Server Error",
-        404: "404: Page Not Found",
-        403: "403: Access Forbidden",
-        401: "401: Unauthorized Access",
-    }[status] || `Error ${status}`;
+    const title =
+        {
+            503: "503: Service Unavailable",
+            500: "500: Server Error",
+            404: "404: Page Not Found",
+            403: "403: Access Forbidden",
+            401: "401: Unauthorized Access",
+        }[status] || `Error ${status}`;
 
-    const description = {
-        503: "Sorry, we are doing some maintenance. Please check back soon.",
-        500: "Whoops, something went wrong on our servers. We are looking into it.",
-        404: "Sorry, the page you are looking for could not be found.",
-        403: "Sorry, you don't have permission to access this page.",
-        401: "Please login to access this area.",
-    }[status] || message || "An unexpected error occurred.";
+    const description =
+        {
+            503: "Sorry, we are doing some maintenance. Please check back soon.",
+            500: "Whoops, something went wrong on our servers. We are looking into it.",
+            404: "Sorry, the page you are looking for could not be found.",
+            403: "Sorry, you don't have permission to access this page.",
+            401: "Please login to access this area.",
+        }[status] ||
+        message ||
+        "An unexpected error occurred.";
 
-    const Icon = {
-        503: RefreshCw,
-        500: AlertCircle,
-        404: Search,
-        403: Lock,
-        401: ShieldAlert,
-    }[status] || AlertCircle;
+    const Icon =
+        {
+            503: RefreshCw,
+            500: AlertCircle,
+            404: Search,
+            403: Lock,
+            401: ShieldAlert,
+        }[status] || AlertCircle;
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 relative overflow-hidden p-6 font-sans">
             <Head title={title} />
 
-            {/* Abstract Background Patterns */}
             <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
                 <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-3xl animate-pulse delay-700" />
@@ -62,8 +66,8 @@ export default function ErrorPage({ status, message }) {
                     >
                         <Icon className="w-10 h-10 sm:w-14 sm:h-14 text-primary" />
                     </motion.div>
-                    
-                    <motion.div 
+
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
@@ -73,16 +77,16 @@ export default function ErrorPage({ status, message }) {
                     </motion.div>
                 </div>
 
-                <motion.h1 
+                <motion.h1
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
                     className="text-3xl sm:text-4xl font-black text-slate-900 mb-4 tracking-tight"
                 >
-                    {title.split(': ')[1] || title}
+                    {title.split(": ")[1] || title}
                 </motion.h1>
 
-                <motion.p 
+                <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
@@ -91,7 +95,7 @@ export default function ErrorPage({ status, message }) {
                     {description}
                 </motion.p>
 
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
@@ -115,14 +119,14 @@ export default function ErrorPage({ status, message }) {
                 </motion.div>
 
                 {status === 401 && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.7 }}
                         className="mt-8"
                     >
-                        <Link 
-                            href={route('auth.login')}
+                        <Link
+                            href={route("auth.login")}
                             className="text-primary font-bold hover:underline"
                         >
                             Masuk ke Akun Anda
@@ -133,7 +137,8 @@ export default function ErrorPage({ status, message }) {
 
             <footer className="absolute bottom-8 left-0 right-0 text-center z-10">
                 <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
-                    &copy; {new Date().getFullYear()} ApoTrack Systems &bull; Error Dashboard
+                    &copy; {new Date().getFullYear()} ApoTrack Systems &bull;
+                    Error Dashboard
                 </p>
             </footer>
         </div>

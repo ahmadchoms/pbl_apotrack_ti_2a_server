@@ -1,6 +1,10 @@
 import React from "react";
-import { 
-    Card, CardContent, CardHeader, CardTitle, CardDescription 
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,21 +18,27 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { 
-    FileText, Eye, ExternalLink, ShieldAlert, XCircle, 
-    CheckCircle2, Loader2, ShieldCheck 
+import {
+    FileText,
+    Eye,
+    ExternalLink,
+    ShieldAlert,
+    XCircle,
+    CheckCircle2,
+    Loader2,
+    ShieldCheck,
 } from "lucide-react";
 
-export function PharmacyLegality({ 
-    data, 
-    isRejectDialogOpen, 
-    setIsRejectDialogOpen, 
-    isVerifyDialogOpen, 
-    setIsVerifyDialogOpen, 
-    rejectionNote, 
-    setRejectionNote, 
-    isProcessing, 
-    handleVerify 
+export function PharmacyLegality({
+    data,
+    isRejectDialogOpen,
+    setIsRejectDialogOpen,
+    isVerifyDialogOpen,
+    setIsVerifyDialogOpen,
+    rejectionNote,
+    setRejectionNote,
+    isProcessing,
+    handleVerify,
 }) {
     return (
         <Card className="py-0 gap-0 rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">
@@ -56,7 +66,7 @@ export function PharmacyLegality({
                                 Nomor SIPA
                             </p>
                             <p className="text-lg font-black text-slate-800">
-                                {data.pharmacist?.sipa || "N/A"}
+                                {data.legality?.sipa_number || "N/A"}
                             </p>
                         </div>
                     </div>
@@ -75,10 +85,13 @@ export function PharmacyLegality({
                                             variant="secondary"
                                             className="rounded-xl font-bold text-[10px] uppercase tracking-widest px-4 h-9"
                                         >
-                                            <Eye className="w-4 h-4 mr-2" /> Lihat
+                                            <Eye className="w-4 h-4 mr-2" />{" "}
+                                            Lihat
                                         </Button>
                                         <a
-                                            href={data.legality.sia_document_url}
+                                            href={
+                                                data.legality.sia_document_url
+                                            }
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -86,7 +99,8 @@ export function PharmacyLegality({
                                                 variant="secondary"
                                                 className="rounded-xl font-bold text-[10px] uppercase tracking-widest px-4 h-9"
                                             >
-                                                <ExternalLink className="w-4 h-4 mr-2" /> Tab Baru
+                                                <ExternalLink className="w-4 h-4 mr-2" />{" "}
+                                                Tab Baru
                                             </Button>
                                         </a>
                                     </div>
@@ -113,17 +127,22 @@ export function PharmacyLegality({
                                 Butuh Tindakan Admin
                             </p>
                             <p className="text-xs text-slate-400">
-                                Pastikan nomor SIA dan dokumen fisik cocok sebelum menyetujui.
+                                Pastikan nomor SIA dan dokumen fisik cocok
+                                sebelum menyetujui.
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+                            <Dialog
+                                open={isRejectDialogOpen}
+                                onOpenChange={setIsRejectDialogOpen}
+                            >
                                 <DialogTrigger asChild>
                                     <Button
                                         variant="ghost"
                                         className="h-12 px-6 rounded-2xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 font-black text-[10px] uppercase tracking-widest border border-rose-100"
                                     >
-                                        <XCircle className="w-4 h-4 mr-2" /> Tolak Dokumen
+                                        <XCircle className="w-4 h-4 mr-2" />{" "}
+                                        Tolak Dokumen
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-106.25 rounded-[2rem]">
@@ -132,11 +151,15 @@ export function PharmacyLegality({
                                             Tolak Verifikasi
                                         </DialogTitle>
                                         <DialogDescription className="text-sm font-medium text-slate-500">
-                                            Berikan alasan penolakan agar apotek dapat memperbaiki dokumen mereka.
+                                            Berikan alasan penolakan agar apotek
+                                            dapat memperbaiki dokumen mereka.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="py-4">
-                                        <Label htmlFor="reason" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                                        <Label
+                                            htmlFor="reason"
+                                            className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1"
+                                        >
                                             Alasan Penolakan
                                         </Label>
                                         <Textarea
@@ -144,17 +167,26 @@ export function PharmacyLegality({
                                             className="mt-2 rounded-2xl border-slate-200 focus:ring-rose-500/10 min-h-30"
                                             placeholder="Misal: Foto dokumen tidak jelas, nomor SIA tidak valid..."
                                             value={rejectionNote}
-                                            onChange={(e) => setRejectionNote(e.target.value)}
+                                            onChange={(e) =>
+                                                setRejectionNote(e.target.value)
+                                            }
                                         />
                                     </div>
                                     <DialogFooter>
                                         <Button
                                             className="w-full h-12 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-500/20"
-                                            onClick={() => handleVerify("REJECTED")}
-                                            disabled={!rejectionNote || isProcessing}
+                                            onClick={() =>
+                                                handleVerify("REJECTED")
+                                            }
+                                            disabled={
+                                                !rejectionNote || isProcessing
+                                            }
                                         >
                                             {isProcessing ? (
-                                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</>
+                                                <>
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
+                                                    Memproses...
+                                                </>
                                             ) : (
                                                 "Kirim Penolakan"
                                             )}
@@ -163,10 +195,14 @@ export function PharmacyLegality({
                                 </DialogContent>
                             </Dialog>
 
-                            <Dialog open={isVerifyDialogOpen} onOpenChange={setIsVerifyDialogOpen}>
+                            <Dialog
+                                open={isVerifyDialogOpen}
+                                onOpenChange={setIsVerifyDialogOpen}
+                            >
                                 <DialogTrigger asChild>
                                     <Button className="h-12 px-8 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-500/20">
-                                        <CheckCircle2 className="w-4 h-4 mr-2" /> Verifikasi & Setujui
+                                        <CheckCircle2 className="w-4 h-4 mr-2" />{" "}
+                                        Verifikasi & Setujui
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-106.25 rounded-[2rem]">
@@ -178,18 +214,26 @@ export function PharmacyLegality({
                                             Konfirmasi Verifikasi
                                         </DialogTitle>
                                         <DialogDescription className="text-sm font-medium text-slate-500">
-                                            Dengan menyetujui, apotek <strong>{data.name}</strong> akan segera aktif dan dapat melakukan transaksi di platform.
+                                            Dengan menyetujui, apotek{" "}
+                                            <strong>{data.name}</strong> akan
+                                            segera aktif dan dapat melakukan
+                                            transaksi di platform.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <DialogFooter className="mt-6">
                                         <div className="w-full space-y-3">
                                             <Button
                                                 className="w-full h-12 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20"
-                                                onClick={() => handleVerify("APPROVED")}
+                                                onClick={() =>
+                                                    handleVerify("APPROVED")
+                                                }
                                                 disabled={isProcessing}
                                             >
                                                 {isProcessing ? (
-                                                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</>
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
+                                                        Memproses...
+                                                    </>
                                                 ) : (
                                                     "Ya, Setujui Sekarang"
                                                 )}
@@ -197,7 +241,9 @@ export function PharmacyLegality({
                                             <Button
                                                 variant="ghost"
                                                 className="w-full h-12 rounded-2xl font-bold text-xs uppercase tracking-widest text-slate-400"
-                                                onClick={() => setIsVerifyDialogOpen(false)}
+                                                onClick={() =>
+                                                    setIsVerifyDialogOpen(false)
+                                                }
                                             >
                                                 Batal
                                             </Button>

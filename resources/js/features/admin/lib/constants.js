@@ -1,6 +1,12 @@
 import {
-    LogIn, Info, ShieldAlert, Building2, XCircle, FileText,
-    UserPlus, ShieldCheck
+    LogIn,
+    Info,
+    ShieldAlert,
+    Building2,
+    XCircle,
+    FileText,
+    UserPlus,
+    ShieldCheck,
 } from "lucide-react";
 
 // ─── Animation Variants ───────────────────────────────────────────────
@@ -25,7 +31,7 @@ export const listItemVariants = {
 
 // ─── User Role Config ─────────────────────────────────────────────────
 export const ROLE_CONFIG = {
-    CUSTOMER: {
+    USER: {
         label: "PENGGUNA",
         variant: "secondary",
         class: "bg-blue-50 text-blue-600 border-blue-100",
@@ -108,7 +114,15 @@ export const ACTION_COLORS = {
 };
 
 // ─── Operating Hours ──────────────────────────────────────────────────
-export const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+export const DAY_NAMES = [
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu",
+];
 export const DAY_LABELS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
 export const INITIAL_HOURS = DAY_NAMES.map((_, i) => ({

@@ -121,4 +121,37 @@ class OrderController extends Controller
             'data' => $order->load(['items', 'user']),
         ]);
     }
+
+    /**
+     * Create a new POS order (Direct sale).
+     */
+    public function storePOS(Request $request)
+    {
+        $staff = $request->user()->pharmacyStaff;
+
+        $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.id' => 'required|exists:medicines,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+            'total' => 'required|numeric|min:0',
+            'payment_method' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
+        try {
+            $order = $this->orderService->createPOSOrder($staff->pharmacy_id, $request->all());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pesanan kasir berhasil dibuat',
+                'data' => $order->load('items'),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

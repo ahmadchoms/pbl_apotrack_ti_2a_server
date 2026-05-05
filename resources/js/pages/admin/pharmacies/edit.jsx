@@ -157,7 +157,6 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                     className="grid grid-cols-1 lg:grid-cols-3 gap-10"
                 >
                     <div className="lg:col-span-2 space-y-10">
-                        {/* Basic Info */}
                         <motion.section
                             variants={itemVariants}
                             className="space-y-6"
@@ -240,7 +239,6 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                             </Card>
                         </motion.section>
 
-                        {/* Staff */}
                         <motion.section
                             variants={itemVariants}
                             className="space-y-6"
@@ -268,7 +266,6 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                             </Card>
                         </motion.section>
 
-                        {/* Coordinates */}
                         <motion.section
                             variants={itemVariants}
                             className="space-y-6"
@@ -321,7 +318,6 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                             </Card>
                         </motion.section>
 
-                        {/* Danger Zone */}
                         <motion.section
                             variants={itemVariants}
                             className="space-y-6 pt-10"
@@ -390,7 +386,6 @@ export default function AdminPharmacyEdit({ pharmacy, available_staff = [] }) {
                         </motion.section>
                     </div>
 
-                    {/* Sidebar */}
                     <div className="space-y-10">
                         <motion.section variants={itemVariants}>
                             <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 bg-white overflow-hidden">

@@ -12,7 +12,7 @@ export function PharmacyStats({ data, formatCurrency }) {
             color: "text-indigo-600",
             sub: "Transaksi Berhasil",
             subColor: "text-emerald-600",
-            dot: "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+            dot: "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]",
         },
         {
             label: "Total Pesanan",
@@ -24,7 +24,11 @@ export function PharmacyStats({ data, formatCurrency }) {
         },
         {
             label: "Bergabung Sejak",
-            value: data.stats.joined_at,
+            value: new Date(data.stats.joined_at).toLocaleDateString("id-ID", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            }),
             icon: Calendar,
             color: "text-emerald-600",
             sub: "Mitra ApoTrack",
@@ -37,7 +41,7 @@ export function PharmacyStats({ data, formatCurrency }) {
             color: "text-indigo-600",
             sub: `${data.total_reviews} Ulasan Pelanggan`,
             subColor: "text-slate-500",
-        }
+        },
     ];
 
     return (
@@ -52,7 +56,9 @@ export function PharmacyStats({ data, formatCurrency }) {
                     <Card className="py-0 gap-0 rounded-[2rem] border-none shadow-2xl shadow-slate-200/50 bg-linear-to-br from-white to-slate-50/50 overflow-hidden group">
                         <CardContent className="p-8 relative">
                             <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
-                                <stat.icon className={`w-20 h-20 ${stat.color}`} />
+                                <stat.icon
+                                    className={`w-20 h-20 ${stat.color}`}
+                                />
                             </div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">
                                 {stat.label}
@@ -61,8 +67,14 @@ export function PharmacyStats({ data, formatCurrency }) {
                                 {stat.value}
                             </h3>
                             <div className="mt-4 flex items-center gap-2">
-                                {stat.dot && <div className={`w-1.5 h-1.5 rounded-full ${stat.dot}`} />}
-                                <p className={`text-[10px] font-bold ${stat.subColor} uppercase tracking-widest`}>
+                                {stat.dot && (
+                                    <div
+                                        className={`w-1.5 h-1.5 rounded-full ${stat.dot}`}
+                                    />
+                                )}
+                                <p
+                                    className={`text-[10px] font-bold ${stat.subColor} uppercase tracking-widest`}
+                                >
                                     {stat.sub}
                                 </p>
                             </div>

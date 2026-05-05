@@ -97,7 +97,6 @@ export default function OrderShow({ order: orderWrapper }) {
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Pesanan">
             <div className="max-w-[1600px] mx-auto pb-20">
-                {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 px-4">
                     <div className="flex items-center gap-4">
                         <Link
@@ -134,7 +133,6 @@ export default function OrderShow({ order: orderWrapper }) {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
-                    {/* Left Column: Prescription Document */}
                     <div className="lg:col-span-5 xl:col-span-4">
                         <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/30 overflow-hidden sticky top-6 bg-white flex flex-col h-[calc(100vh-200px)]">
                             <div className="p-8 border-b border-slate-50 flex items-center justify-between">
@@ -219,9 +217,7 @@ export default function OrderShow({ order: orderWrapper }) {
                         </Card>
                     </div>
 
-                    {/* Right Column: Order Details & Actions */}
                     <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-                        {/* Summary & Customer Info */}
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                             <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-xl shadow-slate-200/20 bg-white p-8">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
@@ -318,7 +314,6 @@ export default function OrderShow({ order: orderWrapper }) {
                             </Card>
                         </div>
 
-                        {/* Order Items Table */}
                         <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/20 bg-white overflow-hidden">
                             <div className="p-8 border-b border-slate-50">
                                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3">
@@ -409,7 +404,6 @@ export default function OrderShow({ order: orderWrapper }) {
                             </div>
                         </Card>
 
-                        {/* Action Buttons Container */}
                         <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/80 shadow-2xl shadow-slate-200/30">
                             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                                 <Clock className="w-3.5 h-3.5" /> Manajemen
@@ -540,7 +534,6 @@ export default function OrderShow({ order: orderWrapper }) {
                 </div>
             </div>
 
-            {/* Rejection Dialog */}
             <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
                 <DialogContent className="max-w-md rounded-[2.5rem] p-8 border-slate-100 shadow-2xl">
                     <DialogHeader>
@@ -582,7 +575,6 @@ export default function OrderShow({ order: orderWrapper }) {
                 </DialogContent>
             </Dialog>
 
-            {/* Prescription Zoom Overlay */}
             <AnimatePresence>
                 {isZoomed && (
                     <motion.div

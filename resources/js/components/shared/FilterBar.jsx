@@ -86,9 +86,11 @@ export function FilterBar({ configs, currentFilters, onFilterChange, onReset, ac
                                     <SelectValue placeholder={config.label || "Semua"} />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-                                    <SelectItem value="all" className="text-xs font-bold">
-                                        Semua {config.label || ""}
-                                    </SelectItem>
+                                    {!config.options?.some(opt => opt.value === "all") && (
+                                        <SelectItem value="all" className="text-xs font-bold">
+                                            Semua {config.label || ""}
+                                        </SelectItem>
+                                    )}
                                     {(config.options || []).map((opt) => (
                                         <SelectItem key={opt.value} value={opt.value} className="text-xs font-bold">
                                             {opt.label}

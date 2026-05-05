@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Scan, ShoppingCart, X } from "lucide-react";
-import { OrderCatalog } from "../../components/orders/OrderCatalog";
-import { OrderCart } from "../../components/orders/OrderCart";
 import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
 import { useCart } from "@/features/pharmacy/hooks/useCart";
+import { OrderCatalog } from "@/features/pharmacy/components/orders/OrderCatalog";
+import { OrderCart } from "@/features/pharmacy/components/orders/OrderCart";
 
 function getUniqueMedicines(list) {
     const seen = new Set();
@@ -22,13 +22,13 @@ export default function PharmacistPOS({ medicines }) {
         [medicines],
     );
 
-    const { 
-        cart, 
-        addToCart, 
-        updateQty, 
-        removeFromCart, 
-        resetCart, 
-        totalCartItems 
+    const {
+        cart,
+        addToCart,
+        updateQty,
+        removeFromCart,
+        resetCart,
+        totalCartItems,
     } = useCart();
 
     const [searchQuery, setSearchQuery] = useState("");
