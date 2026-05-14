@@ -18,15 +18,23 @@ use App\Http\Controllers\Api\Staff\AuditController as StaffAuditController;
 |--------------------------------------------------------------------------
 */
 
-// --- PUBLIC ROUTES ---
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/register', [AuthController::class, 'register']);
+// --- PUBLIC ROUTES (Rate Limited) ---
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/auth/login', [AuthController::class, 'login']);
+});
+Route::middleware('throttle:3,1')->group(function () {
+    Route::post('/auth/register/request-otp', [AuthController::class, 'requestRegistrationOtp']);
+    Route::post('/auth/register/verify-otp', [AuthController::class, 'verifyRegistrationOtp']);
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+});
 
 // --- PROTECTED ROUTES (Requires Auth & Active User) ---
 Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
 
     // Auth & Profile
     Route::get('/me', [AuthController::class, 'me']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::put('/password', [AuthController::class, 'changePassword']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // Catalog & Exploration (Moved to Protected for Security)

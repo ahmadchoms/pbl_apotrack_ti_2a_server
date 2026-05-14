@@ -40,7 +40,7 @@ class AddressController extends Controller
             'is_primary' => 'boolean',
         ]);
 
-        $address = $this->addressService->createAddress($request->user(), $request->all());
+        $address = $this->addressService->createAddress($request->user(), $request->validated());
 
         return response()->json([
             'status' => 'success',
@@ -64,7 +64,7 @@ class AddressController extends Controller
             'is_primary' => 'boolean',
         ]);
 
-        $updatedAddress = $this->addressService->updateAddress($address, $request->all());
+        $updatedAddress = $this->addressService->updateAddress($address, $request->validated());
 
         return response()->json([
             'status' => 'success',

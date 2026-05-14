@@ -68,9 +68,10 @@ class OrderController extends Controller
                 'message' => $e->getMessage(),
             ], 422);
         } catch (\Exception $e) {
+            \Log::error('Order creation failed: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.',
             ], 500);
         }
     }

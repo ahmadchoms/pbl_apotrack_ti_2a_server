@@ -37,10 +37,10 @@ class OrderService
     {
         return DB::transaction(function () use ($pharmacyId, $data) {
             $order = Order::create([
-                'user_id' => $data['user_id'] ?? \App\Models\User::where('role', 'CUSTOMER')->first()->id, // Default to a customer if not provided
+                'user_id' => $data['user_id'] ?? \App\Models\User::where('role', 'CUSTOMER')->first()?->id ?? Auth::id(),
                 'pharmacy_id' => $pharmacyId,
                 'order_number' => 'POS-' . strtoupper(Str::random(8)),
-                'verification_code' => strtoupper(Str::random(6)),
+                'verification_code' => strtoupper(Str::random(10)),
                 'service_type' => 'WALK_IN',
                 'payment_method' => $data['payment_method'] ?? 'CASH',
                 'order_status' => 'COMPLETED',

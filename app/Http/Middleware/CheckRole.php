@@ -22,22 +22,46 @@ class CheckRole
             return $next($request);
         }
 
-        if (in_array($user->role, $roles)) {
-            return $next($request);
-        }
-
-        if ($user->role === 'USER') {
-            $user->loadMissing('pharmacyStaff');
-
-            $pharmacyStaff = $user->pharmacyStaff;
-
-            if ($pharmacyStaff && $pharmacyStaff->is_active) {
-                if (in_array($pharmacyStaff->role, $roles)) {
-                    return $next($request);
-                }
+        // --- NORMALISASI ROLES ---
+        // Jika parameter dikirim sebagai 'STAFF|APOTEKER', pecah menjadi array ['STAFF', 'APOTEKER']
+        $normalizedRoles = [];
+        foreach ($roles as $role) {
+            if (str_contains($role, '|')) {
+                $normalizedRoles = array_merge($normalizedRoles, explode('|', $role));
+            } else {
+                $normalizedRoles[] = $role;
             }
         }
 
-        abort(403, 'Anda tidak memiliki otoritas untuk mengakses halaman ini.');
+        // 1. Cek role utama di tabel users
+        if (in_array($user->role, $normalizedRoles)) {
+            return $next($request);
+        }
+
+        // 2. Logika Khusus Staf
+        $user->loadMissing('pharmacyStaff');
+        $staff = $user->pharmacyStaff;
+
+        if ($staff && $staff->is_active) {
+            // Izinkan jika rute ini memang ditujukan untuk staf (role STAFF atau APOTEKER diminta)
+            if (in_array('STAFF', $normalizedRoles) || in_array('APOTEKER', $normalizedRoles)) {
+                return $next($request);
+            }
+            
+            // Cek role spesifik milik staf tersebut
+            if (in_array($staff->role, $normalizedRoles)) {
+                return $next($request);
+            }
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Anda tidak memiliki otoritas untuk mengakses halaman ini.',
+            'debug' => [
+                'user_role' => $user->role,
+                'staff_found' => (bool)$staff,
+                'required_roles' => $normalizedRoles
+            ]
+        ], 403);
     }
 }

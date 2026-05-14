@@ -28,7 +28,7 @@ class OrderController extends Controller
             ], 403);
         }
 
-        $query = Order::with(['items', 'user'])
+        $query = Order::with(['items.medicine', 'user'])
             ->where('pharmacy_id', $staff->pharmacy_id);
 
         // Filter by status if provided

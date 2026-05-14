@@ -30,10 +30,33 @@ class MedicineService
     public function store(string $pharmacyId, array $data)
     {
         return DB::transaction(function () use ($pharmacyId, $data) {
-            $category = MedicineCategory::where('name', $data['category'])->firstOrFail();
-            $type = MedicineType::where('name', $data['type'])->firstOrFail();
-            $form = MedicineForm::where('name', $data['form'])->firstOrFail();
-            $unit = MedicineUnit::where('name', $data['unit'])->firstOrFail();
+            // 1. Get Category
+            $category = MedicineCategory::where('name', $data['category'] ?? '')->first();
+            if (!$category) throw new \Exception("Kategori '" . ($data['category'] ?? 'NULL') . "' tidak ditemukan.");
+            
+            // 2. Get Type (with smart check)
+            $type = MedicineType::where('name', $data['type'] ?? '')->first();
+            if (!$type) {
+                // Cek apakah user salah memasukkan data Sediaan ke kolom Tipe
+                if (MedicineForm::where('name', $data['type'])->exists()) {
+                    throw new \Exception("Kesalahan: '" . $data['type'] . "' adalah Sediaan (Form), jangan masukkan ke kolom Golongan Obat.");
+                }
+                throw new \Exception("Tipe '" . ($data['type'] ?? 'NULL') . "' tidak ditemukan di database.");
+            }
+
+            // 3. Get Form (with smart check)
+            $form = MedicineForm::where('name', $data['form'] ?? '')->first();
+            if (!$form) {
+                // Cek apakah user salah memasukkan data Golongan ke kolom Sediaan
+                if (MedicineType::where('name', $data['form'])->exists()) {
+                    throw new \Exception("Kesalahan: '" . $data['form'] . "' adalah Golongan Obat (Type), jangan masukkan ke kolom Sediaan (Form).");
+                }
+                throw new \Exception("Sediaan '" . ($data['form'] ?? 'NULL') . "' tidak ditemukan di database.");
+            }
+
+            // 4. Get Unit
+            $unit = MedicineUnit::where('name', $data['unit'] ?? '')->first();
+            if (!$unit) throw new \Exception("Satuan '" . ($data['unit'] ?? 'NULL') . "' tidak ditemukan.");
 
             $medicine = Medicine::create([
                 'pharmacy_id' => $pharmacyId,
@@ -42,14 +65,14 @@ class MedicineService
                 'form_id' => $form->id,
                 'unit_id' => $unit->id,
                 'name' => $data['name'],
-                'generic_name' => $data['generic_name'],
-                'manufacturer' => $data['manufacturer'],
-                'description' => $data['description'],
-                'dosage_info' => $data['dosage_info'],
+                'generic_name' => $data['generic_name'] ?? null,
+                'manufacturer' => $data['manufacturer'] ?? null,
+                'description' => $data['description'] ?? null,
+                'dosage_info' => $data['dosage_info'] ?? null,
                 'price' => $data['price'],
-                'weight_in_grams' => $data['weight_in_grams'],
-                'requires_prescription' => $data['requires_prescription'],
-                'is_active' => $data['is_active'],
+                'weight_in_grams' => $data['weight_in_grams'] ?? 0,
+                'requires_prescription' => $data['requires_prescription'] ?? false,
+                'is_active' => $data['is_active'] ?? true,
             ]);
 
             if (isset($data['image'])) {
@@ -59,11 +82,9 @@ class MedicineService
                 $medicine->update(['image_url' => Storage::disk('s3')->url($path)]);
             }
 
-            foreach ($data['batches'] as $batchData) {
-                $medicine->batches()->create($batchData);
+            if (isset($data['batches']) && is_array($data['batches'])) {
+                $this->syncBatches($medicine, $data['batches']);
             }
-
-
 
             return $medicine;
         });
@@ -72,10 +93,31 @@ class MedicineService
     public function update(Medicine $medicine, array $data)
     {
         return DB::transaction(function () use ($medicine, $data) {
-            $category = MedicineCategory::where('name', $data['category'])->firstOrFail();
-            $type = MedicineType::where('name', $data['type'])->firstOrFail();
-            $form = MedicineForm::where('name', $data['form'])->firstOrFail();
-            $unit = MedicineUnit::where('name', $data['unit'])->firstOrFail();
+            // 1. Get Category
+            $category = MedicineCategory::where('name', $data['category'] ?? '')->first();
+            if (!$category) throw new \Exception("Kategori '" . ($data['category'] ?? 'NULL') . "' tidak ditemukan.");
+            
+            // 2. Get Type (with smart check)
+            $type = MedicineType::where('name', $data['type'] ?? '')->first();
+            if (!$type) {
+                if (MedicineForm::where('name', $data['type'])->exists()) {
+                    throw new \Exception("Kesalahan: '" . $data['type'] . "' adalah Sediaan (Form), jangan masukkan ke kolom Golongan Obat.");
+                }
+                throw new \Exception("Tipe '" . ($data['type'] ?? 'NULL') . "' tidak ditemukan di database.");
+            }
+
+            // 3. Get Form (with smart check)
+            $form = MedicineForm::where('name', $data['form'] ?? '')->first();
+            if (!$form) {
+                if (MedicineType::where('name', $data['form'])->exists()) {
+                    throw new \Exception("Kesalahan: '" . $data['form'] . "' adalah Golongan Obat (Type), jangan masukkan ke kolom Sediaan (Form).");
+                }
+                throw new \Exception("Sediaan '" . ($data['form'] ?? 'NULL') . "' tidak ditemukan di database.");
+            }
+
+            // 4. Get Unit
+            $unit = MedicineUnit::where('name', $data['unit'] ?? '')->first();
+            if (!$unit) throw new \Exception("Satuan '" . ($data['unit'] ?? 'NULL') . "' tidak ditemukan.");
 
             $medicine->update([
                 'category_id' => $category->id,
@@ -83,14 +125,14 @@ class MedicineService
                 'form_id' => $form->id,
                 'unit_id' => $unit->id,
                 'name' => $data['name'],
-                'generic_name' => $data['generic_name'],
-                'manufacturer' => $data['manufacturer'],
-                'description' => $data['description'],
-                'dosage_info' => $data['dosage_info'],
+                'generic_name' => $data['generic_name'] ?? null,
+                'manufacturer' => $data['manufacturer'] ?? null,
+                'description' => $data['description'] ?? null,
+                'dosage_info' => $data['dosage_info'] ?? null,
                 'price' => $data['price'],
-                'weight_in_grams' => $data['weight_in_grams'],
-                'requires_prescription' => $data['requires_prescription'],
-                'is_active' => $data['is_active'],
+                'weight_in_grams' => $data['weight_in_grams'] ?? 0,
+                'requires_prescription' => $data['requires_prescription'] ?? false,
+                'is_active' => $data['is_active'] ?? true,
             ]);
 
             if (isset($data['image'])) {
@@ -156,14 +198,14 @@ class MedicineService
             $batch = $medicine->batches()->create([
                 'batch_number' => $data['batch_number'],
                 'expired_date' => $data['expired_date'],
-                'stock' => $data['stock'],
+                'stock' => $data['quantity'],
             ]);
 
             StockMovement::create([
                 'medicine_id' => $medicineId,
                 'batch_id' => $batch->id,
                 'type' => 'IN',
-                'quantity' => $data['stock'],
+                'quantity' => $data['quantity'],
                 'note' => $data['note'] ?? 'Initial batch stock',
                 'created_by' => $userId,
             ]);

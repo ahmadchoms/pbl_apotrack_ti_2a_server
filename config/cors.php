@@ -19,10 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:3000',   // Next.js
-        'http://localhost:56051',  // Flutter Web
-    ],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
