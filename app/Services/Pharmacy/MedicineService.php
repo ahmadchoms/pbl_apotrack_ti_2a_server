@@ -76,10 +76,17 @@ class MedicineService
             ]);
 
             if (isset($data['image'])) {
-                $file = $data['image'];
-                $path = 'medicines/' . $file->hashName();
-                Storage::disk('s3')->put($path, file_get_contents($file));
-                $medicine->update(['image_url' => Storage::disk('s3')->url($path)]);
+                try {
+                    $file = $data['image'];
+                    $disk = config('filesystems.default');
+                    $path = 'medicines/' . $file->hashName();
+                    
+                    Storage::disk($disk)->put($path, file_get_contents($file));
+                    $medicine->update(['image_url' => Storage::disk($disk)->url($path)]);
+                } catch (\Exception $e) {
+                    \Log::warning("Gagal upload gambar obat: " . $e->getMessage());
+                    // Tetap lanjut meskipun gambar gagal, agar data obat tersimpan
+                }
             }
 
             if (isset($data['batches']) && is_array($data['batches'])) {
@@ -136,31 +143,32 @@ class MedicineService
             ]);
 
             if (isset($data['image'])) {
-                if ($medicine->image_url) {
-                    // Extract relative path from URL for S3 deletion
-                    $urlPath = parse_url($medicine->image_url, PHP_URL_PATH);
-                    
-                    // Supabase public URLs often contain '/storage/v1/object/public/bucket/'
-                    // We need the part after the bucket name.
-                    $bucket = env('AWS_BUCKET');
-                    $search = '/' . $bucket . '/';
-                    $pos = strpos($urlPath, $search);
-                    
-                    if ($pos !== false) {
-                        $oldPath = substr($urlPath, $pos + strlen($search));
-                    } else {
-                        $oldPath = ltrim($urlPath, '/');
+                try {
+                    $disk = config('filesystems.default');
+                    if ($medicine->image_url) {
+                        $urlPath = parse_url($medicine->image_url, PHP_URL_PATH);
+                        $bucket = env('SUPABASE_BUCKET_PRIVATE', 'apotrack-private');
+                        $search = '/' . $bucket . '/';
+                        $pos = strpos($urlPath, $search);
+                        
+                        if ($pos !== false) {
+                            $oldPath = substr($urlPath, $pos + strlen($search));
+                        } else {
+                            $oldPath = ltrim($urlPath, '/');
+                        }
+                        
+                        if (Storage::disk($disk)->exists($oldPath)) {
+                            Storage::disk($disk)->delete($oldPath);
+                        }
                     }
                     
-                    if (Storage::disk('s3')->exists($oldPath)) {
-                        Storage::disk('s3')->delete($oldPath);
-                    }
+                    $file = $data['image'];
+                    $path = 'medicines/' . $file->hashName();
+                    Storage::disk($disk)->put($path, file_get_contents($file));
+                    $medicine->update(['image_url' => Storage::disk($disk)->url($path)]);
+                } catch (\Exception $e) {
+                    \Log::warning("Gagal update gambar obat: " . $e->getMessage());
                 }
-                
-                $file = $data['image'];
-                $path = 'medicines/' . $file->hashName();
-                Storage::disk('s3')->put($path, file_get_contents($file));
-                $medicine->update(['image_url' => Storage::disk('s3')->url($path)]);
             }
 
             $this->syncBatches($medicine, $data['batches'] ?? []);
