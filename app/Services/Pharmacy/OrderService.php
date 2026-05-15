@@ -71,6 +71,67 @@ class OrderService
         });
     }
 
+    public function createCustomerOrder(\App\Models\User $user, array $data)
+    {
+        return DB::transaction(function () use ($user, $data) {
+            $isDelivery = ($data['service_type'] ?? 'PICK_UP') === 'DELIVERY';
+
+            $order = Order::create([
+                'user_id' => $user->id,
+                'pharmacy_id' => $data['pharmacy_id'],
+                'address_id' => $isDelivery ? ($data['address_id'] ?? null) : null,
+                'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+                'verification_code' => strtoupper(Str::random(10)),
+                'service_type' => $data['service_type'] ?? 'PICK_UP',
+                'payment_method' => $data['payment_method'] ?? 'TRANSFER',
+                'order_status' => 'PENDING',
+                'payment_status' => 'UNPAID',
+                'subtotal_amount' => $data['subtotal_amount'],
+                'shipping_cost' => $isDelivery ? ($data['shipping_cost'] ?? 0) : 0,
+                'grand_total' => $data['subtotal_amount'] + ($isDelivery ? ($data['shipping_cost'] ?? 0) : 0),
+                'notes' => $data['notes'] ?? null,
+                'expired_at' => now()->addHours(24),
+            ]);
+
+            foreach ($data['items'] as $item) {
+                $medicine = \App\Models\Medicine::with('unit')->findOrFail($item['id']);
+
+                $order->items()->create([
+                    'medicine_id' => $medicine->id,
+                    'medicine_name' => $medicine->name,
+                    'unit_name' => $medicine->unit->name ?? '-',
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['price'] * $item['quantity'],
+                ]);
+
+                // Reduce stock from batches (FIFO)
+                $this->reduceStock($medicine, $item['quantity']);
+            }
+
+            if ($isDelivery) {
+                \App\Models\DeliveryTracking::create([
+                    'order_id' => $order->id,
+                    'courier_code' => $data['courier_code'] ?? null,
+                    'courier_service' => $data['courier_service'] ?? null,
+                    'delivery_fee' => $data['shipping_cost'] ?? 0,
+                    'status' => 'WAITING_PICKUP',
+                ]);
+            }
+
+            // Clear User Cart
+            $cart = \App\Models\Cart::where('user_id', $user->id)
+                ->where('pharmacy_id', $data['pharmacy_id'])
+                ->first();
+            
+            if ($cart) {
+                $cart->items()->delete();
+            }
+
+            return $order;
+        });
+    }
+
     protected function reduceStock($medicine, $quantity)
     {
         $batches = $medicine->batches()

@@ -35,6 +35,9 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
 
             $table->index(['pharmacy_id', 'rating']);
+            $table->dropUnique('reviews_order_id_unique');
+            $table->foreignUuid('medicine_id')->nullable()->after('order_id')->constrained('medicines')->cascadeOnDelete();
+            $table->unique(['order_id', 'medicine_id']);
         });
 
         DB::statement('ALTER TABLE reviews ADD CONSTRAINT chk_rating_range CHECK (rating >= 1 AND rating <= 5)');
@@ -44,5 +47,11 @@ return new class extends Migration
     {
         Schema::dropIfExists('reviews');
         Schema::dropIfExists('notifications');
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->dropUnique(['order_id', 'medicine_id']);
+            $table->dropForeign(['medicine_id']);
+            $table->dropColumn('medicine_id');
+            $table->unique('order_id', 'reviews_order_id_unique');
+        });
     }
 };

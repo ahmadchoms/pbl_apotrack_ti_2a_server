@@ -47,20 +47,28 @@ class OrderController extends Controller
             'items.*.id' => 'required|exists:medicines,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric',
-            'total' => 'required|numeric',
+            'subtotal_amount' => 'required|numeric',
+            'service_type' => 'required|string|in:PICK_UP,DELIVERY',
             'payment_method' => 'required|string|in:CASH,TRANSFER,E-WALLET',
+            
+            // Aturan khusus logistik jika memilih DELIVERY
+            'address_id' => 'required_if:service_type,DELIVERY|nullable|exists:user_addresses,id',
+            'courier_code' => 'required_if:service_type,DELIVERY|nullable|string',
+            'courier_service' => 'required_if:service_type,DELIVERY|nullable|string',
+            'shipping_cost' => 'required_if:service_type,DELIVERY|numeric',
+            'notes' => 'nullable|string'
         ]);
 
         try {
+            $user = $request->user();
             $data = $request->all();
-            $data['user_id'] = $request->user()->id;
 
-            $order = $this->orderService->createPOSOrder($request->pharmacy_id, $data);
+            $order = $this->orderService->createCustomerOrder($user, $data);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Pesanan berhasil dibuat',
-                'data' => $order->load('items'),
+                'data' => $order->load(['items.medicine', 'tracking']),
             ], 201);
         } catch (InsufficientStockException $e) {
             return response()->json([
@@ -173,6 +181,32 @@ class OrderController extends Controller
             'status' => 'success',
             'message' => 'Data pelacakan pengiriman berhasil diambil',
             'data' => $order->deliveryTracking,
+        ]);
+    }
+
+    /**
+     * Simulate payment for UI Testing (Dummy)
+     */
+    public function simulatePayment($id, Request $request)
+    {
+        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+
+        if ($order->payment_status !== 'UNPAID') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pesanan ini sudah dibayar atau status tidak valid.',
+            ], 422);
+        }
+
+        $order->update([
+            'payment_status' => 'PAID',
+            'paid_at' => now(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Simulasi pembayaran berhasil, pesanan telah dilunasi.',
+            'data' => $order,
         ]);
     }
 }

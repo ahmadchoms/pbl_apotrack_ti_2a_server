@@ -8,9 +8,12 @@ use App\Http\Controllers\Api\PharmacyController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\MedicineCategoryController;
+use App\Http\Controllers\Api\Customer\CartController;
+use App\Http\Controllers\Api\Customer\ReviewController;
 use App\Http\Controllers\Api\Staff\OrderController as StaffOrderController;
 use App\Http\Controllers\Api\Staff\MedicineController as StaffMedicineController;
 use App\Http\Controllers\Api\Staff\AuditController as StaffAuditController;
+use App\Http\Controllers\Api\BiteshipWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +22,9 @@ use App\Http\Controllers\Api\Staff\AuditController as StaffAuditController;
 */
 
 // --- PUBLIC ROUTES (Rate Limited) ---
+Route::post('/webhooks/biteship', [BiteshipWebhookController::class, 'handle']);
+Route::get('/medicines/{medicineId}/reviews', [ReviewController::class, 'index']); // Public API Review
+
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
 });
@@ -54,6 +60,11 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         // Address Management
         Route::apiResource('user/addresses', AddressController::class);
 
+        // Cart Management
+        Route::get('/cart', [CartController::class, 'index']);
+        Route::post('/cart/items', [CartController::class, 'store']);
+        Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
+
         // Order Management
         Route::get('/orders', [OrderController::class, 'index']);
         Route::get('/orders/history', [OrderController::class, 'history']);
@@ -63,6 +74,10 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         
         // Uploads
         Route::post('/orders/{id}/prescription', [OrderController::class, 'uploadPrescription']);
+        Route::post('/orders/{id}/simulate-payment', [OrderController::class, 'simulatePayment']);
+
+        // Reviews
+        Route::post('/reviews', [ReviewController::class, 'store']);
     });
 
     // --- PHARMACY STAFF ROUTES (role:STAFF|APOTEKER) ---
@@ -73,6 +88,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/orders/{id}', [StaffOrderController::class, 'show']);
         Route::patch('/orders/{id}/status', [StaffOrderController::class, 'updateStatus']);
         Route::post('/orders/verify', [StaffOrderController::class, 'verify']);
+        Route::post('/orders/{id}/ship', [StaffOrderController::class, 'shipOrder']);
         Route::post('/pos/orders', [StaffOrderController::class, 'storePOS']);
 
         // Inventory Management

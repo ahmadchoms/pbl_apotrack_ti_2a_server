@@ -436,6 +436,24 @@ class DatabaseSeeder extends Seeder
         ]);
         OrderItem::firstOrCreate(['order_id' => $o6->id, 'medicine_id' => $medsPhar1['Tolak Angin Cair']->id], ['medicine_name' => 'Tolak Angin Cair', 'unit_name' => 'Box', 'quantity' => 1, 'price' => 35000, 'subtotal' => 35000]);
 
+        // 7. SHIPPING TEST ORDER (READY_FOR_PICKUP & DELIVERY)
+        $o7 = Order::firstOrCreate(['order_number' => 'ORD-2026-SHIP-TEST'], [
+            'user_id' => $budi->id,
+            'pharmacy_id' => $phar1->id,
+            'address_id' => $addrBudi->id,
+            'service_type' => 'DELIVERY',
+            'payment_method' => 'QRIS',
+            'order_status' => 'READY_FOR_PICKUP',
+            'payment_status' => 'PAID',
+            'subtotal_amount' => 24000,
+            'shipping_cost' => 10000,
+            'grand_total' => 34000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subHours(1),
+            'expired_at' => Carbon::now()->addHours(24)
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o7->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], ['medicine_name' => 'Panadol Extra 500mg', 'unit_name' => 'Strip', 'quantity' => 2, 'price' => 12000, 'subtotal' => 24000]);
+
         // ==========================================
         // 6. NOTIFICATION SEEDS
         // ==========================================

@@ -11,6 +11,8 @@ class UserAddress extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['complete_address'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -19,5 +21,10 @@ class UserAddress extends Model
     public function orders()
     {
         return $this->hasMany(Order::class, "address_id");
+    }
+
+    public function getCompleteAddressAttribute()
+    {
+        return $this->address_detail;
     }
 }

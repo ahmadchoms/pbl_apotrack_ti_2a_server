@@ -114,6 +114,9 @@ return new class extends Migration
             $table->string('courier_service', 50)->nullable();
             $table->string('tracking_number', 50)->nullable();
             $table->string('status', 30)->default('WAITING_PICKUP');
+            $table->decimal('delivery_fee', 12, 2)->default(0)->after('status');
+            $table->string('courier_code', 50)->nullable()->after('courier_name');
+            $table->text('tracking_url')->nullable()->after('tracking_number');
             $table->text('notes')->nullable();
             $table->timestamps();
         });
@@ -140,6 +143,9 @@ return new class extends Migration
 
         Schema::table('prescriptions', function (Blueprint $table) {
             $table->dropForeign(['order_id']);
+        });
+        Schema::table('delivery_trackings', function (Blueprint $table) {
+            $table->dropColumn(['delivery_fee', 'courier_code', 'tracking_url']);
         });
 
         Schema::dropIfExists('orders');
