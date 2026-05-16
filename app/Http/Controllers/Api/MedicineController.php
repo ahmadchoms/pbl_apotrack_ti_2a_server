@@ -2,34 +2,72 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Models\Medicine;
 use App\Http\Resources\Pharmacy\MedicineResource;
-use App\Services\Api\MedicineService;
 use Illuminate\Http\Request;
 
-class MedicineController extends Controller
+class MedicineController extends BaseApiController
 {
-    public function __construct(
-        protected MedicineService $medicineService
-    ) {}
-
     /**
-     * Display a listing of medicines (Optimized with Service Pattern).
+     * Display a listing of active medicines (Public Catalog).
      */
     public function index(Request $request)
     {
-        $medicines = $this->medicineService->listMedicines($request->all());
+        $query = Medicine::with(['pharmacy:id,name,address', 'category:id,name', 'form:id,name', 'type:id,name', 'unit:id,name'])
+            ->where('is_active', true)
+            ->whereHas('pharmacy', function ($q) {
+                $q->where('verification_status', 'VERIFIED');
+            });
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Daftar obat berhasil diambil',
-            'data' => MedicineResource::collection($medicines),
-            'meta' => [
-                'current_page' => $medicines->currentPage(),
-                'last_page' => $medicines->lastPage(),
-                'total' => $medicines->total(),
-            ],
-        ]);
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('generic_name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('pharmacy_id')) {
+            $query->where('pharmacy_id', $request->pharmacy_id);
+        }
+
+        if ($request->has('category_id')) {
+            $query->where('medicine_category_id', $request->category_id);
+        }
+
+        if ($request->has('type_id')) {
+            $query->where('medicine_type_id', $request->type_id);
+        }
+
+        if ($request->has('form_id')) {
+            $query->where('medicine_form_id', $request->form_id);
+        }
+
+        if ($request->has('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->has('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        $query->withSum(['batches as total_active_stock' => function ($sq) {
+            $sq->where('expired_date', '>=', now()->startOfDay());
+        }], 'stock');
+
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+
+        $allowedSorts = ['name', 'price', 'created_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder === 'asc' ? 'asc' : 'desc');
+        }
+
+        $medicines = $query->paginate($request->get('per_page', 15));
+
+        return $this->successResponse(MedicineResource::collection($medicines), 'Katalog obat berhasil diambil');
     }
 
     /**
@@ -37,12 +75,16 @@ class MedicineController extends Controller
      */
     public function show($id)
     {
-        $medicine = $this->medicineService->getMedicineDetail($id);
+        $medicine = Medicine::with(['pharmacy:id,name,address,phone', 'category', 'form', 'type', 'unit', 'batches'])
+            ->where('is_active', true)
+            ->whereHas('pharmacy', function ($q) {
+                $q->where('verification_status', 'VERIFIED');
+            })
+            ->withSum(['batches as total_active_stock' => function ($sq) {
+                $sq->where('expired_date', '>=', now()->startOfDay());
+            }], 'stock')
+            ->findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Detail obat berhasil diambil',
-            'data' => new MedicineResource($medicine),
-        ]);
+        return $this->successResponse(new MedicineResource($medicine), 'Detail obat berhasil diambil');
     }
 }

@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'verified.pharmacy' => \App\Http\Middleware\EnsurePharmacyVerified::class,
             'active.user' => \App\Http\Middleware\CheckUserActive::class,
+            'biteship.webhook' => \App\Http\Middleware\VerifyBiteshipSignature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

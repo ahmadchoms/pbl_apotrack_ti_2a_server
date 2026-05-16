@@ -20,12 +20,17 @@ class AddressService
     }
 
     /**
-     * Create a new address and handle primary status.
+     * Create a new address and handle primary status (ACID Protected & Pessimistic Locking).
      */
     public function createAddress(User $user, array $data)
     {
         return DB::transaction(function () use ($user, $data) {
             if ($data['is_primary'] ?? false) {
+                // Lock existing addresses before updating
+                UserAddress::where('user_id', $user->id)
+                    ->lockForUpdate()
+                    ->get();
+
                 $user->addresses()->update(['is_primary' => false]);
             }
 
@@ -34,12 +39,18 @@ class AddressService
     }
 
     /**
-     * Update address and handle primary status changes.
+     * Update address and handle primary status changes (ACID Protected & Pessimistic Locking).
      */
     public function updateAddress(UserAddress $address, array $data)
     {
         return DB::transaction(function () use ($address, $data) {
             if ($data['is_primary'] ?? false) {
+                // Lock existing addresses before updating
+                UserAddress::where('user_id', $address->user_id)
+                    ->where('id', '!=', $address->id)
+                    ->lockForUpdate()
+                    ->get();
+
                 UserAddress::where('user_id', $address->user_id)
                     ->where('id', '!=', $address->id)
                     ->update(['is_primary' => false]);

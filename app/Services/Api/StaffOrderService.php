@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Services\Api;
+
+use App\Models\Order;
+use App\Models\User;
+use App\Services\Pharmacy\OrderService;
+use App\Jobs\CreateBiteshipOrderJob;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+class StaffOrderService
+{
+    public function __construct(
+        protected OrderService $orderService
+    ) {}
+
+    /**
+     * Get paginated orders for a staff's pharmacy.
+     */
+    public function listOrders(User $user, array $filters = [], int $perPage = 20): LengthAwarePaginator
+    {
+        $staff = $user->pharmacyStaff;
+
+        if (!$staff) {
+            throw new \Exception('Anda tidak terdaftar sebagai staf apotek mana pun.', 403);
+        }
+
+        $query = Order::with(['items.medicine', 'user', 'address', 'tracking'])
+            ->where('pharmacy_id', $staff->pharmacy_id);
+
+        if (!empty($filters['status'])) {
+            $query->where('order_status', $filters['status']);
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
+
+    /**
+     * Get specific order details for staff.
+     */
+    public function showOrder(User $user, string $id): Order
+    {
+        $staff = $user->pharmacyStaff;
+
+        return Order::with(['items.medicine', 'user', 'prescription', 'tracking', 'address'])
+            ->where('pharmacy_id', $staff->pharmacy_id)
+            ->findOrFail($id);
+    }
+
+    /**
+     * Verify order by verification code.
+     */
+    public function verifyOrder(User $user, string $code): Order
+    {
+        $staff = $user->pharmacyStaff;
+
+        $order = Order::where('pharmacy_id', $staff->pharmacy_id)
+            ->where('verification_code', $code)
+            ->first();
+
+        if (!$order) {
+            throw new \Exception('Kode verifikasi tidak valid atau pesanan tidak ditemukan di apotek ini.', 404);
+        }
+
+        return $order->load(['items', 'user']);
+    }
+
+    /**
+     * Ship order via Biteship asynchronously (Non-Blocking & ACID Protected).
+     */
+    public function shipOrder(User $user, string $id, array $data): Order
+    {
+        $staff = $user->pharmacyStaff;
+
+        return DB::transaction(function () use ($staff, $id, $data) {
+            $order = Order::with(['address', 'items.medicine', 'pharmacy', 'user'])
+                ->where('pharmacy_id', $staff->pharmacy_id)
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($order->order_status !== Order::STATUS_READY_FOR_PICKUP) {
+                throw new \Exception('Pesanan harus dalam status READY_FOR_PICKUP sebelum dikirim.', 422);
+            }
+
+            $items = $order->items->map(function ($item) {
+                return [
+                    'name' => $item->medicine_name,
+                    'quantity' => $item->quantity,
+                    'value' => (int) $item->price,
+                ];
+            })->toArray();
+
+            $payload = [
+                'shipper_contact_name' => $order->pharmacy->name,
+                'shipper_contact_phone' => $order->pharmacy->phone ?? '081234567890',
+                'shipper_contact_email' => $order->pharmacy->email ?? 'admin@apotrack.com',
+                'shipper_organization' => $order->pharmacy->name,
+                'origin_contact_name' => $order->pharmacy->name,
+                'origin_contact_phone' => $order->pharmacy->phone ?? '081234567890',
+                'origin_address' => $order->pharmacy->address,
+                'origin_coordinate' => [
+                    'latitude' => (float) $order->pharmacy->latitude,
+                    'longitude' => (float) $order->pharmacy->longitude,
+                ],
+                'destination_contact_name' => $order->user->username,
+                'destination_contact_phone' => $order->user->phone ?? '081234567890',
+                'destination_contact_email' => $order->user->email,
+                'destination_address' => $order->address->complete_address,
+                'destination_coordinate' => [
+                    'latitude' => (float) $order->address->latitude,
+                    'longitude' => (float) $order->address->longitude,
+                ],
+                'courier_company' => $data['courier_code'],
+                'courier_type' => $data['courier_service'],
+                'delivery_type' => 'now',
+                'items' => $items,
+            ];
+
+            // Buat record tracking sementara
+            $order->tracking()->updateOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'courier_code' => $data['courier_code'],
+                    'courier_service' => $data['courier_service'],
+                    'status' => 'PENDING_BITESHIP',
+                ]
+            );
+
+            // Ubah status order menjadi sedang mengalokasikan kurir
+            $order->update(['order_status' => 'ALLOCATING_COURIER']);
+
+            // Dispatch job ke antrean latar belakang
+            CreateBiteshipOrderJob::dispatch($order->id, $payload, $data);
+
+            return $order->load(['tracking', 'address', 'user']);
+        });
+    }
+
+    /**
+     * Create a new POS order.
+     */
+    public function storePOS(User $user, array $data): Order
+    {
+        $staff = $user->pharmacyStaff;
+        return $this->orderService->createPOSOrder($staff->pharmacy_id, $data);
+    }
+
+    /**
+     * Update order status.
+     */
+    public function updateStatus(User $user, string $id, string $status, ?string $note): Order
+    {
+        $staff = $user->pharmacyStaff;
+        $order = Order::where('pharmacy_id', $staff->pharmacy_id)->findOrFail($id);
+
+        return $this->orderService->updateStatus($order->id, $status, $note);
+    }
+}

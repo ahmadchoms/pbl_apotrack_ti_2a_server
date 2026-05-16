@@ -10,18 +10,43 @@ class OrderPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user): bool
+    /**
+     * Determine whether the staff can view any orders.
+     */
+    public function viewAnyStaff(User $user): bool
     {
-        return $user->pharmacyStaff !== null;
+        return $user->pharmacyStaff !== null && $user->pharmacyStaff->is_active;
     }
 
-    public function view(User $user, Order $order): bool
+    /**
+     * Determine whether the staff can view the specific order.
+     */
+    public function viewStaff(User $user, Order $order): bool
     {
-        return $user->pharmacyStaff && $order->pharmacy_id === $user->pharmacyStaff->pharmacy_id;
+        return $user->pharmacyStaff && $user->pharmacyStaff->is_active && $order->pharmacy_id === $user->pharmacyStaff->pharmacy_id;
     }
 
-    public function update(User $user, Order $order): bool
+    /**
+     * Determine whether the staff can update the specific order.
+     */
+    public function updateStaff(User $user, Order $order): bool
     {
-        return $user->pharmacyStaff && $order->pharmacy_id === $user->pharmacyStaff->pharmacy_id;
+        return $user->pharmacyStaff && $user->pharmacyStaff->is_active && $order->pharmacy_id === $user->pharmacyStaff->pharmacy_id;
+    }
+
+    /**
+     * Determine whether the customer can view their own order.
+     */
+    public function viewCustomer(User $user, Order $order): bool
+    {
+        return $user->id === $order->user_id;
+    }
+
+    /**
+     * Determine whether the customer can update/upload prescription or simulate payment for their own order.
+     */
+    public function updateCustomer(User $user, Order $order): bool
+    {
+        return $user->id === $order->user_id;
     }
 }

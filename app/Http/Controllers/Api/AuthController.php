@@ -2,174 +2,66 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\UserResource;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\Api\UserResource;
 use App\Services\Api\AuthService;
-use App\Mail\OtpVerificationMail;
-use App\Mail\TemporaryPasswordMail;
-use App\Models\User;
+use App\Http\Requests\Api\Auth\RequestRegistrationOtpRequest;
+use App\Http\Requests\Api\Auth\VerifyRegistrationOtpRequest;
+use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Api\Auth\LoginApiRequest;
+use App\Http\Requests\Api\Auth\UpdateProfileRequest;
+use App\Http\Requests\Api\Auth\ChangePasswordRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
-class AuthController extends Controller
+class AuthController extends BaseApiController
 {
     public function __construct(
         protected AuthService $authService
     ) {}
 
-    /**
-     * TAHAP 1: Request OTP & Simpan Data Sementara di Cache
-     */
-    public function requestRegistrationOtp(Request $request)
+    public function requestRegistrationOtp(RequestRegistrationOtpRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:20',
-            'password' => 'required|string|min:8',
-        ]);
-
         try {
-            $otp = rand(100000, 999999);
-            $email = $request->email;
+            $this->authService->requestRegistrationOtp($request->validated());
 
-            $userData = [
-                'username' => $request->username,
-                'email' => $email,
-                'phone' => $request->phone,
-                'password' => $request->password,
-                'otp' => (string) $otp,
-            ];
-
-            Cache::put('registration_' . $email, $userData, 300);
-            
-            // Tambahkan log untuk memudahkan debugging tanpa email asli
-            Log::info("OTP untuk $email adalah: $otp");
-
-            Mail::to($email)->send(new OtpVerificationMail($otp));
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Kode OTP berhasil dikirim ke email ' . $email . ' (Cek log server jika email tidak masuk)',
-            ]);
+            return $this->successResponse(null, 'Kode OTP berhasil dikirim ke email ' . $request->email . ' (Cek log server jika email tidak masuk)');
         } catch (\Exception $e) {
             Log::error('OTP Error: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal mengirim OTP. Pastikan konfigurasi SMTP benar.',
-            ], 500);
+            return $this->errorResponse('Gagal mengirim OTP. Pastikan konfigurasi SMTP benar.', 500);
         }
     }
 
-    /**
-     * TAHAP 2: Verifikasi OTP & Create User (Final)
-     */
-    public function verifyRegistrationOtp(Request $request)
+    public function verifyRegistrationOtp(VerifyRegistrationOtpRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required|string|size:6',
-        ]);
-
-        $cacheKey = 'registration_' . $request->email;
-        $cachedData = Cache::get($cacheKey);
-
-        if (!$cachedData) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'OTP kadaluarsa atau data tidak ditemukan.',
-            ], 400);
-        }
-
-        if ((string) $cachedData['otp'] !== (string) $request->otp) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Kode OTP salah.',
-            ], 400);
-        }
-
         try {
-            $user = User::create([
-                'username' => $cachedData['username'],
-                'email' => $cachedData['email'],
-                'phone' => $cachedData['phone'],
-                'password_hash' => Hash::make($cachedData['password']),
-                'role' => 'USER',
-                'is_active' => true,
-            ]);
+            $result = $this->authService->verifyRegistrationOtp($request->email, $request->otp);
 
-            Cache::forget($cacheKey);
-            $token = $user->createToken('mobile_app')->plainTextToken;
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Registrasi berhasil!',
-                'data' => [
-                    'user' => new UserResource($user),
-                    'token' => $token,
-                ],
-            ], 201);
+            return $this->successResponse([
+                'user' => new UserResource($result['user']),
+                'token' => $result['token'],
+            ], 'Registrasi berhasil!', 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->errorResponse(collect($e->errors())->first()[0], 400, $e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal membuat akun.',
-            ], 500);
+            return $this->errorResponse('Gagal membuat akun.', 500);
         }
     }
 
-    /**
-     * LUPA PASSWORD: Kirim Password Sementara
-     */
-    public function forgotPassword(Request $request)
+    public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $request->validate(['email' => 'required|email']);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            // Return success even if email not found to prevent email enumeration
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Jika email terdaftar, password sementara telah dikirim.',
-            ]);
-        }
-
         try {
-            Log::info("Permintaan Lupa Password untuk: " . $user->email);
-            $tempPassword = Str::random(8);
-            
-            // Simpan password baru
-            $user->update(['password_hash' => Hash::make($tempPassword)]);
-            
-            // Log password sementara agar bisa dicek di storage/logs/laravel.log
-            Log::info("Password sementara untuk " . $user->email . " adalah: " . $tempPassword);
+            $this->authService->forgotPassword($request->email);
 
-            Mail::to($user->email)->send(new TemporaryPasswordMail($tempPassword));
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Jika email terdaftar, password sementara telah dikirim.',
-            ]);
+            return $this->successResponse(null, 'Jika email terdaftar, password sementara telah dikirim.');
         } catch (\Exception $e) {
             Log::error('Forgot Password Error: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal memproses permintaan reset password.',
-            ], 500);
+            return $this->errorResponse('Gagal memproses permintaan reset password.', 500);
         }
     }
 
-    public function login(Request $request)
+    public function login(LoginApiRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
         try {
             $result = $this->authService->login(
                 $request->email,
@@ -177,93 +69,48 @@ class AuthController extends Controller
                 $request->device_name ?? 'mobile-app'
             );
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Login berhasil',
-                'data' => [
-                    'user' => new UserResource($result['user']),
-                    'token' => $result['token'],
-                ],
-            ]);
+            return $this->successResponse([
+                'user' => new UserResource($result['user']),
+                'token' => $result['token'],
+            ], 'Login berhasil');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 401);
+            return $this->errorResponse($e->getMessage(), 401);
         }
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $this->authService->logout($request->user());
 
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        return $this->successResponse(null, 'Logged out successfully');
     }
 
-    /**
-     * Get the authenticated User profile.
-     */
     public function me(Request $request)
     {
-        $user = $request->user()->load(['pharmacyStaff.pharmacy']);
+        $user = $this->authService->getProfile($request->user());
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $user
-        ]);
+        return $this->successResponse(new UserResource($user), 'Profil berhasil diambil');
     }
 
-    /**
-     * Update authenticated user's profile.
-     */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email,' . $request->user()->id,
-            'phone'    => 'nullable|string|max:20',
-        ]);
+        $updatedUser = $this->authService->updateProfile($request->user(), $request->validated());
 
-        $user = $request->user();
-        $user->update([
-            'username' => $request->username,
-            'email'    => $request->email,
-            'phone'    => $request->phone,
-        ]);
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Profil berhasil diperbarui',
-            'data'    => $user->fresh()->load(['pharmacyStaff.pharmacy']),
-        ]);
+        return $this->successResponse(new UserResource($updatedUser), 'Profil berhasil diperbarui');
     }
 
-    /**
-     * Change authenticated user's password.
-     */
-    public function changePassword(Request $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => 'required|string',
-            'new_password'     => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            $this->authService->changePassword(
+                $request->user(),
+                $request->current_password,
+                $request->new_password
+            );
 
-        $user = $request->user();
-
-        if (!\Hash::check($request->current_password, $user->password_hash)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Password lama tidak sesuai.',
-            ], 422);
+            return $this->successResponse(null, 'Password berhasil diperbarui');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->errorResponse(collect($e->errors())->first()[0], 422, $e->errors());
         }
-
-        $user->update(['password_hash' => \Hash::make($request->new_password)]);
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Password berhasil diperbarui',
-        ]);
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Resources\Admin\PharmacyResource;
 use App\Services\Api\PharmacyService;
 use Illuminate\Http\Request;
 
-class PharmacyController extends Controller
+class PharmacyController extends BaseApiController
 {
     public function __construct(
         protected PharmacyService $pharmacyService
@@ -20,16 +20,7 @@ class PharmacyController extends Controller
     {
         $pharmacies = $this->pharmacyService->listActivePharmacies($request->all());
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Daftar apotek berhasil diambil',
-            'data' => PharmacyResource::collection($pharmacies),
-            'meta' => [
-                'current_page' => $pharmacies->currentPage(),
-                'last_page' => $pharmacies->lastPage(),
-                'total' => $pharmacies->total(),
-            ],
-        ]);
+        return $this->successResponse(PharmacyResource::collection($pharmacies), 'Daftar apotek berhasil diambil');
     }
 
     /**
@@ -39,10 +30,6 @@ class PharmacyController extends Controller
     {
         $pharmacy = $this->pharmacyService->getPharmacyDetail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Detail apotek berhasil diambil',
-            'data' => new PharmacyResource($pharmacy),
-        ]);
+        return $this->successResponse(new PharmacyResource($pharmacy), 'Detail apotek berhasil diambil');
     }
 }

@@ -9,6 +9,7 @@ use App\Models\MedicineForm;
 use App\Models\MedicineType;
 use App\Models\MedicineUnit;
 use App\Models\StockMovement;
+use App\Jobs\UploadMedicineImageJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -37,7 +38,6 @@ class MedicineService
             // 2. Get Type (with smart check)
             $type = MedicineType::where('name', $data['type'] ?? '')->first();
             if (!$type) {
-                // Cek apakah user salah memasukkan data Sediaan ke kolom Tipe
                 if (MedicineForm::where('name', $data['type'])->exists()) {
                     throw new \Exception("Kesalahan: '" . $data['type'] . "' adalah Sediaan (Form), jangan masukkan ke kolom Golongan Obat.");
                 }
@@ -47,7 +47,6 @@ class MedicineService
             // 3. Get Form (with smart check)
             $form = MedicineForm::where('name', $data['form'] ?? '')->first();
             if (!$form) {
-                // Cek apakah user salah memasukkan data Golongan ke kolom Sediaan
                 if (MedicineType::where('name', $data['form'])->exists()) {
                     throw new \Exception("Kesalahan: '" . $data['form'] . "' adalah Golongan Obat (Type), jangan masukkan ke kolom Sediaan (Form).");
                 }
@@ -78,14 +77,12 @@ class MedicineService
             if (isset($data['image'])) {
                 try {
                     $file = $data['image'];
-                    $disk = config('filesystems.default');
-                    $path = 'medicines/' . $file->hashName();
+                    $localPath = $file->store('temp/medicines', 'local');
+                    $medicine->update(['image_url' => url('api/temp-medicine/' . basename($localPath))]);
                     
-                    Storage::disk($disk)->put($path, file_get_contents($file));
-                    $medicine->update(['image_url' => Storage::disk($disk)->url($path)]);
+                    UploadMedicineImageJob::dispatch($medicine->id, $localPath);
                 } catch (\Exception $e) {
-                    \Log::warning("Gagal upload gambar obat: " . $e->getMessage());
-                    // Tetap lanjut meskipun gambar gagal, agar data obat tersimpan
+                    \Log::warning("Gagal men-dispatch job upload gambar obat: " . $e->getMessage());
                 }
             }
 
@@ -100,6 +97,9 @@ class MedicineService
     public function update(Medicine $medicine, array $data)
     {
         return DB::transaction(function () use ($medicine, $data) {
+            // Lock medicine row to prevent concurrent updates
+            $med = Medicine::where('id', $medicine->id)->lockForUpdate()->firstOrFail();
+
             // 1. Get Category
             $category = MedicineCategory::where('name', $data['category'] ?? '')->first();
             if (!$category) throw new \Exception("Kategori '" . ($data['category'] ?? 'NULL') . "' tidak ditemukan.");
@@ -126,7 +126,9 @@ class MedicineService
             $unit = MedicineUnit::where('name', $data['unit'] ?? '')->first();
             if (!$unit) throw new \Exception("Satuan '" . ($data['unit'] ?? 'NULL') . "' tidak ditemukan.");
 
-            $medicine->update([
+            $oldImageUrl = $med->image_url;
+
+            $med->update([
                 'category_id' => $category->id,
                 'type_id' => $type->id,
                 'form_id' => $form->id,
@@ -144,38 +146,19 @@ class MedicineService
 
             if (isset($data['image'])) {
                 try {
-                    $disk = config('filesystems.default');
-                    if ($medicine->image_url) {
-                        $urlPath = parse_url($medicine->image_url, PHP_URL_PATH);
-                        $bucket = env('SUPABASE_BUCKET_PRIVATE', 'apotrack-private');
-                        $search = '/' . $bucket . '/';
-                        $pos = strpos($urlPath, $search);
-                        
-                        if ($pos !== false) {
-                            $oldPath = substr($urlPath, $pos + strlen($search));
-                        } else {
-                            $oldPath = ltrim($urlPath, '/');
-                        }
-                        
-                        if (Storage::disk($disk)->exists($oldPath)) {
-                            Storage::disk($disk)->delete($oldPath);
-                        }
-                    }
-                    
                     $file = $data['image'];
-                    $path = 'medicines/' . $file->hashName();
-                    Storage::disk($disk)->put($path, file_get_contents($file));
-                    $medicine->update(['image_url' => Storage::disk($disk)->url($path)]);
+                    $localPath = $file->store('temp/medicines', 'local');
+                    $med->update(['image_url' => url('api/temp-medicine/' . basename($localPath))]);
+                    
+                    UploadMedicineImageJob::dispatch($med->id, $localPath, $oldImageUrl);
                 } catch (\Exception $e) {
-                    \Log::warning("Gagal update gambar obat: " . $e->getMessage());
+                    \Log::warning("Gagal men-dispatch job update gambar obat: " . $e->getMessage());
                 }
             }
 
-            $this->syncBatches($medicine, $data['batches'] ?? []);
+            $this->syncBatches($med, $data['batches'] ?? []);
 
-
-
-            return $medicine;
+            return $med;
         });
     }
 
@@ -201,7 +184,7 @@ class MedicineService
     public function addBatch(string $medicineId, array $data, string $userId)
     {
         return DB::transaction(function () use ($medicineId, $data, $userId) {
-            $medicine = Medicine::findOrFail($medicineId);
+            $medicine = Medicine::where('id', $medicineId)->lockForUpdate()->firstOrFail();
 
             $batch = $medicine->batches()->create([
                 'batch_number' => $data['batch_number'],
@@ -225,7 +208,7 @@ class MedicineService
     public function adjustStock(string $batchId, array $data, string $userId)
     {
         return DB::transaction(function () use ($batchId, $data, $userId) {
-            $batch = MedicineBatch::with('medicine')->findOrFail($batchId);
+            $batch = MedicineBatch::with('medicine')->where('id', $batchId)->lockForUpdate()->firstOrFail();
             $oldStock = $batch->stock;
             $newStock = $data['new_stock'];
             $diff = $newStock - $oldStock;

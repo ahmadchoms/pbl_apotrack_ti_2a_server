@@ -38,6 +38,8 @@ return [
     'biteship' => [
         'key' => env('BITESHIP_API_KEY'),
         'url' => env('BITESHIP_BASE_URL', 'https://api.biteship.com'),
+        'webhook_secret' => env('BITESHIP_WEBHOOK_SECRET'),
+        'webhook_bypass' => env('BITESHIP_WEBHOOK_BYPASS', true),
     ],
 
 ];

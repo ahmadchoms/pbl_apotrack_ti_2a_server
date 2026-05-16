@@ -4,6 +4,7 @@ namespace App\Services\Pharmacy;
 
 use App\Models\Order;
 use App\Models\Pharmacy;
+use App\Events\OrderStatusChangedEvent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -63,7 +64,7 @@ class OrderService
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
 
-                // Reduce stock from batches (FIFO simple logic)
+                // Reduce stock from batches (FIFO simple logic with locking)
                 $this->reduceStock($medicine, $item['quantity']);
             }
 
@@ -105,7 +106,7 @@ class OrderService
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
 
-                // Reduce stock from batches (FIFO)
+                // Reduce stock from batches (FIFO with locking)
                 $this->reduceStock($medicine, $item['quantity']);
             }
 
@@ -122,6 +123,7 @@ class OrderService
             // Clear User Cart
             $cart = \App\Models\Cart::where('user_id', $user->id)
                 ->where('pharmacy_id', $data['pharmacy_id'])
+                ->lockForUpdate()
                 ->first();
             
             if ($cart) {
@@ -134,15 +136,19 @@ class OrderService
 
     protected function reduceStock($medicine, $quantity)
     {
-        $batches = $medicine->batches()
+        // Pessimistic Locking on medicine and batches
+        $med = \App\Models\Medicine::where('id', $medicine->id)->lockForUpdate()->first();
+
+        $batches = $med->batches()
             ->where('expired_date', '>', now())
             ->where('stock', '>', 0)
             ->orderBy('expired_date', 'asc')
+            ->lockForUpdate()
             ->get();
 
         $totalAvailable = $batches->sum('stock');
         if ($totalAvailable < $quantity) {
-            throw new InsufficientStockException("Stok obat \"{$medicine->name}\" tidak mencukupi. Tersedia: {$totalAvailable}, Diminta: {$quantity}.");
+            throw new InsufficientStockException("Stok obat \"{$med->name}\" tidak mencukupi. Tersedia: {$totalAvailable}, Diminta: {$quantity}.");
         }
 
         $remainingToReduce = $quantity;
@@ -170,7 +176,7 @@ class OrderService
     public function updateStatus(string $orderId, OrderStatus $status, ?string $note = null)
     {
         return DB::transaction(function () use ($orderId, $status, $note) {
-            $order = Order::findOrFail($orderId);
+            $order = Order::with('user')->where('id', $orderId)->lockForUpdate()->firstOrFail();
             $oldStatus = OrderStatus::from($order->order_status);
 
             // Validate Transition
@@ -186,8 +192,40 @@ class OrderService
                 'source' => 'PHARMACY_WEB'
             ]);
 
+            // Jika dibatalkan, kembalikan stok obat ke batch aktif
+            if ($status === OrderStatus::CANCELLED && $oldStatus !== OrderStatus::CANCELLED) {
+                $this->restoreStock($order);
+            }
+
+            // Dispatch event perubahan status pesanan untuk notifikasi latar belakang
+            OrderStatusChangedEvent::dispatch($order, $oldStatus->value, $status->value);
+
             return $order;
         });
+    }
+
+    protected function restoreStock(Order $order)
+    {
+        foreach ($order->items as $item) {
+            $med = \App\Models\Medicine::where('id', $item->medicine_id)->lockForUpdate()->first();
+            if (!$med) continue;
+
+            $batch = $med->batches()
+                ->where('expired_date', '>', now())
+                ->orderBy('expired_date', 'desc')
+                ->lockForUpdate()
+                ->first();
+
+            if ($batch) {
+                $batch->increment('stock', $item->quantity);
+            } else {
+                $med->batches()->create([
+                    'batch_number' => 'RET-' . strtoupper(Str::random(6)),
+                    'expired_date' => now()->addMonths(6),
+                    'stock' => $item->quantity,
+                ]);
+            }
+        }
     }
 
     protected function validateStatusTransition(OrderStatus $from, OrderStatus $to): void
@@ -235,7 +273,7 @@ class OrderService
     public function validatePrescription(string $prescriptionId, string $status, ?string $note = null)
     {
         return DB::transaction(function () use ($prescriptionId, $status, $note) {
-            $prescription = \App\Models\Prescription::findOrFail($prescriptionId);
+            $prescription = \App\Models\Prescription::where('id', $prescriptionId)->lockForUpdate()->firstOrFail();
             $prescription->update([
                 'status' => $status,
                 'rejection_note' => $note,

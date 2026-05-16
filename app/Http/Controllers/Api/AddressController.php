@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\UserAddress;
 use App\Services\Api\AddressService;
+use App\Http\Requests\Api\Customer\StoreAddressRequest;
+use App\Http\Requests\Api\Customer\UpdateAddressRequest;
+use App\Http\Resources\Api\AddressResource;
 use Illuminate\Http\Request;
 
-class AddressController extends Controller
+class AddressController extends BaseApiController
 {
     public function __construct(
         protected AddressService $addressService
@@ -20,57 +23,29 @@ class AddressController extends Controller
     {
         $addresses = $this->addressService->getUserAddresses($request->user());
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Daftar alamat berhasil diambil',
-            'data' => $addresses,
-        ]);
+        return $this->successResponse(AddressResource::collection($addresses), 'Daftar alamat berhasil diambil');
     }
 
     /**
      * Store a new address (Transaction Protected).
      */
-    public function store(Request $request)
+    public function store(StoreAddressRequest $request)
     {
-        $request->validate([
-            'label' => 'required|string|max:50',
-            'address_detail' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'is_primary' => 'boolean',
-        ]);
-
         $address = $this->addressService->createAddress($request->user(), $request->validated());
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Alamat berhasil ditambahkan',
-            'data' => $address,
-        ], 201);
+        return $this->successResponse(new AddressResource($address), 'Alamat berhasil ditambahkan', 201);
     }
 
     /**
      * Update an address (Transaction Protected).
      */
-    public function update(Request $request, $id)
+    public function update(UpdateAddressRequest $request, $id)
     {
         $address = $request->user()->addresses()->findOrFail($id);
 
-        $request->validate([
-            'label' => 'string|max:50',
-            'address_detail' => 'string',
-            'latitude' => 'numeric',
-            'longitude' => 'numeric',
-            'is_primary' => 'boolean',
-        ]);
-
         $updatedAddress = $this->addressService->updateAddress($address, $request->validated());
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Alamat berhasil diperbarui',
-            'data' => $updatedAddress,
-        ]);
+        return $this->successResponse(new AddressResource($updatedAddress), 'Alamat berhasil diperbarui');
     }
 
     /**
@@ -81,9 +56,6 @@ class AddressController extends Controller
         $address = $request->user()->addresses()->findOrFail($id);
         $this->addressService->deleteAddress($address);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Alamat berhasil dihapus',
-        ]);
+        return $this->successResponse(null, 'Alamat berhasil dihapus');
     }
 }

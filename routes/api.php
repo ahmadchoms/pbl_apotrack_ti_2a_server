@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\BiteshipWebhookController;
 */
 
 // --- PUBLIC ROUTES (Rate Limited) ---
-Route::post('/webhooks/biteship', [BiteshipWebhookController::class, 'handle']);
+Route::post('/webhooks/biteship', [BiteshipWebhookController::class, 'handle'])->middleware('biteship.webhook');
 Route::get('/medicines/{medicineId}/reviews', [ReviewController::class, 'index']); // Public API Review
 
 Route::middleware('throttle:5,1')->group(function () {

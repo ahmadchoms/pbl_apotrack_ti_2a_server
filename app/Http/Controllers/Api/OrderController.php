@@ -2,211 +2,95 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Services\Pharmacy\OrderService;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Services\Api\CustomerOrderService;
+use App\Http\Requests\Api\Customer\StoreCustomerOrderRequest;
+use App\Http\Requests\Api\Customer\UploadPrescriptionRequest;
+use App\Http\Resources\Api\OrderResource;
+use App\Http\Resources\Api\DeliveryTrackingResource;
 use Illuminate\Http\Request;
 use App\Exceptions\InsufficientStockException;
+use Illuminate\Support\Facades\Log;
 
-class OrderController extends Controller
+class OrderController extends BaseApiController
 {
     public function __construct(
-        protected OrderService $orderService
+        protected CustomerOrderService $customerOrderService
     ) {}
 
-    /**
-     * Display a listing of user orders.
-     */
     public function index(Request $request)
     {
-        $orders = Order::with(['items.medicine', 'pharmacy'])
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(10);
+        $orders = $this->customerOrderService->listOrders($request->user(), 10);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Riwayat pesanan berhasil diambil',
-            'data' => $orders->items(),
-            'meta' => [
-                'current_page' => $orders->currentPage(),
-                'last_page' => $orders->lastPage(),
-                'total' => $orders->total(),
-            ],
-        ]);
+        return $this->successResponse(OrderResource::collection($orders), 'Riwayat pesanan berhasil diambil');
     }
 
-    /**
-     * Store a new order from mobile.
-     */
-    public function store(Request $request)
+    public function store(StoreCustomerOrderRequest $request)
     {
-        $request->validate([
-            'pharmacy_id' => 'required|exists:pharmacies,id',
-            'items' => 'required|array|min:1',
-            'items.*.id' => 'required|exists:medicines,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric',
-            'subtotal_amount' => 'required|numeric',
-            'service_type' => 'required|string|in:PICK_UP,DELIVERY',
-            'payment_method' => 'required|string|in:CASH,TRANSFER,E-WALLET',
-            
-            // Aturan khusus logistik jika memilih DELIVERY
-            'address_id' => 'required_if:service_type,DELIVERY|nullable|exists:user_addresses,id',
-            'courier_code' => 'required_if:service_type,DELIVERY|nullable|string',
-            'courier_service' => 'required_if:service_type,DELIVERY|nullable|string',
-            'shipping_cost' => 'required_if:service_type,DELIVERY|numeric',
-            'notes' => 'nullable|string'
-        ]);
-
         try {
-            $user = $request->user();
-            $data = $request->all();
+            $order = $this->customerOrderService->storeOrder($request->user(), $request->validated());
 
-            $order = $this->orderService->createCustomerOrder($user, $data);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Pesanan berhasil dibuat',
-                'data' => $order->load(['items.medicine', 'tracking']),
-            ], 201);
+            return $this->successResponse(new OrderResource($order->load(['items.medicine', 'tracking'])), 'Pesanan berhasil dibuat', 201);
         } catch (InsufficientStockException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 422);
+            return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
-            \Log::error('Order creation failed: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.',
-            ], 500);
+            Log::error('Order creation failed: ' . $e->getMessage());
+            return $this->errorResponse('Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.', 500);
         }
     }
 
-    /**
-     * Display specific order details.
-     */
     public function show($id, Request $request)
     {
-        $order = Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription'])
-            ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Detail pesanan berhasil diambil',
-            'data' => $order,
-        ]);
-    }
-
-    /**
-     * Upload prescription for an order.
-     */
-    public function uploadPrescription(Request $request, $id)
-    {
-        $request->validate([
-            'prescription_image' => 'required|image|max:5120', // Max 5MB
-        ]);
-
-        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
-
         try {
-            $file = $request->file('prescription_image');
-            $path = $file->store('prescriptions', 's3');
-            $url = \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
+            $order = $this->customerOrderService->showOrder($request->user(), $id);
 
-            $prescription = \App\Models\Prescription::create([
-                'user_id' => $request->user()->id,
-                'order_id' => $order->id,
-                'image_url' => $url,
-                'status' => 'PENDING',
-            ]);
-
-            $order->update(['prescription_id' => $prescription->id]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Resep dokter berhasil diunggah',
-                'data' => $prescription,
-            ]);
+            return $this->successResponse(new OrderResource($order), 'Detail pesanan berhasil diambil');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal mengunggah resep: ' . $e->getMessage(),
-            ], 500);
+            return $this->errorResponse('Pesanan tidak ditemukan', 404);
         }
     }
 
-    /**
-     * Get order history (Completed or Cancelled).
-     */
+    public function uploadPrescription(UploadPrescriptionRequest $request, $id)
+    {
+        try {
+            $prescription = $this->customerOrderService->uploadPrescription(
+                $request->user(),
+                $id,
+                $request->file('prescription_image')
+            );
+
+            return $this->successResponse($prescription, 'Resep dokter berhasil diunggah');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Gagal mengunggah resep: ' . $e->getMessage(), 500);
+        }
+    }
+
     public function history(Request $request)
     {
-        $orders = Order::with(['items.medicine', 'pharmacy'])
-            ->where('user_id', $request->user()->id)
-            ->whereIn('order_status', ['COMPLETED', 'CANCELLED'])
-            ->latest()
-            ->paginate(15);
+        $orders = $this->customerOrderService->listHistory($request->user(), 15);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Riwayat pesanan berhasil diambil',
-            'data' => $orders->items(),
-            'meta' => [
-                'current_page' => $orders->currentPage(),
-                'last_page' => $orders->lastPage(),
-                'total' => $orders->total(),
-            ],
-        ]);
+        return $this->successResponse(OrderResource::collection($orders), 'Riwayat pesanan berhasil diambil');
     }
 
-    /**
-     * Get courier tracking details.
-     */
     public function tracking($id, Request $request)
     {
-        $order = Order::with(['deliveryTracking.logs'])
-            ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        try {
+            $tracking = $this->customerOrderService->getTracking($request->user(), $id);
 
-        if (!$order->deliveryTracking) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Informasi pengiriman tidak ditemukan untuk pesanan ini.',
-            ], 404);
+            return $this->successResponse(new DeliveryTrackingResource($tracking), 'Data pelacakan pengiriman berhasil diambil');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 404);
         }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data pelacakan pengiriman berhasil diambil',
-            'data' => $order->deliveryTracking,
-        ]);
     }
 
-    /**
-     * Simulate payment for UI Testing (Dummy)
-     */
     public function simulatePayment($id, Request $request)
     {
-        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+        try {
+            $order = $this->customerOrderService->simulatePayment($request->user(), $id);
 
-        if ($order->payment_status !== 'UNPAID') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pesanan ini sudah dibayar atau status tidak valid.',
-            ], 422);
+            return $this->successResponse(new OrderResource($order), 'Simulasi pembayaran berhasil, pesanan telah dilunasi.');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
         }
-
-        $order->update([
-            'payment_status' => 'PAID',
-            'paid_at' => now(),
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Simulasi pembayaran berhasil, pesanan telah dilunasi.',
-            'data' => $order,
-        ]);
     }
 }

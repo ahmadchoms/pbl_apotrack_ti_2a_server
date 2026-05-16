@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\Staff;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
 
-class AuditController extends Controller
+class AuditController extends BaseApiController
 {
     /**
      * Display a listing of the audit logs for the staff's pharmacy.
@@ -15,7 +15,6 @@ class AuditController extends Controller
     {
         $staff = $request->user()->pharmacyStaff;
         
-        // Find all staff IDs in this pharmacy to show their logs
         $staffUserIds = \App\Models\PharmacyStaff::where('pharmacy_id', $staff->pharmacy_id)
             ->pluck('user_id');
 
@@ -28,15 +27,6 @@ class AuditController extends Controller
             ->latest('created_at')
             ->paginate(20);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Log riwayat aktivitas apotek berhasil diambil',
-            'data' => $logs->items(),
-            'meta' => [
-                'current_page' => $logs->currentPage(),
-                'last_page' => $logs->lastPage(),
-                'total' => $logs->total(),
-            ],
-        ]);
+        return $this->successResponse($logs, 'Log riwayat aktivitas apotek berhasil diambil');
     }
 }

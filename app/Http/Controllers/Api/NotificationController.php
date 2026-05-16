@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class NotificationController extends Controller
+class NotificationController extends BaseApiController
 {
     /**
      * Get user notifications.
@@ -18,16 +18,8 @@ class NotificationController extends Controller
             ->latest()
             ->paginate(20);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Daftar notifikasi berhasil diambil',
-            'data' => $notifications->items(),
-            'meta' => [
-                'current_page' => $notifications->currentPage(),
-                'last_page' => $notifications->lastPage(),
-                'total' => $notifications->total(),
-                'unread_count' => $request->user()->notifications()->where('is_read', false)->count(),
-            ],
+        return $this->successResponse($notifications, 'Daftar notifikasi berhasil diambil', 200, [
+            'unread_count' => $request->user()->notifications()->where('is_read', false)->count(),
         ]);
     }
 
@@ -43,10 +35,7 @@ class NotificationController extends Controller
             'read_at' => Carbon::now(),
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Notifikasi ditandai sebagai dibaca',
-        ]);
+        return $this->successResponse(null, 'Notifikasi ditandai sebagai dibaca');
     }
 
     /**
@@ -59,9 +48,6 @@ class NotificationController extends Controller
             'read_at' => Carbon::now(),
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Semua notifikasi ditandai sebagai dibaca',
-        ]);
+        return $this->successResponse(null, 'Semua notifikasi ditandai sebagai dibaca');
     }
 }

@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\Api\MedicineCategoryService;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Models\MedicineCategory;
 use Illuminate\Http\Request;
 
-class MedicineCategoryController extends Controller
+class MedicineCategoryController extends BaseApiController
 {
-    public function __construct(
-        protected MedicineCategoryService $categoryService
-    ) {}
-
     /**
-     * Get all medicine categories (Optimized with Caching).
+     * Get all medicine categories.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = $this->categoryService->getAllCategories();
+        $categories = MedicineCategory::select('id', 'name', 'description')
+            ->orderBy('name')
+            ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Daftar kategori obat berhasil diambil',
-            'data' => $categories,
-        ]);
+        return $this->successResponse($categories, 'Daftar kategori obat berhasil diambil');
     }
 }

@@ -2,63 +2,29 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\DeliveryTracking;
-use App\Models\Order;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Jobs\ProcessBiteshipWebhookJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class BiteshipWebhookController extends Controller
+class BiteshipWebhookController extends BaseApiController
 {
-    /**
-     * Handle incoming webhooks from Biteship.
-     */
     public function handle(Request $request)
     {
-        // Biteship security: Optional check for signature/token if configured
-        
-        $payload = $request->all();
-        $biteshipId = $payload['order_id'] ?? null;
-        $biteshipStatus = $payload['status'] ?? null;
+        try {
+            // Jika body kosong atau tidak memiliki order_id (seperti saat Biteship melakukan ping/instalasi webhook), langsung kembalikan respons 200 OK
+            if (empty($request->all()) || !$request->has('order_id')) {
+                Log::info('Biteship Webhook Installation/Ping received. Responding with 200 OK.');
+                return response()->json(['success' => true, 'message' => 'Webhook verification/ping successful'], 200);
+            }
 
-        Log::info("Biteship Webhook Received: ID {$biteshipId}, Status {$biteshipStatus}");
+            // Dispatch job ke antrean latar belakang agar Biteship (!mengalami timeout)
+            ProcessBiteshipWebhookJob::dispatch($request->all());
 
-        if (!$biteshipId || !$biteshipStatus) {
-            return response()->json(['message' => 'Invalid payload'], 400);
+            return $this->successResponse(null, 'Webhook received and queued for processing');
+        } catch (\Exception $e) {
+            Log::error('Webhook queuing failed: ' . $e->getMessage());
+            return $this->errorResponse('Failed to queue webhook', 500);
         }
-
-        $tracking = DeliveryTracking::with('order')->where('biteship_id', $biteshipId)->first();
-
-        if (!$tracking) {
-            return response()->json(['message' => 'Tracking record not found'], 404);
-        }
-
-        // Mapping Biteship status to internal status
-        $internalStatus = strtoupper($biteshipStatus);
-        
-        $tracking->update([
-            'status' => $internalStatus,
-            'tracking_number' => $payload['courier']['waybill_id'] ?? $tracking->tracking_number,
-        ]);
-
-        // Create delivery log
-        $tracking->logs()->create([
-            'status' => $internalStatus,
-            'description' => "Status kurir diperbarui menjadi {$internalStatus}",
-        ]);
-
-        // Auto-update Order status based on delivery progress
-        $order = $tracking->order;
-        
-        if ($biteshipStatus === 'delivered') {
-            $order->update(['order_status' => Order::STATUS_COMPLETED]);
-        } elseif ($biteshipStatus === 'picking_up' || $biteshipStatus === 'picked_up') {
-            $order->update(['order_status' => Order::STATUS_SHIPPED]);
-        } elseif ($biteshipStatus === 'cancelled' || $biteshipStatus === 'rejected') {
-            // Log cancellation but maybe keep order as processing for manual check
-            Log::warning("Shipment for Order {$order->order_number} was cancelled by Biteship/Courier.");
-        }
-
-        return response()->json(['message' => 'Webhook processed successfully']);
     }
 }
