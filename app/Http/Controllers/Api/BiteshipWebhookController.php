@@ -12,10 +12,18 @@ class BiteshipWebhookController extends BaseApiController
     public function handle(Request $request)
     {
         try {
-            // Jika body kosong atau tidak memiliki order_id (seperti saat Biteship melakukan ping/instalasi webhook), langsung kembalikan respons 200 OK
-            if (empty($request->all()) || !$request->has('order_id')) {
-                Log::info('Biteship Webhook Installation/Ping received. Responding with 200 OK.');
-                return response()->json(['success' => true, 'message' => 'Webhook verification/ping successful'], 200);
+            if ($request->getContent() == "" || empty($request->all()) || !$request->has('order_id')) {
+                Log::info('Biteship Webhook Handshake/Ping received.');
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'ok'
+                ], 200);
+            }
+
+            $signature = $request->header(config('services.biteship.key'));
+            if ($signature !== config('services.biteship.webhook_secret')) {
+                return response()->json(['message' => 'Unauthorized'], 401);
             }
 
             // Dispatch job ke antrean latar belakang agar Biteship (!mengalami timeout)

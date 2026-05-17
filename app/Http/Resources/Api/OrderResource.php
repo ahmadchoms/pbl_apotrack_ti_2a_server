@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,6 +10,7 @@ class OrderResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        Carbon::setLocale('id');
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
@@ -27,7 +29,7 @@ class OrderResource extends JsonResource
             'subtotal_amount' => (float) $this->subtotal_amount,
             'shipping_cost' => (float) $this->shipping_cost,
             'notes' => $this->notes,
-            'created_at' => $this->created_at?->format('d M Y H:i'),
+            'created_at' => $this->created_at?->translatedFormat('d M Y H:i'),
             'buyer' => $this->whenLoaded('user', fn() => [
                 'id' => $this->user->id,
                 'username' => $this->user->username,
