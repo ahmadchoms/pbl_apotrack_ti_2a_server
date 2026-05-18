@@ -28,15 +28,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users');
             $table->foreignUuid('pharmacy_id')->constrained('pharmacies');
-            $table->foreignUuid('order_id')->unique()->constrained('orders');
+            $table->foreignUuid('order_id')->constrained('orders');
+            $table->foreignUuid('medicine_id')->nullable()->constrained('medicines')->cascadeOnDelete();
             $table->integer('rating'); // 1-5
             $table->text('comment')->nullable();
             $table->boolean('is_visible')->default(true);
             $table->timestamp('created_at')->useCurrent();
 
             $table->index(['pharmacy_id', 'rating']);
-            $table->dropUnique('reviews_order_id_unique');
-            $table->foreignUuid('medicine_id')->nullable()->after('order_id')->constrained('medicines')->cascadeOnDelete();
             $table->unique(['order_id', 'medicine_id']);
         });
 
@@ -47,11 +46,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('reviews');
         Schema::dropIfExists('notifications');
-        Schema::table('reviews', function (Blueprint $table) {
-            $table->dropUnique(['order_id', 'medicine_id']);
-            $table->dropForeign(['medicine_id']);
-            $table->dropColumn('medicine_id');
-            $table->unique('order_id', 'reviews_order_id_unique');
-        });
     }
 };

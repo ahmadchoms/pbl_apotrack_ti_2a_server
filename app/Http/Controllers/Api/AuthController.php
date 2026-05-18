@@ -14,6 +14,7 @@ use App\Http\Requests\Api\Auth\ChangePasswordRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Annotations as OA;
+use App\Helpers\AuditHelper;
 
 class AuthController extends BaseApiController
 {
@@ -435,6 +436,14 @@ class AuthController extends BaseApiController
     {
         $updatedUser = $this->authService->updateProfile($request->user(), $request->validated());
 
+        if (in_array($request->user()->role, ['STAFF', 'APOTEKER'])) {
+            AuditHelper::log(
+                'UPDATE_PROFILE',
+                'Memperbarui informasi profil staf.',
+                ['user_id' => $request->user()->id]
+            );
+        }
+
         return $this->successResponse(new UserResource($updatedUser), 'Profil berhasil diperbarui');
     }
 
@@ -493,6 +502,14 @@ class AuthController extends BaseApiController
                 $request->current_password,
                 $request->new_password
             );
+
+            if (in_array($request->user()->role, ['STAFF', 'APOTEKER'])) {
+                AuditHelper::log(
+                    'CHANGE_PASSWORD',
+                    'Melakukan perubahan kata sandi akun.',
+                    ['user_id' => $request->user()->id]
+                );
+            }
 
             return $this->successResponse(null, 'Password berhasil diperbarui');
         } catch (\Illuminate\Validation\ValidationException $e) {

@@ -11,6 +11,7 @@ use App\Http\Requests\Api\Staff\StorePOSOrderRequest;
 use App\Http\Resources\Api\OrderResource;
 use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
+use App\Helpers\AuditHelper;
 
 class OrderController extends BaseApiController
 {
@@ -76,6 +77,12 @@ class OrderController extends BaseApiController
     {
         try {
             $order = $this->staffOrderService->shipOrder($request->user(), $id, $request->validated());
+
+            AuditHelper::log(
+                'SHIP_ORDER',
+                "Mengatur pengiriman pesanan {$order->order_number} melalui Biteship.",
+                ['order_id' => $order->id, 'courier' => $request->courier_code]
+            );
 
             return $this->successResponse(new OrderResource($order), 'Permintaan pengiriman berhasil dikirim ke Biteship');
         } catch (\Exception $e) {
@@ -265,6 +272,12 @@ class OrderController extends BaseApiController
                 $request->note
             );
 
+            AuditHelper::log(
+                'UPDATE_ORDER_STATUS',
+                "Memperbarui status pesanan {$updatedOrder->order_number} menjadi {$request->status}.",
+                ['order_id' => $updatedOrder->id, 'status' => $request->status]
+            );
+
             return $this->successResponse(new OrderResource($updatedOrder), "Status pesanan berhasil diperbarui menjadi {$request->status}");
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);
@@ -320,6 +333,12 @@ class OrderController extends BaseApiController
     {
         try {
             $order = $this->staffOrderService->verifyOrder($request->user(), $request->verification_code);
+
+            AuditHelper::log(
+                'VERIFY_PRESCRIPTION',
+                "Melakukan verifikasi pesanan/resep #{$order->id}.",
+                ['order_id' => $order->id]
+            );
 
             return $this->successResponse(new OrderResource($order), 'Kode verifikasi valid');
         } catch (\Exception $e) {
@@ -387,6 +406,12 @@ class OrderController extends BaseApiController
     {
         try {
             $order = $this->staffOrderService->storePOS($request->user(), $request->validated());
+
+            AuditHelper::log(
+                'CREATE_POS_ORDER',
+                "Membuat transaksi kasir langsung (POS) dengan invoice {$order->order_number}.",
+                ['invoice' => $order->order_number, 'total' => $order->grand_total]
+            );
 
             return $this->successResponse(new OrderResource($order->load('items')), 'Pesanan kasir berhasil dibuat', 201);
         } catch (\Exception $e) {

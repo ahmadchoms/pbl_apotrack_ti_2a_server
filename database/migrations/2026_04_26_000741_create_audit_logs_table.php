@@ -11,12 +11,10 @@ return new class extends Migration
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->nullable()->constrained('users')->cascadeOnDelete();
-            $table->string('action', 50); // e.g., 'LOGIN', 'PROFILE_UPDATE', 'PHARMACY_CREATE'
+            $table->string('action', 50); // e.g., 'SHIP_ORDER', 'UPDATE_PROFILE'
             $table->text('description');
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->json('metadata')->nullable(); // For affected data
-            $table->string('status', 20)->default('SUCCESS'); // SUCCESS | FAILED
+            $table->string('status', 20)->default('SUCCESS');
+            $table->json('metadata')->nullable(); // For machine data
             $table->timestamp('created_at')->useCurrent();
 
             $table->index(['user_id', 'action']);

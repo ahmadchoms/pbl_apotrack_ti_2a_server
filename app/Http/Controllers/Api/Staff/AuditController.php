@@ -15,11 +15,18 @@ class AuditController extends BaseApiController
     {
         $staff = $request->user()->pharmacyStaff;
         
-        $staffUserIds = \App\Models\PharmacyStaff::where('pharmacy_id', $staff->pharmacy_id)
-            ->pluck('user_id');
+        // Pemilahan Data (Data Filtering):
+        // Jika rolenya adalah APOTEKER (Manajer/Penanggung Jawab Apotek), mereka berhak melihat seluruh aktivitas log dari semua staf di apotek tersebut.
+        // Namun jika rolenya adalah STAFF biasa (seperti Rina Staff), mereka hanya berhak melihat riwayat aktivitas yang mereka lakukan sendiri.
+        if ($staff && $staff->role === 'APOTEKER') {
+            $staffUserIds = \App\Models\PharmacyStaff::where('pharmacy_id', $staff->pharmacy_id)
+                ->pluck('user_id');
+            $query = AuditLog::whereIn('user_id', $staffUserIds);
+        } else {
+            $query = AuditLog::where('user_id', $request->user()->id);
+        }
 
-        $logs = AuditLog::with('user:id,username')
-            ->whereIn('user_id', $staffUserIds)
+        $logs = $query->with('user:id,username')
             ->search($request->search)
             ->filterStatus($request->status)
             ->filterAction($request->action)
@@ -27,6 +34,6 @@ class AuditController extends BaseApiController
             ->latest('created_at')
             ->paginate(20);
 
-        return $this->successResponse($logs, 'Log riwayat aktivitas apotek berhasil diambil');
+        return $this->successResponse(\App\Http\Resources\Admin\AuditLogResource::collection($logs), 'Log riwayat aktivitas apotek berhasil diambil');
     }
 }

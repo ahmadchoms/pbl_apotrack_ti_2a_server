@@ -14,7 +14,7 @@ class AuditLog extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'metadata' => 'array',
+        'metadata' => 'json',
         'created_at' => 'datetime',
     ];
 

@@ -12,6 +12,7 @@ use App\Http\Requests\Api\Staff\UpdateMedicineRequest;
 use App\Http\Requests\Api\Staff\UpdateMedicineStockRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditHelper;
 
 class MedicineController extends BaseApiController
 {
@@ -38,6 +39,12 @@ class MedicineController extends BaseApiController
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         
         $medicine = $this->medicineService->store($pharmacyId, $request->validated());
+
+        AuditHelper::log(
+            'ADD_MEDICINE',
+            "Menambahkan obat baru: {$medicine->name} ke katalog.",
+            ['medicine_name' => $medicine->name]
+        );
 
         return $this->successResponse(new MedicineResource($medicine->refresh()->loadMissing(['category', 'form', 'type', 'unit', 'batches'])->loadSum(['batches as total_active_stock' => function ($sq) {
             $sq->where('expired_date', '>=', now()->startOfDay());
@@ -69,6 +76,12 @@ class MedicineController extends BaseApiController
 
         $updatedMedicine = $this->medicineService->update($medicine, $request->validated());
 
+        AuditHelper::log(
+            'UPDATE_MEDICINE',
+            "Mengubah informasi data obat {$updatedMedicine->name}.",
+            ['medicine_id' => $updatedMedicine->id]
+        );
+
         return $this->successResponse(new MedicineResource($updatedMedicine->refresh()->loadMissing(['category', 'form', 'type', 'unit', 'batches'])->loadSum(['batches as total_active_stock' => function ($sq) {
             $sq->where('expired_date', '>=', now()->startOfDay());
         }], 'stock')), 'Data obat berhasil diperbarui');
@@ -82,7 +95,14 @@ class MedicineController extends BaseApiController
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $medicine = Medicine::where('pharmacy_id', $pharmacyId)->findOrFail($id);
         
+        $medicineName = $medicine->name;
         $medicine->delete();
+
+        AuditHelper::log(
+            'DELETE_MEDICINE',
+            "Menghapus obat {$medicineName} dari sistem apotek.",
+            ['medicine_name' => $medicineName]
+        );
 
         return $this->successResponse(null, 'Obat berhasil dihapus');
     }
@@ -96,13 +116,29 @@ class MedicineController extends BaseApiController
         $medicine = Medicine::where('pharmacy_id', $pharmacyId)->findOrFail($id);
 
         try {
+            $oldStock = 0;
+            $newStock = 0;
+
             if ($request->type === 'IN') {
                 $batch = $this->medicineService->addBatch($medicine->id, $request->validated(), $request->user()->id);
+                $newStock = $batch->stock;
             } elseif ($request->type === 'ADJUSTMENT') {
+                $oldStock = MedicineBatch::where('id', $request->batch_id)->value('stock') ?? 0;
                 $batch = $this->medicineService->adjustStock($request->batch_id, $request->validated(), $request->user()->id);
+                $newStock = $batch->stock;
             } else {
                 return $this->errorResponse('Metode pengurangan stok (OUT) belum diimplementasikan secara langsung di endpoint ini.', 400);
             }
+
+            AuditHelper::log(
+                'ADJUST_STOCK',
+                "Menyesuaikan stok obat {$medicine->name}: {$oldStock} -> {$newStock}.",
+                [
+                    'medicine_id' => $medicine->id,
+                    'old_stock' => $oldStock,
+                    'new_stock' => $newStock,
+                ]
+            );
 
             return $this->successResponse($batch, 'Stok berhasil diperbarui');
         } catch (\Exception $e) {
