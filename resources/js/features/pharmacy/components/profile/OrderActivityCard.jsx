@@ -61,14 +61,14 @@ export function OrderActivityCard() {
         <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-3xl overflow-hidden hover:scale-[1.01] transition-transform duration-300 bg-white">
             <CardHeader className="pb-4 pt-6 px-8 border-b border-slate-50 flex flex-row items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-[#0b3b60]" />
+                    <Clock className="h-5 w-5 text-primary" />
                     <CardTitle className="text-lg font-bold text-slate-800">
                         Aktivitas Pesanan
                     </CardTitle>
                 </div>
                 <Dialog>
                     <DialogTrigger asChild>
-                        <button className="text-xs font-bold text-[#0b3b60] hover:underline">
+                        <button className="text-xs font-bold text-primary hover:underline">
                             Lihat Semua
                         </button>
                     </DialogTrigger>
@@ -127,7 +127,7 @@ export function OrderActivityCard() {
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                                                     Total
                                                 </p>
-                                                <p className="text-base font-bold text-[#0b3b60]">
+                                                <p className="text-base font-bold text-primary">
                                                     {order.total}
                                                 </p>
                                             </div>
@@ -183,7 +183,7 @@ export function OrderActivityCard() {
                                         </p>
                                     </div>
                                 </div>
-                                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-[#0b3b60] transition-colors" />
+                                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-primary transition-colors" />
                             </div>
                         ))}
                     </div>

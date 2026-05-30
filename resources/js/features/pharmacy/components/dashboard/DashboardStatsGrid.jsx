@@ -28,7 +28,10 @@ export function DashboardStatsGrid({
 }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <motion.div variants={itemVariants} className="group cursor-default">
+            <motion.div
+                variants={itemVariants}
+                className="group cursor-default"
+            >
                 <Card className="border border-white/40 bg-white/70 backdrop-blur-md shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 rounded-2xl">
                     <CardContent className="p-6">
                         <div className="flex flex-col gap-4">
@@ -44,8 +47,8 @@ export function DashboardStatsGrid({
                                 </h3>
                             </div>
                             <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3" /> +12% dari bulan
-                                lalu
+                                <TrendingUp className="h-3 w-3" /> +12% dari
+                                bulan lalu
                             </p>
                         </div>
                     </CardContent>
@@ -100,7 +103,7 @@ export function DashboardStatsGrid({
             </motion.div>
 
             <motion.div variants={itemVariants}>
-                <Card className="bg-linear-to-br from-[#0b3b60] to-[#082a45] text-white shadow-xl shadow-[#0b3b60]/20 hover:scale-[1.02] transition-all duration-300 border-0 rounded-2xl overflow-hidden relative">
+                <Card className="bg-linear-to-br from-primary to-[#082a45] text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all duration-300 border-0 rounded-2xl overflow-hidden relative">
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
                     <CardContent className="p-6 relative z-10">
                         <div className="flex flex-col gap-4">
@@ -114,9 +117,9 @@ export function DashboardStatsGrid({
                                 <h3 className="text-3xl font-extrabold text-white">
                                     {"Rp " +
                                         (totalRevenue >= 1000000
-                                            ? (
-                                                  totalRevenue / 1000000
-                                              ).toFixed(1) + "M"
+                                            ? (totalRevenue / 1000000).toFixed(
+                                                  1,
+                                              ) + "M"
                                             : totalRevenue.toLocaleString())}
                                 </h3>
                             </div>

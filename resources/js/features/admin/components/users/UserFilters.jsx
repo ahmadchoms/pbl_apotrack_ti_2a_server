@@ -44,32 +44,58 @@ export function UserFilters({ filters, onFilter, onReset }) {
                     </InputGroupAddon>
                 </InputGroup>
 
-                <Select value={filters.role || "all"} onValueChange={handleRoleChange}>
+                <Select
+                    value={filters.role || "all"}
+                    onValueChange={handleRoleChange}
+                >
                     <SelectTrigger className="h-11 w-44 rounded-2xl bg-white border-slate-200 shadow-sm text-xs font-bold text-slate-600">
                         <SelectValue placeholder="Semua Peran" />
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-                        <SelectItem value="all" className="text-xs font-bold">Semua Peran</SelectItem>
+                        <SelectItem value="all" className="text-xs font-bold">
+                            Semua Peran
+                        </SelectItem>
                         {Object.entries(ROLE_CONFIG).map(([key, cfg]) => (
-                            <SelectItem key={key} value={key} className="text-xs font-bold">
+                            <SelectItem
+                                key={key}
+                                value={key}
+                                className="text-xs font-bold"
+                            >
                                 {cfg.label}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
 
-                <Select value={filters.status || "all"} onValueChange={handleStatusChange}>
+                <Select
+                    value={filters.status || "all"}
+                    onValueChange={handleStatusChange}
+                >
                     <SelectTrigger className="h-11 w-40 rounded-2xl bg-white border-slate-200 shadow-sm text-xs font-bold text-slate-600">
                         <SelectValue placeholder="Semua Status" />
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-                        <SelectItem value="all" className="text-xs font-bold">Semua Status</SelectItem>
-                        <SelectItem value="active" className="text-xs font-bold">Aktif</SelectItem>
-                        <SelectItem value="inactive" className="text-xs font-bold">Non-Aktif</SelectItem>
+                        <SelectItem value="all" className="text-xs font-bold">
+                            Semua Status
+                        </SelectItem>
+                        <SelectItem
+                            value="active"
+                            className="text-xs font-bold"
+                        >
+                            Aktif
+                        </SelectItem>
+                        <SelectItem
+                            value="inactive"
+                            className="text-xs font-bold"
+                        >
+                            Non-Aktif
+                        </SelectItem>
                     </SelectContent>
                 </Select>
 
-                {(filters.search || filters.role !== "all" || filters.status !== "all") && (
+                {(filters.search ||
+                    filters.role !== "all" ||
+                    filters.status !== "all") && (
                     <Button
                         variant="ghost"
                         onClick={onReset}
@@ -81,8 +107,8 @@ export function UserFilters({ filters, onFilter, onReset }) {
             </div>
 
             <Button
-                onClick={() => router.get(route('admin.users.create'))}
-                className="h-11 px-6 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-blue-900/20"
+                onClick={() => router.get(route("admin.users.create"))}
+                className="h-11 px-6 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-blue-900/20"
             >
                 <UserPlus className="w-4 h-4" /> Tambah Pengguna
             </Button>

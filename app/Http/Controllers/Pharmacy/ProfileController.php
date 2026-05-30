@@ -19,12 +19,23 @@ class ProfileController extends Controller
         $user = $request->user()->load('pharmacyStaff.pharmacy');
         $pharmacy = $user->pharmacyStaff->pharmacy->load('operatingHours');
 
-        return Inertia::render('pharmacy/profile', [
+        return Inertia::render('pharmacy/profile/index', [
             'user' => $user,
             'pharmacy' => $pharmacy,
-            'auditLogs' => $this->profileService->getAuditLogs($user->id)->items(),
-            'recentActivities' => [] 
+            'operatingHours' => $pharmacy->operatingHours,
+            'userActivities' => $this->profileService->getAuditLogs($user->id)->items(),
         ]);
+    }
+
+    public function updateUser(Request $request)
+    {
+        $data = $request->validate([
+            'username' => 'required|string|max:50|unique:users,username,' . $request->user()->id,
+        ]);
+
+        $this->profileService->updateUserProfile($request->user(), $data);
+
+        return redirect()->back()->with('success', 'Profil pengguna berhasil diperbarui');
     }
 
     public function update(Request $request)
@@ -34,11 +45,13 @@ class ProfileController extends Controller
         }
 
         $pharmacy = $request->user()->pharmacyStaff->pharmacy;
-        
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         $this->profileService->updatePharmacy($pharmacy, $data);
@@ -67,8 +80,8 @@ class ProfileController extends Controller
         $request->validate([
             'hours' => 'required|array',
             'hours.*.day_of_week' => 'required|integer|between:0,6',
-            'hours.*.open_time' => 'required|string',
-            'hours.*.close_time' => 'required|string',
+            'hours.*.open_time' => 'nullable|string',
+            'hours.*.close_time' => 'nullable|string',
             'hours.*.is_closed' => 'required|boolean',
             'hours.*.is_24_hours' => 'required|boolean',
         ]);
@@ -80,10 +93,12 @@ class ProfileController extends Controller
 
     public function auditLogs(Request $request)
     {
-        $logs = $this->profileService->getAuditLogs($request->user()->id);
+        $filters = $request->only(['search', 'status']);
+        $logs = $this->profileService->getAuditLogs($request->user()->id, $filters);
 
         return Inertia::render('pharmacy/profile/logs', [
-            'logs' => $logs
+            'logs' => $logs,
+            'filters' => $filters,
         ]);
     }
 

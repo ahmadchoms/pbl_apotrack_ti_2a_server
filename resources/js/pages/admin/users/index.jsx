@@ -58,10 +58,7 @@ export default function AdminUserList({ users, filters }) {
     return (
         <DashboardAdminLayout activeMenu="users">
             <div className="space-y-8 pb-12">
-                <PageHeader
-                    subtitle="Pengawasan Ekosistem"
-                    title="Manajemen Pengguna"
-                />
+                <PageHeader title="Manajemen Pengguna" />
 
                 <FilterBar
                     configs={[
@@ -75,7 +72,12 @@ export default function AdminUserList({ users, filters }) {
                             key: "role",
                             label: "Peran",
                             options: Object.entries(ROLE_CONFIG).map(
-                                ([k, v]) => ({ value: k, label: v.label }),
+                                ([k, v]) => ({
+                                    value: k,
+                                    label:
+                                        v.label.charAt(0).toUpperCase() +
+                                        v.label.slice(1).toLowerCase(),
+                                }),
                             ),
                         },
                         {
@@ -96,7 +98,7 @@ export default function AdminUserList({ users, filters }) {
                             onClick={() =>
                                 router.get(route("admin.users.create"))
                             }
-                            className="h-11 px-6 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-blue-900/20"
+                            className="h-11 px-6 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-blue-900/20"
                         >
                             <UserPlus className="w-4 h-4" /> Tambah Pengguna
                         </Button>

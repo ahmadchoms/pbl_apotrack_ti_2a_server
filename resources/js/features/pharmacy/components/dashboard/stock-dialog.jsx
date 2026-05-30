@@ -13,7 +13,7 @@ export function StockDialog({ stocks }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <button className="w-full text-xs font-bold text-[#0b3b60] tracking-widest uppercase hover:text-blue-700 transition-colors p-4 border-t border-slate-50 relative z-10 bg-white">
+                <button className="w-full text-xs font-bold text-primary tracking-widest uppercase hover:text-blue-700 transition-colors p-4 border-t border-slate-50 relative z-10 bg-white">
                     Lihat Semua Stok Kritis
                 </button>
             </DialogTrigger>
@@ -39,7 +39,7 @@ export function StockDialog({ stocks }) {
                                     ) : (
                                         <span className="relative flex h-2.5 w-2.5 rounded-full bg-amber-400"></span>
                                     )}
-                                    <p className="text-sm font-bold text-[#0b3b60] flex-1">
+                                    <p className="text-sm font-bold text-primary flex-1">
                                         {stock.name}
                                     </p>
                                     <Badge

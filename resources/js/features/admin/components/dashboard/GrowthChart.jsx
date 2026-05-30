@@ -1,14 +1,33 @@
 import React from "react";
-import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import {
+    XAxis,
+    Tooltip,
+    ResponsiveContainer,
+    AreaChart,
+    Area,
+    CartesianGrid,
+} from "recharts";
 import { router } from "@inertiajs/react";
-import { Card } from "@/components/ui/card";
-import { ChevronDown } from "lucide-react";
+import { Card, CardTitle } from "@/components/ui/card";
+import { CalendarDays } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-[#0b3b60] text-white text-[10px] font-black px-3 py-2 rounded-xl shadow-xl border border-white/10 backdrop-blur-md">
-                <p>{`${payload[0].payload.name}: ${payload[0].value.toLocaleString()}`}</p>
+            <div className="bg-slate-900/90 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-800 backdrop-blur-md">
+                <p className="text-[10px] text-slate-400 font-semibold mb-1 uppercase tracking-wider">
+                    {payload[0].payload.name}
+                </p>
+                <p className="text-sm font-black text-white">
+                    {`${payload[0].value.toLocaleString()} Pendaftaran`}
+                </p>
             </div>
         );
     }
@@ -46,62 +65,86 @@ export function GrowthChart({ data = [], filters = {} }) {
     };
 
     return (
-        <Card className="border-0 shadow-2xl shadow-slate-200/50 rounded-[2.5rem] bg-white p-10">
-            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mb-10 gap-6">
-                <div>
-                    <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                        Pertumbuhan Lintas Platform
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 font-bold">
-                        Statistik pertumbuhan pendaftaran pengguna
-                    </p>
+        <Card className="border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[2.5rem] bg-white p-8 md:p-10 h-full flex flex-col justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+                        <CalendarDays className="h-5 w-5" />
+                    </div>
+                    <div>
+                        <CardTitle className="text-base font-bold text-slate-800">
+                            Pertumbuhan Pengguna
+                        </CardTitle>
+                        <p className="text-xs text-slate-405 mt-0.5">
+                            Grafik pertumbuhan registrasi pengguna apotek &
+                            staff
+                        </p>
+                    </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                    <div className="relative group">
-                        <select
-                            value={filters.year}
-                            onChange={(e) =>
-                                handleFilterChange("year", e.target.value)
+                <div className="flex flex-row items-center gap-3 w-full sm:w-auto">
+                    <div className="relative">
+                        <Select
+                            value={String(filters.year)}
+                            onValueChange={(value) =>
+                                handleFilterChange("year", value)
                             }
-                            className="appearance-none h-11 pl-5 pr-10 rounded-2xl bg-slate-50 border-none text-[10px] font-black uppercase tracking-wider text-[#0b3b60] focus:ring-2 focus:ring-[#0b3b60]/10 transition-all cursor-pointer"
                         >
-                            {years.map((y) => (
-                                <option key={y} value={y}>
-                                    {y}
-                                </option>
-                            ))}
-                        </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 text-[#0b3b60] pointer-events-none transition-transform group-hover:translate-y-[-40%]" />
+                            <SelectTrigger className="appearance-none h-11 pl-4 pr-10 rounded-2xl bg-slate-50 border border-slate-250/30 text-xs font-bold text-primary focus:ring-2 focus:ring-primary/10 focus:bg-white transition-all cursor-pointer shadow-sm [&>svg]:opacity-60 [&>svg]:w-3.5 [&>svg]:h-3.5">
+                                <SelectValue placeholder="Pilih Tahun" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl border border-slate-200 bg-white shadow-md">
+                                {years.map((y) => (
+                                    <SelectItem
+                                        key={y}
+                                        value={String(y)}
+                                        className="text-xs font-medium text-slate-700 focus:bg-slate-50 focus:text-primary cursor-pointer rounded-lg py-2"
+                                    >
+                                        {y}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
-                    <div className="relative group">
-                        <select
-                            value={filters.month || ""}
-                            onChange={(e) =>
+                    <div className="relative">
+                        <Select
+                            value={String(filters.month || "ALL")}
+                            onValueChange={(value) =>
                                 handleFilterChange(
                                     "month",
-                                    e.target.value || null,
+                                    value === "ALL" ? null : value,
                                 )
                             }
-                            className="appearance-none h-11 pl-5 pr-10 rounded-2xl bg-slate-50 border-none text-[10px] font-black uppercase tracking-wider text-[#0b3b60] focus:ring-2 focus:ring-[#0b3b60]/10 transition-all cursor-pointer"
                         >
-                            {months.map((m) => (
-                                <option key={m.val} value={m.val || ""}>
-                                    {m.label}
-                                </option>
-                            ))}
-                        </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 text-[#0b3b60] pointer-events-none transition-transform group-hover:translate-y-[-40%]" />
+                            <SelectTrigger className="appearance-none h-11 pl-4 pr-10 rounded-2xl bg-slate-50 border border-slate-250/30 text-xs font-bold text-primary focus:ring-2 focus:ring-primary/10 focus:bg-white transition-all cursor-pointer shadow-sm [&>svg]:opacity-60 [&>svg]:w-3.5 [&>svg]:h-3.5">
+                                <SelectValue placeholder="Pilih Bulan" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl border border-slate-200 bg-white shadow-md">
+                                {months.map((m) => (
+                                    <SelectItem
+                                        key={m.val || "ALL"}
+                                        value={String(m.val || "ALL")}
+                                        className="text-xs font-medium text-slate-700 focus:bg-slate-50 focus:text-primary cursor-pointer rounded-lg py-2"
+                                    >
+                                        {m.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
             </div>
-            <div className="h-80 w-full">
+
+            <div className="h-80 w-full mt-4 flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data}>
+                    <AreaChart
+                        data={data}
+                        margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
+                    >
                         <defs>
                             <linearGradient
-                                id="colorValue"
+                                id="colorGrowth"
                                 x1="0"
                                 y1="0"
                                 x2="0"
@@ -110,7 +153,7 @@ export function GrowthChart({ data = [], filters = {} }) {
                                 <stop
                                     offset="5%"
                                     stopColor="#0b3b60"
-                                    stopOpacity={0.1}
+                                    stopOpacity={0.15}
                                 />
                                 <stop
                                     offset="95%"
@@ -119,6 +162,11 @@ export function GrowthChart({ data = [], filters = {} }) {
                                 />
                             </linearGradient>
                         </defs>
+                        <CartesianGrid
+                            strokeDasharray="4 4"
+                            vertical={false}
+                            stroke="#f1f5f9"
+                        />
                         <XAxis
                             dataKey="name"
                             axisLine={false}
@@ -126,9 +174,9 @@ export function GrowthChart({ data = [], filters = {} }) {
                             tick={{
                                 fontSize: 10,
                                 fill: "#94a3b8",
-                                fontWeight: 800,
+                                fontWeight: 600,
                             }}
-                            dy={15}
+                            dy={10}
                         />
                         <Tooltip
                             content={<CustomTooltip />}
@@ -138,10 +186,10 @@ export function GrowthChart({ data = [], filters = {} }) {
                             type="monotone"
                             dataKey="value"
                             stroke="#0b3b60"
-                            strokeWidth={4}
+                            strokeWidth={3.5}
                             fillOpacity={1}
-                            fill="url(#colorValue)"
-                            animationDuration={2000}
+                            fill="url(#colorGrowth)"
+                            animationDuration={1500}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

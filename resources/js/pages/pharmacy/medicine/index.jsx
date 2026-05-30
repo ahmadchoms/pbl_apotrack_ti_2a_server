@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { MedicineTableRow } from "@/features/pharmacy/components/medicine/MedicineTableRow";
@@ -13,20 +14,14 @@ import {
     TableRow,
     TableCell,
 } from "@/components/ui/table";
-import { Plus, Package, Info, X, Trash2 } from "lucide-react";
+import { PlusCircle, Package, Info, X, Trash2 } from "lucide-react";
 import { FILTER_TABS } from "@/features/pharmacy/lib/constants";
 import { router, Link } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
 export default function PharmacistMedicineCatalog({
     medicines,
@@ -63,39 +58,39 @@ export default function PharmacistMedicineCatalog({
 
     const confirmDelete = () => {
         if (deleteDialog.data) {
-            router.delete(route("pharmacy.medicines.destroy", deleteDialog.data.id), {
-                onSuccess: () => {
-                    setDeleteDialog({ open: false, data: null });
-                    toast.success("Data obat berhasil dihapus");
+            router.delete(
+                route("pharmacy.medicines.destroy", deleteDialog.data.id),
+                {
+                    onSuccess: () => {
+                        setDeleteDialog({ open: false, data: null });
+                        toast.success("Data obat berhasil dihapus");
+                    },
                 },
-            });
+            );
         }
     };
 
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Obat">
-            <div className="max-w-7xl mx-auto space-y-8 pb-12">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <Badge className="bg-primary text-white border-blue-900 shadow-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                Inventory Control
-                            </Badge>
-                        </div>
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">
-                            Katalog Inventori
-                        </h2>
-                        <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-wide">
-                            Kelola data master obat dan pergerakan stok apotek.
-                        </p>
-                    </div>
+            <div className="pb-8">
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2"
+                >
+                    <PageHeader
+                        title="Manajemen Obat Apotek"
+                        description="Kelola inventori obat Anda dengan mudah. Tambah, edit, atau hapus data obat untuk memastikan stok selalu akurat dan up-to-date."
+                    />
 
-                    <Link href={route("pharmacy.medicines.create")}>
-                        <Button className="h-14 px-8 rounded-2xl bg-primary hover:bg-[#0055a5] text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/10 flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95">
-                            <Plus className="w-5 h-5" /> Tambah Obat Baru
-                        </Button>
+                    <Link
+                        href={route("pharmacy.medicines.create")}
+                        className="inline-flex items-center justify-center gap-2.5 bg-primary hover:bg-primary/80 text-white font-semibold text-xs tracking-wide px-5 h-11 rounded-xl shadow-sm hover:shadow-md hover:shadow-blue-600/10 transition-all duration-200 group shrink-0 active:scale-[0.98]"
+                    >
+                        <PlusCircle className="w-4 h-4 text-white/90 group-hover:rotate-90 transition-transform duration-300 stroke-[2.2]" />
+                        <span>Tambah Obat</span>
                     </Link>
-                </div>
+                </motion.div>
 
                 <FilterBar
                     configs={[
@@ -235,8 +230,8 @@ export default function PharmacistMedicineCatalog({
                             <span className="text-slate-900 font-black">
                                 {deleteDialog.data?.name}
                             </span>{" "}
-                            akan dihapus secara permanen dari inventori. Tindakan
-                            ini tidak dapat dibatalkan.
+                            akan dihapus secara permanen dari inventori.
+                            Tindakan ini tidak dapat dibatalkan.
                         </p>
                         <div className="flex items-center gap-4 w-full">
                             <Button

@@ -20,21 +20,26 @@ const itemVariants = {
     visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.4, ease: "easeOut" },
+        transition: { duration: 0.5, ease: "easeOut" },
     },
 };
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+        const isSales = payload[0].name === "Pendapatan";
         return (
-            <div className="bg-white p-4 shadow-2xl rounded-2xl border border-slate-100">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            <div className="bg-slate-900/90 text-white p-4 shadow-2xl rounded-2xl border border-slate-800 backdrop-blur-md">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
                     {label}
                 </p>
-                <p className="text-sm font-black text-[#0b3b60]">
-                    {payload[0].name === "Revenue"
-                        ? `Rp ${payload[0].value.toLocaleString()}`
-                        : `${payload[0].value} Unit`}
+                <p className="text-sm font-bold text-white">
+                    {isSales
+                        ? new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                          }).format(payload[0].value)
+                        : `${payload[0].value.toLocaleString()} Unit`}
                 </p>
             </div>
         );
@@ -46,31 +51,46 @@ export function DashboardCharts({ charts = {} }) {
     const revenueTrend = charts.revenue_trend || [];
     const topMedicines = charts.top_medicines || [];
 
-    const barColors = ["#0b3b60", "#1a6fad", "#3b82f6", "#60a5fa", "#93c5fd"];
+    // Modern harmonious color palette for top medicines
+    const barColors = [
+        "url(#barGrad1)",
+        "url(#barGrad2)",
+        "url(#barGrad3)",
+        "url(#barGrad4)",
+        "url(#barGrad5)",
+    ];
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
-                    <CardHeader className="p-10 pb-0">
-                        <div className="flex items-center gap-4 mb-2">
-                            <div className="p-3 rounded-2xl bg-blue-50 text-[#0b3b60]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <motion.div variants={itemVariants} className="lg:col-span-7">
+                <Card className="border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white">
+                    <CardHeader className="p-8 pb-2 flex flex-row items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-2xl bg-blue-50 text-primary">
                                 <TrendingUp className="h-5 w-5" />
                             </div>
                             <div>
-                                <CardTitle className="text-lg font-black text-slate-800 uppercase tracking-tight">
-                                    Tren Pendapatan
+                                <CardTitle className="text-base font-bold text-slate-800">
+                                    Tren Pendapatan Harian
                                 </CardTitle>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                    30 Hari Terakhir
+                                <p className="text-xs text-slate-400 mt-0.5">
+                                    Grafik pergerakan omzet 30 hari terakhir
                                 </p>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-10 pt-6">
-                        <div className="h-[300px] w-full">
+                    <CardContent className="p-8 pt-4">
+                        <div className="h-80 w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={revenueTrend}>
+                                <AreaChart
+                                    data={revenueTrend}
+                                    margin={{
+                                        top: 10,
+                                        right: 10,
+                                        left: -20,
+                                        bottom: 0,
+                                    }}
+                                >
                                     <defs>
                                         <linearGradient
                                             id="colorRevenue"
@@ -82,7 +102,7 @@ export function DashboardCharts({ charts = {} }) {
                                             <stop
                                                 offset="5%"
                                                 stopColor="#0b3b60"
-                                                stopOpacity={0.15}
+                                                stopOpacity={0.2}
                                             />
                                             <stop
                                                 offset="95%"
@@ -92,7 +112,7 @@ export function DashboardCharts({ charts = {} }) {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid
-                                        strokeDasharray="3 3"
+                                        strokeDasharray="4 4"
                                         vertical={false}
                                         stroke="#f1f5f9"
                                     />
@@ -102,19 +122,30 @@ export function DashboardCharts({ charts = {} }) {
                                         tickLine={false}
                                         tick={{
                                             fontSize: 10,
-                                            fontWeight: 700,
+                                            fontWeight: 600,
                                             fill: "#94a3b8",
                                         }}
                                         dy={10}
                                     />
-                                    <YAxis hide />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{
+                                            fontSize: 10,
+                                            fontWeight: 600,
+                                            fill: "#94a3b8",
+                                        }}
+                                        tickFormatter={(v) =>
+                                            `Rp ${v >= 1000000 ? v / 1000000 + "M" : v.toLocaleString()}`
+                                        }
+                                    />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Area
                                         type="monotone"
                                         dataKey="revenue"
-                                        name="Revenue"
+                                        name="Pendapatan"
                                         stroke="#0b3b60"
-                                        strokeWidth={4}
+                                        strokeWidth={3.5}
                                         fillOpacity={1}
                                         fill="url(#colorRevenue)"
                                     />
@@ -125,33 +156,121 @@ export function DashboardCharts({ charts = {} }) {
                 </Card>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
-                    <CardHeader className="p-10 pb-0">
-                        <div className="flex items-center gap-4 mb-2">
-                            <div className="p-3 rounded-2xl bg-orange-50 text-orange-600">
+            <motion.div variants={itemVariants} className="lg:col-span-5">
+                <Card className="border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white">
+                    <CardHeader className="p-8 pb-2">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-2xl bg-amber-50 text-amber-600">
                                 <Trophy className="h-5 w-5" />
                             </div>
                             <div>
-                                <CardTitle className="text-lg font-black text-slate-800 uppercase tracking-tight">
-                                    Obat Terlaris
+                                <CardTitle className="text-base font-bold text-slate-800">
+                                    Obat Paling Laris
                                 </CardTitle>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                    Top 5 Produk
+                                <p className="text-xs text-slate-400 mt-0.5">
+                                    5 komoditas obat dengan volume jual
+                                    tertinggi
                                 </p>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-10 pt-6">
-                        <div className="h-[300px] w-full">
+                    <CardContent className="p-8 pt-4">
+                        <div className="h-80 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
                                     data={topMedicines}
                                     layout="vertical"
-                                    margin={{ left: 40 }}
+                                    margin={{
+                                        left: -10,
+                                        right: 10,
+                                        top: 10,
+                                        bottom: 0,
+                                    }}
                                 >
+                                    <defs>
+                                        <linearGradient
+                                            id="barGrad1"
+                                            x1="0"
+                                            y1="0"
+                                            x2="1"
+                                            y2="0"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                stopColor="#0b3b60"
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                stopColor="#1e4ed8"
+                                            />
+                                        </linearGradient>
+                                        <linearGradient
+                                            id="barGrad2"
+                                            x1="0"
+                                            y1="0"
+                                            x2="1"
+                                            y2="0"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                stopColor="#2563eb"
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                stopColor="#3b82f6"
+                                            />
+                                        </linearGradient>
+                                        <linearGradient
+                                            id="barGrad3"
+                                            x1="0"
+                                            y1="0"
+                                            x2="1"
+                                            y2="0"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                stopColor="#4f46e5"
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                stopColor="#6366f1"
+                                            />
+                                        </linearGradient>
+                                        <linearGradient
+                                            id="barGrad4"
+                                            x1="0"
+                                            y1="0"
+                                            x2="1"
+                                            y2="0"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                stopColor="#6366f1"
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                stopColor="#818cf8"
+                                            />
+                                        </linearGradient>
+                                        <linearGradient
+                                            id="barGrad5"
+                                            x1="0"
+                                            y1="0"
+                                            x2="1"
+                                            y2="0"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                stopColor="#94a3b8"
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                stopColor="#cbd5e1"
+                                            />
+                                        </linearGradient>
+                                    </defs>
                                     <CartesianGrid
-                                        strokeDasharray="3 3"
+                                        strokeDasharray="4 4"
                                         horizontal={false}
                                         stroke="#f1f5f9"
                                     />
@@ -163,7 +282,7 @@ export function DashboardCharts({ charts = {} }) {
                                         tickLine={false}
                                         tick={{
                                             fontSize: 10,
-                                            fontWeight: 800,
+                                            fontWeight: 700,
                                             fill: "#475569",
                                         }}
                                         width={100}
@@ -175,8 +294,8 @@ export function DashboardCharts({ charts = {} }) {
                                     <Bar
                                         dataKey="value"
                                         name="Terjual"
-                                        radius={[0, 12, 12, 0]}
-                                        barSize={32}
+                                        radius={[0, 8, 8, 0]}
+                                        barSize={24}
                                     >
                                         {topMedicines.map((entry, index) => (
                                             <Cell

@@ -49,4 +49,26 @@ class OrderPolicy
     {
         return $user->id === $order->user_id;
     }
+
+    /**
+     * Determine whether the user can view the specific order.
+     */
+    public function view(User $user, Order $order): bool
+    {
+        if ($user->pharmacyStaff !== null) {
+            return $this->viewStaff($user, $order);
+        }
+        return $this->viewCustomer($user, $order);
+    }
+
+    /**
+     * Determine whether the user can update the specific order.
+     */
+    public function update(User $user, Order $order): bool
+    {
+        if ($user->pharmacyStaff !== null) {
+            return $this->updateStaff($user, $order);
+        }
+        return $this->updateCustomer($user, $order);
+    }
 }

@@ -13,12 +13,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Package } from "lucide-react";
 import { formatTime, formatRupiah } from "@/lib/utils";
 import { STATUS_CONFIG } from "@/features/pharmacy/lib/constants";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
+import { Pagination } from "@/components/ui/pagination";
 
 const STATUSES = [
     { label: "Semua", value: "ALL" },
@@ -34,34 +35,6 @@ export default function PharmacistOrderManagement({
     filters: initialFilters,
 }) {
     const orders = paginatedOrders?.data || [];
-    const [search, setSearch] = useState(initialFilters?.search || "");
-    const [selectedStatuses, setSelectedStatuses] = useState(
-        initialFilters?.status ? initialFilters.status.split(",") : [],
-    );
-
-    const handleStatusToggle = (statusId) => {
-        setSelectedStatuses((prev) =>
-            prev.includes(statusId)
-                ? prev.filter((s) => s !== statusId)
-                : [...prev, statusId],
-        );
-    };
-
-    const handleStatusChange = (status) => {
-        router.get(
-            "/pharmacy/orders",
-            { status },
-            {
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
-
-    const handleClearFilters = () => {
-        setSearch("");
-        setSelectedStatuses([]);
-    };
 
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Pesanan">
@@ -69,31 +42,19 @@ export default function PharmacistOrderManagement({
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
+                    className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2"
                 >
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="px-3 py-1 bg-blue-50 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">
-                                Apothecary Hub
-                            </div>
-                        </div>
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">
-                            Manajemen{" "}
-                            <span className="text-primary">Pesanan</span>
-                        </h2>
-                        <p className="text-sm text-slate-500 mt-2 font-medium max-w-xl">
-                            Validasi resep, kelola status pengiriman, dan pantau
-                            seluruh transaksi obat apotek Anda dalam satu
-                            dashboard terintegrasi.
-                        </p>
-                    </div>
+                    <PageHeader
+                        title="Manajemen Pesanan Apotek"
+                        description="Validasi resep, kelola status pengiriman, dan pantau seluruh transaksi obat apotek Anda."
+                    />
 
                     <Link
                         href={route("pharmacy.orders.pos")}
-                        className="inline-flex items-center gap-3 bg-linear-to-r from-primary to-[#0055a5] text-white px-8 h-14 rounded-[1.25rem] font-bold text-sm shadow-xl shadow-blue-900/20 hover:shadow-blue-900/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                        className="inline-flex items-center justify-center gap-2.5 bg-primary hover:bg-primary/80 text-white font-semibold text-xs tracking-wide px-5 h-11 rounded-xl shadow-sm hover:shadow-md hover:shadow-blue-600/10 transition-all duration-200 group shrink-0 active:scale-[0.98]"
                     >
-                        <PlusCircle className="w-5 h-5" />
-                        Buat Pesanan Manual (POS)
+                        <PlusCircle className="w-4 h-4 text-white/90 group-hover:rotate-90 transition-transform duration-300 stroke-[2.2]" />
+                        <span>Buat Pesanan Manual</span>
                     </Link>
                 </motion.div>
 
@@ -272,6 +233,11 @@ export default function PharmacistOrderManagement({
                         </Table>
                     </CardContent>
                 </Card>
+
+                {/* Pagination */}
+                <div className="mt-6 flex justify-center">
+                    <Pagination links={paginatedOrders?.meta?.links || paginatedOrders?.links} />
+                </div>
             </div>
         </DashboardPharmacyLayout>
     );

@@ -4,6 +4,7 @@ import { DashboardAdminLayout } from "@/layouts/admin-layout";
 import { ProfileCard } from "@/features/admin/components/profile/ProfileCard";
 import { SecurityCard } from "@/features/admin/components/profile/SecurityCard";
 import { AuditLogCard } from "@/features/admin/components/profile/AuditLogCard";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -23,21 +24,12 @@ export default function AdminProfilePage({ user, auditLogs }) {
     return (
         <DashboardAdminLayout activeMenu="profile">
             <div className="space-y-10">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                    <div>
-                        <p className="text-[10px] font-black text-[#0b3b60] uppercase tracking-[0.25em] mb-2 flex items-center gap-2">
-                            <span className="w-8 h-px bg-[#0b3b60]/30" />
-                            Manajemen Akun
-                        </p>
-                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                            Profil Administrator
-                        </h2>
-                        <p className="text-sm text-slate-500 mt-1 font-medium">
-                            Kelola data personal, preferensi keamanan, dan
-                            tinjau log audit sistem.
-                        </p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Profil Administrator"
+                    description={
+                        "Kelola data personal, preferensi keamanan, dan tinjau log audit sistem."
+                    }
+                />
 
                 <motion.div
                     variants={containerVariants}

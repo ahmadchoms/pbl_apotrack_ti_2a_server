@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import {
+    MapContainer,
+    TileLayer,
+    Marker,
+    useMapEvents,
+    useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -24,9 +30,7 @@ function LocationMarker({ position, setPosition }) {
         },
     });
 
-    return position === null ? null : (
-        <Marker position={position} />
-    );
+    return position === null ? null : <Marker position={position} />;
 }
 
 function RecenterMap({ position }) {
@@ -40,8 +44,11 @@ function RecenterMap({ position }) {
 }
 
 export function LocationPicker({ lat, lng, onChange }) {
-    const initialPosition = lat && lng ? { lat, lng } : { lat: -6.200000, lng: 106.816666 }; // Default Jakarta
-    const [position, setPosition] = React.useState(lat && lng ? initialPosition : null);
+    const initialPosition =
+        lat && lng ? { lat, lng } : { lat: -6.2, lng: 106.816666 }; // Default Jakarta
+    const [position, setPosition] = React.useState(
+        lat && lng ? initialPosition : null,
+    );
 
     const handleSetPosition = (pos) => {
         setPosition(pos);
@@ -60,13 +67,16 @@ export function LocationPicker({ lat, lng, onChange }) {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <LocationMarker position={position} setPosition={handleSetPosition} />
+                <LocationMarker
+                    position={position}
+                    setPosition={handleSetPosition}
+                />
                 <RecenterMap position={position} />
             </MapContainer>
-            
+
             {!position && (
                 <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center z-[1000] pointer-events-none">
-                    <div className="bg-white px-6 py-3 rounded-2xl shadow-2xl font-bold text-[#0b3b60] border border-slate-200">
+                    <div className="bg-white px-6 py-3 rounded-2xl shadow-2xl font-bold text-primary border border-slate-200">
                         Klik pada peta untuk menentukan lokasi
                     </div>
                 </div>

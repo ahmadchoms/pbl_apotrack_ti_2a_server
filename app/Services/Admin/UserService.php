@@ -33,7 +33,6 @@ class UserService
                 'password_hash' => Hash::make($data['password']),
                 'role' => $data['role'],
                 'phone' => $data['phone'] ?? null,
-                'avatar_url' => $data['avatar_url'] ?? null,
                 'is_active' => $data['is_active'] ?? true,
             ]);
 
@@ -49,7 +48,6 @@ class UserService
                 'email' => $data['email'],
                 'role' => $data['role'],
                 'phone' => $data['phone'] ?? $user->phone,
-                'avatar_url' => $data['avatar_url'] ?? $user->avatar_url,
                 'is_active' => $data['is_active'] ?? $user->is_active,
             ];
 
@@ -74,6 +72,28 @@ class UserService
         $password = 'Apotrack2026!';
         $user->update(['password_hash' => Hash::make($password)]);
         return $password;
+    }
+
+    public function resetAvatar(User $user)
+    {
+        return DB::transaction(function () use ($user) {
+            $oldAvatar = $user->avatar_url;
+
+            $user->update(['avatar_url' => null]);
+
+            if ($oldAvatar) {
+                if (str_contains($oldAvatar, 'storage/')) {
+                    $path = str_replace(url('storage') . '/', '', $oldAvatar);
+                    $path = ltrim(str_replace('/storage/', '', $path), '/');
+
+                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                    }
+                }
+            }
+
+            return $user;
+        });
     }
 
     public function delete(User $user)

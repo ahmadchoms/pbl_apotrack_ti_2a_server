@@ -14,15 +14,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
 };
 
 export default function ReportsPage({ reportData, filters }) {
@@ -73,27 +69,20 @@ export default function ReportsPage({ reportData, filters }) {
         <DashboardPharmacyLayout activeMenu="Laporan">
             <div className="space-y-10 pb-20">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                                Analytics & Reporting
-                            </span>
-                        </div>
-                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-                            Laporan{" "}
-                            {filters.type === "stock"
-                                ? "Mutasi Stok"
-                                : "Penjualan"}
-                        </h2>
-                        <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-wide">
-                            Pantau performa bisnis dan pergerakan inventaris
-                            Anda
-                        </p>
-                    </div>
+                    <PageHeader
+                        title={`Laporan 
+                            ${
+                                filters.type === "stock"
+                                    ? "Mutasi Stok"
+                                    : "Penjualan"
+                            }`}
+                        description="Pantau performa bisnis dan pergerakan inventaris
+                            Anda."
+                    />
 
                     <Button
                         onClick={handleExport}
-                        className="h-12 px-8 rounded-2xl bg-[#0b3b60] hover:bg-[#082a45] text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-blue-900/20 flex items-center gap-2"
+                        className="h-12 px-8 rounded-2xl bg-primary hover:bg-[#082a45] text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-blue-900/20 flex items-center gap-2"
                     >
                         <Download className="w-4 h-4" />
                         Export CSV

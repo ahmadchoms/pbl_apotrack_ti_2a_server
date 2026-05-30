@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-        
+
         // Eager load relasi sekaligus
         if ($user && !$user->relationLoaded('pharmacyStaff')) {
             $user->load('pharmacyStaff');
@@ -67,6 +67,7 @@ class HandleInertiaRequests extends Middleware
             'id'             => $user->id,
             'username'       => $user->username,
             'email'          => $user->email,
+            'phone'          => $user->phone,
             'role'           => $user->role,
             'avatar_url'     => $user->avatar_url,
             'pharmacy_staff' => $user->pharmacyStaff ? [

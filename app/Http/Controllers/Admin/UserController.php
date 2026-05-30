@@ -91,6 +91,15 @@ class UserController extends Controller
         return redirect()->back()->with('success', "Password user {$user->username} telah direset menjadi: {$newPassword}");
     }
 
+    public function resetAvatar(User $user)
+    {
+        $this->authorize('update', $user);
+
+        $this->userService->resetAvatar($user);
+
+        return redirect()->back()->with('success', 'Avatar user berhasil direset');
+    }
+
     public function export()
     {
         $this->authorize('viewAny', User::class);

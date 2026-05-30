@@ -21,7 +21,7 @@ export function AdminPagination({ pagination, itemLabel = "item" }) {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="w-10 h-10 rounded-2xl bg-white border-slate-200 text-slate-400 hover:text-[#0b3b60] hover:border-[#0b3b60]/20 disabled:opacity-30 transition-all shadow-sm"
+                    className="w-10 h-10 rounded-2xl bg-white border-slate-200 text-slate-400 hover:text-primary hover:border-primary/20 disabled:opacity-30 transition-all shadow-sm"
                     disabled={!pagination.prev_page_url}
                     onClick={() => onPageChange(pagination.prev_page_url)}
                 >
@@ -34,7 +34,7 @@ export function AdminPagination({ pagination, itemLabel = "item" }) {
                             <button
                                 key={i}
                                 onClick={() => onPageChange(link.url)}
-                                className={`w-10 h-10 rounded-2xl text-[11px] font-black transition-all shadow-sm ${link.active ? "bg-[#0b3b60] text-white shadow-[#0b3b60]/20" : "bg-white text-slate-400 hover:text-slate-600 border border-slate-200"}`}
+                                className={`w-10 h-10 rounded-2xl text-[11px] font-black transition-all shadow-sm ${link.active ? "bg-primary text-white shadow-primary/20" : "bg-white text-slate-400 hover:text-slate-600 border border-slate-200"}`}
                             >
                                 {link.label}
                             </button>
@@ -43,7 +43,7 @@ export function AdminPagination({ pagination, itemLabel = "item" }) {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="w-10 h-10 rounded-2xl bg-white border-slate-200 text-slate-400 hover:text-[#0b3b60] hover:border-[#0b3b60]/20 disabled:opacity-30 transition-all shadow-sm"
+                    className="w-10 h-10 rounded-2xl bg-white border-slate-200 text-slate-400 hover:text-primary hover:border-primary/20 disabled:opacity-30 transition-all shadow-sm"
                     disabled={!pagination.next_page_url}
                     onClick={() => onPageChange(pagination.next_page_url)}
                 >

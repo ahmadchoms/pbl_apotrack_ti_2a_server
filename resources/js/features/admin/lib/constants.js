@@ -44,7 +44,7 @@ export const ROLE_CONFIG = {
     APOTEKER: {
         label: "APOTEKER",
         variant: "default",
-        class: "bg-[#0b3b60] text-white border-0",
+        class: "bg-primary text-white border-0",
     },
     SUPER_ADMIN: {
         label: "ADMIN",

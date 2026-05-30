@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { Scan, ShoppingCart, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Scan, ShoppingCart, X } from "lucide-react";
 import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
 import { useCart } from "@/features/pharmacy/hooks/useCart";
 import { OrderCatalog } from "@/features/pharmacy/components/orders/OrderCatalog";
 import { OrderCart } from "@/features/pharmacy/components/orders/OrderCart";
+import { Link } from "@inertiajs/react";
 
 function getUniqueMedicines(list) {
     const seen = new Set();
@@ -55,40 +56,53 @@ export default function PharmacistPOS({ medicines }) {
 
     return (
         <DashboardPharmacyLayout activeMenu="orders.pos">
-            <div className="max-w-screen-2xl mx-auto h-full flex flex-col">
+            <div className="max-w-screen-2xl mx-auto h-[calc(100vh-100px)] flex flex-col overflow-hidden">
                 <motion.div
-                    initial={{ opacity: 0, y: -8 }}
+                    initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-5 flex items-center justify-between shrink-0"
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="mb-6 flex items-center justify-between shrink-0"
                 >
-                    <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.18em] mb-0.5">
-                            Sistem Kasir
-                        </p>
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-primary to-[#0055a5] flex items-center justify-center shadow-md shadow-primary/20">
-                                <Scan className="w-4 h-4 text-white" />
-                            </div>
-                            Point of Sale
-                        </h2>
-                    </div>
+                    <div className="w-full flex items-center gap-4">
+                        <Link
+                            href={route("pharmacy.orders.index")}
+                            className="w-11 h-11 rounded-2xl bg-white shadow-[0_2px_12px_rgba(15,23,42,0.01)] border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-primary transition-all duration-300 hover:scale-105 cursor-pointer"
+                        >
+                            <ArrowLeft className="w-5 h-5 text-slate-600" />
+                        </Link>
 
-                    <div className="flex items-center gap-3">
-                        <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="font-semibold">
-                                {uniqueMedicines.length} obat tersedia
-                            </span>
+                        <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
+                            <Scan className="w-5 h-5 stroke-[2.2]" />
                         </div>
 
+                        <div className="flex justify-between items-center w-full">
+                            <div className="space-y-0.5">
+                                <h2 className="text-xl font-bold tracking-tight text-slate-900 font-sans">
+                                    Point of Sale
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[11px] font-medium text-slate-400">
+                                        Sistem Kasir Manual
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                <span className="text-[11px] font-semibold text-slate-500">
+                                    {uniqueMedicines.length} Obat Siap Jual
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center">
                         <button
                             onClick={() => setMobileCartOpen(true)}
-                            className="lg:hidden relative w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-md shadow-primary/25"
+                            className="lg:hidden relative w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-800 flex items-center justify-center transition-all active:scale-[0.97]"
                         >
-                            <ShoppingCart className="w-4.5 h-4.5" />
+                            <ShoppingCart className="w-4.5 h-4.5 stroke-[2.2]" />
                             {totalCartItems > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center shadow">
+                                <span className="absolute -top-1 -right-1 min-w-4.5 h-4.5 px-1 rounded-md bg-blue-600 text-white text-[9px] font-bold flex items-center justify-center shadow-xs font-mono">
                                     {totalCartItems}
                                 </span>
                             )}
@@ -96,82 +110,90 @@ export default function PharmacistPOS({ medicines }) {
                     </div>
                 </motion.div>
 
-                <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    <motion.div
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.35, delay: 0.05 }}
-                        className="min-h-0 flex flex-col"
-                    >
-                        <OrderCatalog
-                            searchQuery={searchQuery}
-                            setSearchQuery={setSearchQuery}
-                            selectedCategory={selectedCategory}
-                            setSelectedCategory={setSelectedCategory}
-                            filteredDrugs={filteredDrugs}
-                            addToCart={addToCart}
-                            cart={cart}
-                        />
-                    </motion.div>
+                <div className="flex-1 min-h-0 pb-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 h-full w-full">
+                        <motion.div
+                            initial={{ opacity: 0, x: -12 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.35, delay: 0.05 }}
+                            className="h-full flex flex-col min-h-0"
+                        >
+                            <div className="flex-1 min-h-0 flex flex-col">
+                                <OrderCatalog
+                                    searchQuery={searchQuery}
+                                    setSearchQuery={setSearchQuery}
+                                    selectedCategory={selectedCategory}
+                                    setSelectedCategory={setSelectedCategory}
+                                    filteredDrugs={filteredDrugs}
+                                    addToCart={addToCart}
+                                    cart={cart}
+                                />
+                            </div>
+                        </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, x: 12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.35, delay: 0.1 }}
-                        className="hidden lg:flex flex-col min-h-0"
-                    >
-                        <OrderCart
-                            cart={cart}
-                            updateQty={updateQty}
-                            removeFromCart={removeFromCart}
-                            onReset={resetCart}
-                        />
-                    </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 12 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.35, delay: 0.1 }}
+                            className="hidden lg:flex flex-col h-full min-h-0"
+                        >
+                            <div className="flex-1 min-h-0 flex flex-col">
+                                <OrderCart
+                                    cart={cart}
+                                    updateQty={updateQty}
+                                    removeFromCart={removeFromCart}
+                                    onReset={resetCart}
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </div>
 
-            {mobileCartOpen && (
-                <div className="lg:hidden fixed inset-0 z-50 flex items-end">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                        onClick={() => setMobileCartOpen(false)}
-                    />
-                    <motion.div
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "100%" }}
-                        transition={{
-                            type: "spring",
-                            damping: 28,
-                            stiffness: 300,
-                        }}
-                        className="relative w-full max-h-[90vh] bg-white rounded-t-3xl overflow-hidden flex flex-col shadow-2xl z-10"
-                    >
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
-                            <h3 className="text-base font-black text-slate-900">
-                                Keranjang Transaksi
-                            </h3>
-                            <button
-                                onClick={() => setMobileCartOpen(false)}
-                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-hidden flex flex-col">
-                            <OrderCart
-                                cart={cart}
-                                updateQty={updateQty}
-                                removeFromCart={removeFromCart}
-                                onReset={resetCart}
-                            />
-                        </div>
-                    </motion.div>
-                </div>
-            )}
+            <AnimatePresence>
+                {mobileCartOpen && (
+                    <div className="lg:hidden fixed inset-0 z-50 flex items-end">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                            onClick={() => setMobileCartOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            exit={{ y: "100%" }}
+                            transition={{
+                                type: "spring",
+                                damping: 28,
+                                stiffness: 300,
+                            }}
+                            className="relative w-full h-[85vh] bg-white rounded-t-3xl overflow-hidden flex flex-col shadow-2xl z-10"
+                        >
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+                                <h3 className="text-base font-black text-slate-900">
+                                    Keranjang Transaksi
+                                </h3>
+                                <button
+                                    onClick={() => setMobileCartOpen(false)}
+                                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+                                <OrderCart
+                                    cart={cart}
+                                    updateQty={updateQty}
+                                    removeFromCart={removeFromCart}
+                                    onReset={resetCart}
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </DashboardPharmacyLayout>
     );
 }

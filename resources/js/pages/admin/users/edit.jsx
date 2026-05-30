@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { DashboardAdminLayout } from "@/layouts/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,7 +17,6 @@ import {
     Phone,
     User,
     Save,
-    Camera,
     Trash2,
     AlertTriangle,
     ShieldAlert,
@@ -45,6 +44,7 @@ import {
     containerVariants,
     itemVariants,
 } from "@/features/admin/lib/constants";
+import { Switch } from "@/components/ui/switch";
 
 export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -74,6 +74,17 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
         });
     };
 
+    const handleResetAvatar = () => {
+        router.post(
+            route("admin.users.reset-avatar", user.data.id),
+            {},
+            {
+                onSuccess: () => toast.success("Foto profil berhasil direset"),
+                onError: () => toast.error("Gagal mereset foto profil"),
+            },
+        );
+    };
+
     const handleDelete = () => {
         router.delete(`/admin/users/${user.data.id}`, {
             onSuccess: () => router.get("/admin/users"),
@@ -91,14 +102,14 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                     <Button
                         variant="ghost"
                         onClick={() => router.get("/admin/users")}
-                        className="text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-[#0b3b60]"
+                        className="text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-primary"
                     >
                         Batalkan
                     </Button>
                     <Button
                         disabled={processing}
                         onClick={submit}
-                        className="h-14 px-10 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-[#0b3b60]/20 flex items-center gap-2"
+                        className="h-14 px-10 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-primary/20 flex items-center gap-2"
                     >
                         {processing ? (
                             <>
@@ -126,7 +137,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                             <SectionHeader
                                 icon={<User className="w-5 h-5" />}
                                 bg="bg-blue-50"
-                                color="text-[#0b3b60]"
+                                color="text-primary"
                                 title="Identitas Pengguna"
                             />
                             <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
@@ -134,27 +145,72 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                     <div className="flex flex-col md:flex-row gap-10">
                                         <div className="flex flex-col items-center gap-4 shrink-0">
                                             <div className="relative group">
-                                                <div className="absolute inset-0 bg-blue-100 rounded-[2rem] blur-2xl scale-125 opacity-40 group-hover:opacity-60 transition-opacity" />
-                                                <Avatar className="h-32 w-32 rounded-[2rem] border-8 border-white shadow-2xl relative z-10">
-                                                    <AvatarImage
-                                                        src={
-                                                            user.data.avatar_url
-                                                        }
-                                                    />
+                                                <div className="absolute inset-0 bg-blue-100 rounded-[2rem] blur-2xl scale-125 opacity-40 transition-opacity" />
+
+                                                <Avatar className="h-32 w-32 rounded-full border-8 border-white shadow-2xl relative z-10 overflow-hidden">
+                                                    {user.data.avatar_url && (
+                                                        <AvatarImage
+                                                            src={
+                                                                user.data
+                                                                    .avatar_url
+                                                            }
+                                                            className="object-cover"
+                                                        />
+                                                    )}
                                                     <AvatarFallback className="bg-slate-50 text-slate-300 font-black text-2xl">
-                                                        {user.data.username
-                                                            .substring(0, 2)
-                                                            .toUpperCase()}
+                                                        <User className="w-10 h-10" />
                                                     </AvatarFallback>
                                                 </Avatar>
-                                                <button className="absolute bottom-0 right-0 w-10 h-10 bg-[#0b3b60] rounded-2xl border-4 border-white text-white flex items-center justify-center shadow-xl z-20 hover:scale-110 transition-transform">
-                                                    <Camera className="w-4 h-4" />
-                                                </button>
                                             </div>
-                                            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                                                Update Foto
-                                            </p>
+
+                                            {user.data.avatar_url && (
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            className="mt-2 text-xs font-black uppercase tracking-widest text-rose-600 hover:text-white hover:bg-rose-600 border-rose-100 hover:border-transparent rounded-xl h-10 px-4"
+                                                        >
+                                                            Reset Avatar
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-10 max-w-lg">
+                                                        <AlertDialogHeader className="flex flex-col items-center justify-center">
+                                                            <div className="w-20 h-20 bg-rose-50 rounded-[2rem] flex items-center justify-center text-rose-600 mb-6 mx-auto">
+                                                                <AlertTriangle className="w-10 h-10" />
+                                                            </div>
+                                                            <AlertDialogTitle className="text-2xl font-black text-slate-900 text-center mb-2 uppercase tracking-tight w-full">
+                                                                Reset Foto
+                                                                Profil
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription className="text-sm font-bold text-slate-400 text-center leading-relaxed">
+                                                                Apakah Anda
+                                                                yakin ingin
+                                                                menghapus foto
+                                                                profil ini dan
+                                                                mengembalikannya
+                                                                ke default
+                                                                sistem?
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter className="flex flex-row items-center justify-center gap-4 mt-10">
+                                                            <AlertDialogCancel className="h-14 flex-1 rounded-2xl border-2 border-slate-100 bg-white text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all">
+                                                                Batalkan
+                                                            </AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={
+                                                                    handleResetAvatar
+                                                                }
+                                                                className="h-14 flex-1 rounded-2xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20"
+                                                            >
+                                                                Ya, Hapus Foto
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            )}
                                         </div>
+
                                         <div className="flex-1 space-y-8">
                                             <FormField
                                                 label="Nama Lengkap / Username"
@@ -169,7 +225,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                             handleInputChange
                                                         }
                                                         placeholder="Masukkan nama pengguna..."
-                                                        className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                                                        className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                                                     />
                                                 </div>
                                             </FormField>
@@ -188,7 +244,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                                 handleInputChange
                                                             }
                                                             placeholder="admin@example.com"
-                                                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                                                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                                                         />
                                                     </div>
                                                 </FormField>
@@ -205,7 +261,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                                 handleInputChange
                                                             }
                                                             placeholder="+62 812..."
-                                                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                                                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                                                         />
                                                     </div>
                                                 </FormField>
@@ -241,7 +297,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                     )
                                                 }
                                             >
-                                                <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold">
+                                                <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold">
                                                     <SelectValue placeholder="Pilih Role" />
                                                 </SelectTrigger>
                                                 <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
@@ -251,10 +307,22 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                             value={r}
                                                             className="text-xs font-bold"
                                                         >
-                                                            {r.replace(
-                                                                "_",
-                                                                " ",
-                                                            )}
+                                                            {r
+                                                                .split("_")
+                                                                .map(
+                                                                    (word) =>
+                                                                        word
+                                                                            .charAt(
+                                                                                0,
+                                                                            )
+                                                                            .toUpperCase() +
+                                                                        word
+                                                                            .slice(
+                                                                                1,
+                                                                            )
+                                                                            .toLowerCase(),
+                                                                )
+                                                                .join(" ")}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -279,7 +347,7 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                                             )
                                                         }
                                                     >
-                                                        <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold">
+                                                        <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold">
                                                             <SelectValue placeholder="Pilih Unit Apotek" />
                                                         </SelectTrigger>
                                                         <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
@@ -390,36 +458,59 @@ export default function AdminUserEdit({ user, pharmacies = [], roles = [] }) {
                                         }
                                         bg="bg-slate-50"
                                         color="text-slate-400"
-                                        title="Status Akun"
+                                        title="Manajemen Akses"
                                     />
-                                    <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100 flex flex-col items-center gap-4 text-center">
-                                        <div
-                                            className={`w-3 h-3 rounded-full ${data.is_active ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" : "bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.5)]"} animate-pulse`}
-                                        />
-                                        <div>
-                                            <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+
+                                    <div
+                                        className={`p-6 rounded-[2rem] border transition-all duration-300 flex items-center justify-between gap-6 ${
+                                            data.is_active
+                                                ? "bg-emerald-50/30 border-emerald-100/80"
+                                                : "bg-slate-50/50 border-slate-100"
+                                        }`}
+                                    >
+                                        <div className="flex flex-col text-left">
+                                            <span className="text-[11px] font-black text-slate-900 uppercase tracking-wider">
                                                 {data.is_active
-                                                    ? "Terverifikasi"
-                                                    : "Tertunda / Nonaktif"}
-                                            </p>
-                                            <p className="text-[9px] font-bold text-slate-400 mt-1">
-                                                Status Keamanan Jaringan
-                                            </p>
+                                                    ? "Akun Aktif"
+                                                    : "Akun Nonaktif"}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-slate-400 mt-0.5 normal-case font-normal">
+                                                {data.is_active
+                                                    ? "Dapat mengakses sistem"
+                                                    : "Akses ditangguhkan sementara"}
+                                            </span>
                                         </div>
+
+                                        <Switch
+                                            checked={data.is_active}
+                                            onCheckedChange={(checked) =>
+                                                setData("is_active", checked)
+                                            }
+                                            className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-300 shrink-0"
+                                        />
                                     </div>
-                                    <div className="space-y-5 pt-4 border-t border-slate-50">
-                                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">
-                                            Informasi Tambahan
-                                        </p>
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-6 h-6 rounded-xl bg-blue-50 text-[#0b3b60] flex items-center justify-center shrink-0">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                            </div>
-                                            <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
-                                                Update Terakhir:{" "}
-                                                <span className="text-slate-900">
-                                                    Hari Ini
-                                                </span>
+
+                                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 border border-slate-100/50">
+                                        <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                                            <ShieldCheck className="w-4 h-4" />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                                Terdaftar Sejak
+                                            </p>
+                                            <p className="text-xs font-black text-slate-800 mt-0.5">
+                                                {user.data.created_at
+                                                    ? new Date(
+                                                          user.data.created_at,
+                                                      ).toLocaleDateString(
+                                                          "id-ID",
+                                                          {
+                                                              day: "numeric",
+                                                              month: "short",
+                                                              year: "numeric",
+                                                          },
+                                                      )
+                                                    : "-"}
                                             </p>
                                         </div>
                                     </div>

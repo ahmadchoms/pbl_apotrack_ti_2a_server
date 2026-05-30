@@ -22,6 +22,7 @@ import { SelectInput } from "@/components/shared/SelectInput";
 import { TextareaInput } from "@/components/shared/TextareaInput";
 import { MedicineImageUploader } from "./MedicineImageUploader";
 import { MedicineBatchManager } from "./MedicineBatchManager";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
 const sectionVariants = {
     hidden: { opacity: 0, y: 18 },
@@ -83,7 +84,7 @@ export function MedicineForm({
               ],
     );
 
-    const { data, setData, post, put } = useForm({
+    const { data, setData, processing } = useForm({
         name: medicine.name || "",
         generic_name: medicine.generic_name || "",
         manufacturer: medicine.manufacturer || "",
@@ -115,7 +116,7 @@ export function MedicineForm({
             preview: URL.createObjectURL(file),
             isExisting: false,
         };
-        
+
         setImages([newImage]);
         setData("image", file);
     };
@@ -147,14 +148,14 @@ export function MedicineForm({
                 >
                     <ArrowLeft className="w-4 h-4" />
                 </Link>
-                <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.18em] mb-0.5">
-                        Manajemen Inventaris
-                    </p>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                        {isEdit ? "Edit Data Obat" : "Tambah Obat Baru"}
-                    </h2>
-                </div>
+                <PageHeader
+                    title={isEdit ? "Edit Obat" : "Tambah Obat"}
+                    description={
+                        isEdit
+                            ? "Perbarui informasi obat dan kelola stok dengan mudah."
+                            : "Masukkan detail obat baru untuk menambahkannya ke katalog apotek Anda."
+                    }
+                />
             </motion.div>
 
             <form onSubmit={handleSubmit}>
@@ -430,13 +431,25 @@ export function MedicineForm({
                             <motion.div whileTap={{ scale: 0.97 }}>
                                 <Button
                                     type="submit"
-                                    className="h-11 px-7 bg-linear-to-r from-primary to-[#0055a5] text-white rounded-xl font-bold text-sm shadow-lg flex items-center gap-2"
+                                    disabled={processing}
+                                    className="h-11 px-7 bg-primary text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100 transition-all min-w-42.5"
                                 >
-                                    <Save className="w-4 h-4" />{" "}
-                                    {isEdit
-                                        ? "Simpan Perubahan"
-                                        : "Simpan Obat"}{" "}
-                                    <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                    {processing ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin text-white/90" />
+                                            <span>Menyimpan...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            <span>
+                                                {isEdit
+                                                    ? "Simpan Perubahan"
+                                                    : "Simpan Obat"}
+                                            </span>
+                                            <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                        </>
+                                    )}
                                 </Button>
                             </motion.div>
                         </motion.div>

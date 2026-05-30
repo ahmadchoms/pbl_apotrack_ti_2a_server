@@ -57,14 +57,14 @@ export function AuditLogCard() {
         <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-3xl overflow-hidden hover:scale-[1.01] transition-transform duration-300 bg-white">
             <CardHeader className="pb-4 pt-6 px-8 border-b border-slate-50 flex flex-row items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Activity className="h-5 w-5 text-[#0b3b60]" />
+                    <Activity className="h-5 w-5 text-primary" />
                     <CardTitle className="text-lg font-bold text-slate-800">
                         Log Audit Klinis
                     </CardTitle>
                 </div>
                 <Dialog>
                     <DialogTrigger asChild>
-                        <button className="text-xs font-bold text-[#0b3b60] hover:underline">
+                        <button className="text-xs font-bold text-primary hover:underline">
                             Lihat Semua
                         </button>
                     </DialogTrigger>
@@ -120,7 +120,7 @@ export function AuditLogCard() {
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                 {log.title}
                             </p>
-                            <p className="text-sm font-semibold text-slate-700 mt-1 group-hover:text-[#0b3b60] transition-colors">
+                            <p className="text-sm font-semibold text-slate-700 mt-1 group-hover:text-primary transition-colors">
                                 {log.desc}
                             </p>
                             <p className="text-[10px] text-slate-400 mt-1">

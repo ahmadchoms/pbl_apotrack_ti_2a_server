@@ -42,7 +42,7 @@ export function CriticalStockCard({ criticalStocks }) {
                                     ) : (
                                         <span className="relative flex h-2.5 w-2.5 rounded-full bg-amber-400"></span>
                                     )}
-                                    <p className="text-sm font-bold text-[#0b3b60] flex-1">
+                                    <p className="text-sm font-bold text-primary flex-1">
                                         {stock.name}
                                     </p>
                                     <Badge

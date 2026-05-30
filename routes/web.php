@@ -42,6 +42,12 @@ Route::get('/', fn() => Inertia::render('index'))->name('home');
 
 Route::middleware(['auth', 'active.user'])->group(function () {
     Route::get('/waiting-room', [WaitingRoomController::class, 'index'])->name('waiting-room');
+
+    Route::prefix('notifications')->name('notifications.')->controller(\App\Http\Controllers\NotificationController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::patch('/{id}/read', 'markAsRead')->name('read');
+        Route::patch('/read-all', 'markAllAsRead')->name('read-all');
+    });
 });
 
 /*
@@ -114,6 +120,7 @@ Route::prefix('admin')
                 Route::put('/{user}', 'update')->name('update');
                 Route::delete('/{user}', 'destroy')->name('destroy');
                 Route::patch('/{user}/reset-password', 'resetPassword')->name('reset-password');
+                Route::post('/{user}/reset-avatar', 'resetAvatar')->name('reset-avatar');
             });
 
         /*
@@ -161,6 +168,7 @@ Route::prefix('pharmacy')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::patch('/', 'update')->name('update');
+                Route::patch('/user', 'updateUser')->name('updateUser');
                 Route::post('/password', 'updatePassword')->name('updatePassword');
                 Route::post('/hours', 'updateHours')->name('updateHours');
                 Route::delete('/', 'delete')->name('delete');
@@ -191,7 +199,6 @@ Route::prefix('pharmacy')
             ->controller(OrderController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('/list', 'list')->name('list');
                 Route::get('/pos', 'pos')->name('pos');
                 Route::post('/', 'store')->name('store');
                 Route::get('/{id}', 'show')->name('show');

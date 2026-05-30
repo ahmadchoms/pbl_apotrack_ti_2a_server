@@ -40,14 +40,23 @@ export function PharmacyFilters({ filters, onFilter, onReset }) {
                     </InputGroupAddon>
                 </InputGroup>
 
-                <Select value={filters.status || "all"} onValueChange={handleStatusChange}>
+                <Select
+                    value={filters.status || "all"}
+                    onValueChange={handleStatusChange}
+                >
                     <SelectTrigger className="h-11 w-44 rounded-2xl bg-white border-slate-200 shadow-sm text-xs font-bold text-slate-600">
                         <SelectValue placeholder="Semua Status" />
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-                        <SelectItem value="all" className="text-xs font-bold">Semua Status</SelectItem>
+                        <SelectItem value="all" className="text-xs font-bold">
+                            Semua Status
+                        </SelectItem>
                         {VERIFICATION_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value} className="text-xs font-bold">
+                            <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className="text-xs font-bold"
+                            >
                                 {opt.label}
                             </SelectItem>
                         ))}
@@ -67,14 +76,16 @@ export function PharmacyFilters({ filters, onFilter, onReset }) {
 
             <div className="flex items-center gap-3 w-full lg:w-auto">
                 <Button
-                    onClick={() => window.open(route('admin.pharmacies.export'))}
+                    onClick={() =>
+                        window.open(route("admin.pharmacies.export"))
+                    }
                     variant="outline"
-                    className="h-11 px-6 rounded-2xl bg-blue-50 border-0 text-[#0b3b60] font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all gap-2"
+                    className="h-11 px-6 rounded-2xl bg-blue-50 border-0 text-primary font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all gap-2"
                 >
                     <Download className="w-4 h-4" /> Ekspor
                 </Button>
                 <Button
-                    onClick={() => router.get('/admin/pharmacies/create')}
+                    onClick={() => router.get("/admin/pharmacies/create")}
                     className="h-11 px-6 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-primary/20"
                 >
                     <Building2 className="w-4 h-4" /> Tambah Apotek

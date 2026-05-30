@@ -8,7 +8,6 @@ import {
     CheckCircle2,
     Pill,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatRupiah } from "@/lib/utils";
@@ -102,8 +101,8 @@ export function OrderCatalog({
     const getCartQty = (id) => cart.find((c) => c.id === id)?.qty ?? 0;
 
     return (
-        <div className="flex flex-col h-full min-h-0">
-            <div className="flex flex-col gap-4 mb-5 shrink-0">
+        <div className="flex flex-col h-full min-h-0 bg-white rounded-[2rem] border border-slate-100 p-6 shadow-[0_2px_8px_rgba(15,23,42,0.01)]">
+            <div className="shrink-0 space-y-5 mb-6">
                 <div className="relative">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
@@ -156,7 +155,7 @@ export function OrderCatalog({
                 </div>
             </div>
 
-            <ScrollArea className="flex-1 -mr-2 pr-2">
+            <ScrollArea className="flex-1 min-h-0 -mr-2 pr-2 scrollbar-thin">
                 <div className="grid grid-cols-2 gap-4 pb-6">
                     <AnimatePresence mode="popLayout">
                         {filteredDrugs.length === 0 ? (
@@ -222,7 +221,9 @@ export function OrderCatalog({
 
                                             <div className="absolute top-2.5 left-2.5">
                                                 <StockIndicator
-                                                    stock={drug.total_stock}
+                                                    stock={
+                                                        drug.total_active_stock
+                                                    }
                                                 />
                                             </div>
 

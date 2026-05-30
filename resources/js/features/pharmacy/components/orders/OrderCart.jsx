@@ -35,7 +35,7 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
     const PayIcon = paymentMethod.icon;
 
     return (
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 flex flex-col overflow-hidden border border-slate-200/80 h-full">
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 flex flex-col overflow-hidden border border-slate-100 h-full">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div>
                     <h3 className="text-base font-black text-slate-900 tracking-tight">

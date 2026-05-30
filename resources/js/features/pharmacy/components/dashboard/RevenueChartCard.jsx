@@ -36,9 +36,9 @@ export function RevenueChartCard({ revenueData }) {
                     </div>
                     <Badge
                         variant="secondary"
-                        className="bg-blue-50 text-[#0b3b60] border-0 font-bold uppercase text-[10px] tracking-wider px-3 py-1"
+                        className="bg-blue-50 text-primary border-0 font-bold uppercase text-[10px] tracking-wider px-3 py-1"
                     >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#0b3b60] mr-2"></span>{" "}
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary mr-2"></span>{" "}
                         Revenue
                     </Badge>
                 </CardHeader>
@@ -106,7 +106,8 @@ export function RevenueChartCard({ revenueData }) {
                                     contentStyle={{
                                         borderRadius: "12px",
                                         border: "none",
-                                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                                        boxShadow:
+                                            "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                                     }}
                                 />
                                 <Bar

@@ -31,6 +31,11 @@ class ProfileService
 
             return $pharmacy;
         });
+     }
+
+    public function updateUserProfile(User $user, array $data)
+    {
+        return $this->accountService->updateProfile($user, $data);
     }
 
     public function updatePassword(User $user, string $newPassword)
@@ -44,7 +49,7 @@ class ProfileService
         
         return DB::transaction(function () use ($pharmacy, $hours) {
             foreach ($hours as $hour) {
-                $pharmacy->hours()->updateOrCreate(
+                $pharmacy->operatingHours()->updateOrCreate(
                     ['day_of_week' => $hour['day_of_week']],
                     [
                         'open_time' => $hour['is_closed'] || $hour['is_24_hours'] ? null : $hour['open_time'],
@@ -74,9 +79,9 @@ class ProfileService
         $this->accountService->deleteAccount(auth()->user());
     }
 
-    public function getAuditLogs(string $userId)
+    public function getAuditLogs(string $userId, array $filters = [])
     {
         $user = User::findOrFail($userId);
-        return $this->accountService->getAuditHistory($user);
+        return $this->accountService->getAuditHistory($user, $filters);
     }
 }

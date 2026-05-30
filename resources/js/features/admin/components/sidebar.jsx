@@ -1,12 +1,5 @@
 import React from "react";
-import {
-    LayoutGrid,
-    Users,
-    Building2,
-    UserCircle,
-    LogOut,
-    ShieldCheck,
-} from "lucide-react";
+import { LayoutGrid, Users, Building2, UserCircle, LogOut } from "lucide-react";
 import { Link } from "@inertiajs/react";
 
 const NAV_STRUCTURE = [
@@ -46,8 +39,8 @@ function NavItem({ item }) {
             href={route(item.route)}
             className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all duration-300 ${
                 isActive
-                    ? "bg-[#0b3b60] text-white shadow-lg shadow-[#0b3b60]/20"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-[#0b3b60]"
+                    ? "bg-primary text-white shadow-lg shadow-primary/20"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-primary"
             }`}
         >
             <div
@@ -59,7 +52,7 @@ function NavItem({ item }) {
                     className={`w-5 h-5 ${
                         isActive
                             ? "text-white"
-                            : "text-slate-400 group-hover:text-[#0b3b60]"
+                            : "text-slate-400 group-hover:text-primary"
                     }`}
                 />
             </div>
@@ -73,7 +66,7 @@ function NavItem({ item }) {
             </span>
 
             {isActive && (
-                <div className="absolute -right-3 w-1.5 h-8 bg-[#0b3b60] rounded-l-full" />
+                <div className="absolute -right-3 w-1.5 h-8 bg-primary rounded-l-full" />
             )}
         </Link>
     );
@@ -83,26 +76,26 @@ export function Sidebar() {
     return (
         <aside className="w-68 bg-white border-r border-slate-200/60 flex flex-col justify-between h-full select-none">
             <div className="flex flex-col min-h-0 flex-1">
-                <div className="px-6 py-8 shrink-0">
-                    <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-[#0b3b60] to-[#0055a5] flex items-center justify-center shadow-lg shrink-0 -rotate-3">
-                            <ShieldCheck className="w-5 h-5 text-white rotate-3" />
+                <div className="px-6 pt-8 pb-4 shrink-0">
+                    <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-primary">
+                        <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1.5 shrink-0 border border-slate-100">
+                            <img
+                                src="/logo.png"
+                                alt="ApoTrack Logo"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
-                        <div>
-                            <h1 className="text-xl font-black text-slate-900 tracking-tighter leading-none">
-                                ApoTrack
-                            </h1>
-                            <p className="text-[9px] font-black text-[#0b3b60] uppercase tracking-[0.25em] mt-1 opacity-60">
-                                Admin Portal
-                            </p>
-                        </div>
+
+                        <h1 className="text-lg font-black text-white tracking-wide leading-none mb-1">
+                            Apotrack
+                        </h1>
                     </div>
                 </div>
 
-                <nav className="flex-1 overflow-y-auto px-4 space-y-1.5 pb-6">
+                <nav className="flex-1 overflow-y-auto px-4 space-y-1.5 pb-6 mt-2">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-4 mb-4 mt-2 flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                        Administrator
+                        menu utama
                     </p>
 
                     {NAV_STRUCTURE.map((item) => (
@@ -123,7 +116,7 @@ export function Sidebar() {
                     </div>
 
                     <span className="text-sm font-bold tracking-tight">
-                        Keluar Panel
+                        Log Out
                     </span>
                 </Link>
             </div>

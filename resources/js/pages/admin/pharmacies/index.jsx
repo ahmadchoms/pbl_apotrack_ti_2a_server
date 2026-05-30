@@ -88,7 +88,7 @@ export default function AdminPharmacyList({ pharmacies, filters }) {
                                     )
                                 }
                                 variant="outline"
-                                className="h-11 px-6 rounded-2xl bg-blue-50 border-0 text-[#0b3b60] font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all gap-2"
+                                className="h-11 px-6 rounded-2xl bg-blue-50 border-0 text-primary font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all gap-2"
                             >
                                 <Download className="w-4 h-4" /> Ekspor
                             </Button>

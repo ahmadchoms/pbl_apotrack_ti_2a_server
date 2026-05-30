@@ -126,14 +126,14 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                         type="button"
                         variant="ghost"
                         onClick={() => router.get("/admin/pharmacies")}
-                        className="text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-[#0b3b60]"
+                        className="text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-primary"
                     >
                         Batalkan
                     </Button>
                     <Button
                         type="submit"
                         disabled={processing}
-                        className="h-14 px-10 rounded-2xl bg-[#0b3b60] text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-[#0b3b60]/20 flex items-center gap-2"
+                        className="h-14 px-10 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#082a45] transition-all shadow-xl shadow-primary/20 flex items-center gap-2"
                     >
                         <Save className="w-4 h-4" />
                         {processing ? "Menyimpan..." : "Simpan Data Apotek"}
@@ -153,7 +153,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                             <SectionHeader
                                 icon={<Building2 className="w-5 h-5" />}
                                 bg="bg-blue-50"
-                                color="text-[#0b3b60]"
+                                color="text-primary"
                                 title="Informasi Dasar"
                             />
                             <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/30 bg-white p-2">
@@ -168,7 +168,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                                                 setData("name", e.target.value)
                                             }
                                             placeholder="Contoh: Apotek Sehat Jaya"
-                                            className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                                            className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                                         />
                                     </FormField>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -185,7 +185,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                                                     )
                                                 }
                                                 placeholder="SIA/XXX/2024"
-                                                className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                                                className="h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                                             />
                                         </FormField>
                                         <FormField
@@ -203,7 +203,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                                                         )
                                                     }
                                                     placeholder="+62 21 xxxx xxxx"
-                                                    className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                                                    className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                                                 />
                                             </div>
                                         </FormField>
@@ -221,7 +221,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                                                 )
                                             }
                                             placeholder="Nama jalan, nomor gedung, RT/RW..."
-                                            className="min-h-[120px] rounded-[1.5rem] bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold p-6"
+                                            className="min-h-[120px] rounded-[1.5rem] bg-slate-50 border-transparent focus:ring-primary/20 font-bold p-6"
                                         />
                                     </FormField>
                                 </CardContent>
@@ -353,7 +353,7 @@ export default function AdminPharmacyCreate({ available_staff = [] }) {
                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                 Kelengkapan Data
                                             </p>
-                                            <p className="text-sm font-black text-[#0b3b60]">
+                                            <p className="text-sm font-black text-primary">
                                                 {completionPct}%
                                             </p>
                                         </div>

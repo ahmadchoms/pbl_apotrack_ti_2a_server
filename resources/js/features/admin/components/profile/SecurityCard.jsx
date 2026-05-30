@@ -13,9 +13,11 @@ export function SecurityCard() {
                     <CardTitle className="text-xl font-black text-slate-900 tracking-tight">
                         Protokol Keamanan
                     </CardTitle>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Sertifikasi & Enkripsi</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                        Sertifikasi & Enkripsi
+                    </p>
                 </div>
-                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:text-[#0b3b60] transition-colors">
+                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:text-primary transition-colors">
                     <Shield className="h-6 w-6" />
                 </div>
             </CardHeader>
@@ -30,11 +32,11 @@ export function SecurityCard() {
                             <Input
                                 type="password"
                                 placeholder="••••••••"
-                                className="pl-12 h-12 bg-slate-50 border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#0b3b60]/20 transition-all font-bold"
+                                className="pl-12 h-12 bg-slate-50 border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                             />
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -45,7 +47,7 @@ export function SecurityCard() {
                                 <Input
                                     type="password"
                                     placeholder="••••••••"
-                                    className="pl-12 h-12 bg-slate-50 border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#0b3b60]/20 transition-all font-bold"
+                                    className="pl-12 h-12 bg-slate-50 border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>
                         </div>
@@ -58,7 +60,7 @@ export function SecurityCard() {
                                 <Input
                                     type="password"
                                     placeholder="••••••••"
-                                    className="pl-12 h-12 bg-slate-50 border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#0b3b60]/20 transition-all font-bold"
+                                    className="pl-12 h-12 bg-slate-50 border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>
                         </div>
@@ -66,16 +68,21 @@ export function SecurityCard() {
 
                     <div className="flex items-center gap-3 p-4 bg-blue-50/50 rounded-2xl border border-blue-100">
                         <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                            <Shield className="w-4 h-4 text-[#0b3b60]" />
+                            <Shield className="w-4 h-4 text-primary" />
                         </div>
                         <p className="text-[10px] font-bold text-slate-500 leading-relaxed">
-                            Password terakhir diubah <span className="text-[#0b3b60]">14 hari yang lalu</span>. <br/>
-                            Disarankan untuk merotasi kunci akses setiap 90 hari.
+                            Password terakhir diubah{" "}
+                            <span className="text-primary">
+                                14 hari yang lalu
+                            </span>
+                            . <br />
+                            Disarankan untuk merotasi kunci akses setiap 90
+                            hari.
                         </p>
                     </div>
 
                     <div className="pt-2">
-                        <Button className="w-full bg-[#0b3b60] hover:bg-[#082a45] text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-[#0b3b60]/20 flex items-center gap-2">
+                        <Button className="w-full bg-primary hover:bg-[#082a45] text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 flex items-center gap-2">
                             <Shield className="w-4 h-4" />
                             Perbarui Protokol Keamanan
                         </Button>

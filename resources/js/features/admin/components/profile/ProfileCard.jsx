@@ -148,8 +148,8 @@ export function ProfileCard({ user }) {
                     </Dialog>
 
                     <div className="relative mb-8 group">
-                        <div className="absolute inset-0 bg-blue-100 rounded-[3rem] blur-2xl scale-125 opacity-40 group-hover:opacity-60 transition-opacity" />
-                        <Avatar className="h-32 w-32 border-8 border-white shadow-2xl relative z-10 rounded-[3rem]">
+                        <div className="absolute inset-0 bg-blue-100 rounded-full blur-2xl scale-125 opacity-40 group-hover:opacity-60 transition-opacity" />
+                        <Avatar className="h-32 w-32 border-8 border-white shadow-2xl relative z-10 rounded-full">
                             <AvatarImage src={user?.avatar_url} />
                             <AvatarFallback className="bg-primary text-white text-3xl font-black">
                                 {user?.username?.substring(0, 2).toUpperCase()}

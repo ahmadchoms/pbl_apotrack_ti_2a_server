@@ -36,7 +36,7 @@ export function UserActivityCard({ userActivities }) {
                                             <AvatarImage
                                                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.avatar}&backgroundColor=e2e8f0`}
                                             />
-                                            <AvatarFallback className="bg-[#0b3b60] text-white text-xs font-bold">
+                                            <AvatarFallback className="bg-primary text-white text-xs font-bold">
                                                 {user.avatar}
                                             </AvatarFallback>
                                         </Avatar>
@@ -53,7 +53,7 @@ export function UserActivityCard({ userActivities }) {
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                                             Total Beli
                                         </p>
-                                        <p className="text-sm font-bold text-[#0b3b60]">
+                                        <p className="text-sm font-bold text-primary">
                                             {user.amount}
                                         </p>
                                     </div>

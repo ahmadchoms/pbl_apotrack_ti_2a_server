@@ -41,6 +41,7 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import { StaffTableRow } from "@/features/pharmacy/components/staff/StaffTableRow";
 import { StaffFormDialog } from "@/features/pharmacy/components/staff/StaffFormDialog";
 import { Pagination } from "@/components/ui/pagination";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
 export default function StaffPage({ staff, activityLogs, filters }) {
     const [search, setSearch] = useState(filters.search || "");
@@ -115,21 +116,10 @@ export default function StaffPage({ staff, activityLogs, filters }) {
         <DashboardPharmacyLayout activeMenu="Tim Apotek">
             <div className="pb-20 px-4 max-w-7xl mx-auto">
                 <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <Badge className="bg-blue-50 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-blue-100 shadow-sm">
-                                Human Resource Center
-                            </Badge>
-                        </div>
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">
-                            Manajemen{" "}
-                            <span className="text-primary">Pegawai</span>
-                        </h2>
-                        <p className="text-sm text-slate-500 mt-2 font-medium max-w-xl">
-                            Kelola tim apotek Anda, pantau aktivitas, dan undang
-                            anggota tim baru ke dalam sistem.
-                        </p>
-                    </div>
+                    <PageHeader
+                        title="Manajemen Pegawai Apotek"
+                        description="Kelola tim apotek Anda, pantau aktivitas, dan undang anggota tim baru ke dalam sistem."
+                    />
 
                     <div className="flex items-center gap-3">
                         <Button

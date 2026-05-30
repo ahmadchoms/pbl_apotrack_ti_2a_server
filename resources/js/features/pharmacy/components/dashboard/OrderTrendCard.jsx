@@ -34,12 +34,15 @@ export function OrderTrendCard({ trendData }) {
                                 <MoreHorizontal className="h-5 w-5 text-slate-400 cursor-pointer hover:text-slate-600" />
                             </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-44 rounded-xl p-2" align="end">
+                        <PopoverContent
+                            className="w-44 rounded-xl p-2"
+                            align="end"
+                        >
                             <div className="flex flex-col text-sm text-slate-600">
-                                <button className="text-left px-3 py-2 hover:bg-slate-50 hover:text-[#0b3b60] rounded-lg font-medium transition-colors">
+                                <button className="text-left px-3 py-2 hover:bg-slate-50 hover:text-primary rounded-lg font-medium transition-colors">
                                     Unduh Laporan PDF
                                 </button>
-                                <button className="text-left px-3 py-2 hover:bg-slate-50 hover:text-[#0b3b60] rounded-lg font-medium transition-colors">
+                                <button className="text-left px-3 py-2 hover:bg-slate-50 hover:text-primary rounded-lg font-medium transition-colors">
                                     Bagikan Grafik
                                 </button>
                                 <div className="h-px w-full bg-slate-100 my-1"></div>
@@ -114,7 +117,8 @@ export function OrderTrendCard({ trendData }) {
                                     contentStyle={{
                                         borderRadius: "8px",
                                         border: "none",
-                                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                                        boxShadow:
+                                            "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                                     }}
                                 />
                                 <Area

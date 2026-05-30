@@ -93,14 +93,14 @@ export function Sidebar() {
             <div className="flex flex-col min-h-0 flex-1">
                 <div className="px-6 py-8 shrink-0">
                     <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-[#0b3b60] to-[#0055a5] flex items-center justify-center shadow-lg shrink-0 -rotate-3">
+                        <div className="w-10 h-10 rounded-2xl bg-linear-to-br from-primary to-[#0055a5] flex items-center justify-center shadow-lg shrink-0 -rotate-3">
                             <ShieldCheck className="w-5 h-5 text-white rotate-3" />
                         </div>
                         <div>
                             <h1 className="text-xl font-black text-slate-900 tracking-tighter leading-none">
                                 ApoTrack
                             </h1>
-                            <p className="text-[9px] font-black text-[#0b3b60] uppercase tracking-[0.25em] mt-1 opacity-60">
+                            <p className="text-[9px] font-black text-primary uppercase tracking-[0.25em] mt-1 opacity-60">
                                 Apotek Portal
                             </p>
                         </div>

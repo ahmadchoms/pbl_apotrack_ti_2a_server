@@ -61,7 +61,7 @@ export function StaffPicker({
                             value={staffSearch}
                             onChange={(e) => setStaffSearch(e.target.value)}
                             placeholder="Ketik nama atau email..."
-                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-[#0b3b60]/20 font-bold"
+                            className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:ring-primary/20 font-bold"
                         />
                         {isLoading && (
                             <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 animate-spin" />
@@ -114,7 +114,7 @@ export function StaffPicker({
                                             >
                                                 {user.role}
                                             </Badge>
-                                            <div className="w-8 h-8 rounded-xl bg-[#0b3b60]/5 text-[#0b3b60] flex items-center justify-center group-hover:bg-[#0b3b60] group-hover:text-white transition-colors">
+                                            <div className="w-8 h-8 rounded-xl bg-primary/5 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
                                                 <UserPlus className="w-4 h-4" />
                                             </div>
                                         </div>
@@ -169,7 +169,7 @@ export function StaffPicker({
                                                     "APOTEKER",
                                                 )
                                             }
-                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-colors ${staff.role === "APOTEKER" ? "bg-[#0b3b60] text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-100"}`}
+                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-colors ${staff.role === "APOTEKER" ? "bg-primary text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-100"}`}
                                         >
                                             Apoteker
                                         </button>
@@ -181,7 +181,7 @@ export function StaffPicker({
                                                     "STAFF",
                                                 )
                                             }
-                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-colors ${staff.role === "STAFF" ? "bg-[#0b3b60] text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-100"}`}
+                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-colors ${staff.role === "STAFF" ? "bg-primary text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-100"}`}
                                         >
                                             Staf
                                         </button>
