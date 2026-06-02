@@ -16,6 +16,7 @@ class Order extends Model
     const STATUS_DELIVERED = 'DELIVERED';
     const STATUS_COMPLETED = 'COMPLETED';
     const STATUS_CANCELLED = 'CANCELLED';
+    const STATUS_CANCELLATION_REQUESTED = 'CANCEL_REQUESTED';
 
     const STATUSES = [
         self::STATUS_PENDING,
@@ -25,6 +26,7 @@ class Order extends Model
         self::STATUS_DELIVERED,
         self::STATUS_COMPLETED,
         self::STATUS_CANCELLED,
+        self::STATUS_CANCELLATION_REQUESTED,
     ];
 
     protected $guarded = [];
@@ -57,6 +59,16 @@ class Order extends Model
     public function tracking()
     {
         return $this->hasOne(DeliveryTracking::class);
+    }
+
+    public function deliveryTracking()
+    {
+        return $this->hasOne(DeliveryTracking::class);
+    }
+
+    public function statusLogs()
+    {
+        return $this->hasMany(OrderStatusLog::class);
     }
 
     public function paymentProof()
