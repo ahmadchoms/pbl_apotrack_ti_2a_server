@@ -2,11 +2,9 @@
 
 namespace App\Services\Admin;
 
+use App\Events\PharmacyVerificationChanged;
 use App\Models\Pharmacy;
-use App\Models\PharmacyOperatingHour;
-use App\Models\PharmacyStaff;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PharmacyService
 {
@@ -62,7 +60,6 @@ class PharmacyService
                 'sia_number' => $data['sia_number'] ?? null,
             ]);
 
-            // Default hours: Mon-Sun, 08:00 - 20:00 if not provided
             $hours = $data['operatingHours'] ?? [];
             if (empty($hours)) {
                 for ($i = 0; $i < 7; $i++) {
@@ -139,19 +136,24 @@ class PharmacyService
     public function verifyLegality(Pharmacy $pharmacy, string $status, ?string $note = null)
     {
         return DB::transaction(function () use ($pharmacy, $status, $note) {
-            $pharmacy->update([
-                'verification_status' => $status === 'APPROVED' ? 'VERIFIED' : 'REJECTED'
-            ]);
+            $isApproved = ($status === 'APPROVED');
 
-            // Assuming there's a way to record the verification note in legality or a separate table
-            // For now, let's just log it in AuditLog
-            \App\Models\AuditLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'VERIFY_PHARMACY_LEGALITY',
-                'description' => "Verified legality for {$pharmacy->name} as {$status}. Note: " . ($note ?? '-'),
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent()
-            ]);
+            $updateData = [
+                'verification_status' => $isApproved ? 'VERIFIED' : 'REJECTED',
+                'is_active'           => $isApproved,
+                'verified_by'         => auth()->id(),
+                'verified_at'         => now(),
+            ];
+
+            if (!$isApproved) {
+                $updateData['rejection_reason'] = $note ?? 'Dokumen legalitas tidak sesuai atau sudah kedaluwarsa.';
+            } else {
+                $updateData['rejection_reason'] = null;
+            }
+
+            $pharmacy->update($updateData);
+
+            event(new PharmacyVerificationChanged($pharmacy, $status));
 
             return $pharmacy;
         });
@@ -162,14 +164,6 @@ class PharmacyService
         return DB::transaction(function () use ($pharmacy) {
             $newStatus = $pharmacy->verification_status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
             $pharmacy->update(['verification_status' => $newStatus]);
-
-            \App\Models\AuditLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'TOGGLE_PHARMACY_SUSPENSION',
-                'description' => "Changed status for {$pharmacy->name} to {$newStatus}",
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent()
-            ]);
 
             return $pharmacy;
         });

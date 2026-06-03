@@ -56,14 +56,29 @@ class SendOrderStatusNotificationListener implements ShouldQueue
             'title' => "Status Pesanan Diperbarui",
             'message' => $message,
             'type' => 'ORDER_STATUS',
-            'data' => [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
-                'old_status' => $event->oldStatus,
-                'new_status' => $event->newStatus,
-            ],
+            'reference_type' => 'ORDER',
+            'reference_id' => $order->id,
             'is_read' => false,
         ]);
+
+        // Kirim notifikasi ke seluruh staff apotek terkait jika ada pesanan baru
+        if ($event->newStatus === 'PENDING') {
+            $staffUsers = \App\Models\User::whereHas('pharmacyStaff', function ($query) use ($order) {
+                $query->where('pharmacy_id', $order->pharmacy_id)
+                      ->where('is_active', true);
+            })->get();
+
+            foreach ($staffUsers as $staff) {
+                $staff->notifications()->create([
+                    'title' => "Pesanan Baru Masuk",
+                    'message' => "Ada pesanan baru #{$order->order_number} dari pelanggan. Harap segera periksa dan konfirmasi.",
+                    'type' => 'NEW_ORDER',
+                    'reference_type' => 'ORDER',
+                    'reference_id' => $order->id,
+                    'is_read' => false,
+                ]);
+            }
+        }
 
         Log::info("Notifikasi berhasil disimpan untuk User ID: {$user->id}");
     }

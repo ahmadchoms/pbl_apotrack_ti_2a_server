@@ -22,6 +22,7 @@ import {
     Shield,
     Sparkles,
     Check,
+    ArrowLeft,
 } from "lucide-react";
 import {
     Card,
@@ -32,10 +33,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-// ─────────────────────────────────────────────
-// Constants
-// ─────────────────────────────────────────────
+import { Link } from "@inertiajs/react";
 
 const NEXT_STEPS = [
     {
@@ -61,10 +59,6 @@ const NEXT_STEPS = [
     },
 ];
 
-// ─────────────────────────────────────────────
-// Animation Variants
-// ─────────────────────────────────────────────
-
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -81,10 +75,6 @@ const fadeUpVariants = {
         transition: { type: "spring", stiffness: 100, damping: 15 },
     },
 };
-
-// ─────────────────────────────────────────────
-// Animated Background Orbs
-// ─────────────────────────────────────────────
 
 function BackgroundOrbs() {
     return (
@@ -135,17 +125,12 @@ function BackgroundOrbs() {
     );
 }
 
-// ─────────────────────────────────────────────
-// Timeline Step Component
-// ─────────────────────────────────────────────
-
 function TimelineStep({ icon: Icon, title, desc, status, isLast }) {
     const isPending = status === "pending";
     const isDone = status === "done";
     const isRejected = status === "rejected";
     const isWaiting = status === "waiting";
 
-    // Glowing border styling
     const ringColor = isDone
         ? "border-emerald-500/30 bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/10"
         : isRejected
@@ -226,10 +211,6 @@ function TimelineStep({ icon: Icon, title, desc, status, isLast }) {
     );
 }
 
-// ─────────────────────────────────────────────
-// Data Field Component
-// ─────────────────────────────────────────────
-
 function DataField({ icon: Icon, label, value, mono }) {
     return (
         <div className="space-y-2 p-4 rounded-2xl bg-slate-50/50 border border-slate-100 hover:border-slate-200 hover:bg-white hover:shadow-sm transition-all duration-300">
@@ -252,10 +233,6 @@ function DataField({ icon: Icon, label, value, mono }) {
     );
 }
 
-// ─────────────────────────────────────────────
-// Main Page Component
-// ─────────────────────────────────────────────
-
 export default function WaitingRoomPage({ registration }) {
     const isRejected = registration.isRejected;
 
@@ -264,20 +241,30 @@ export default function WaitingRoomPage({ registration }) {
             <BackgroundOrbs />
 
             <motion.div
+                variants={fadeUpVariants}
+                className="mb-6 align-start self-start"
+            >
+                <Link
+                    href={route("auth.logout")}
+                    method="post"
+                    as="button"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-500 bg-white/80 hover:bg-white border border-slate-200/80 rounded-xl hover:text-primary hover:border-primary hover:shadow-md active:scale-95 transition-all duration-300 cursor-pointer shadow-sm shadow-slate-100"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Kembali ke Login</span>
+                </Link>
+            </motion.div>
+
+            <motion.div
                 className="relative z-10 w-full max-w-6xl flex-1 flex flex-col"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
-                {/* Header Section */}
                 <motion.header
                     variants={fadeUpVariants}
                     className="mb-14 text-center"
                 >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-primary text-xs font-semibold border border-blue-100 mb-4">
-                        <Sparkles className="w-3.5 h-3.5 animate-pulse text-primary" />
-                        <span>ApoTrack Onboarding</span>
-                    </div>
                     <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4">
                         Status Verifikasi Apotek
                     </h1>
@@ -287,13 +274,10 @@ export default function WaitingRoomPage({ registration }) {
                     </p>
                 </motion.header>
 
-                {/* Asymmetric Grid Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* Main Content Area (Timeline + Data) */}
                     <div className="lg:col-span-8 space-y-8">
-                        {/* Timeline Card */}
                         <motion.div variants={fadeUpVariants}>
-                            <Card className="border border-slate-200/80 rounded-[2.5rem] shadow-xl shadow-slate-200/30 bg-white/80 backdrop-blur-md overflow-hidden">
+                            <Card className="pt-0 border border-slate-200/80 rounded-[2.5rem] shadow-xl shadow-slate-200/30 bg-white/80 backdrop-blur-md overflow-hidden">
                                 <CardHeader className="p-8 md:p-10 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div>
                                         <CardTitle className="text-lg font-bold text-slate-900">
@@ -355,9 +339,8 @@ export default function WaitingRoomPage({ registration }) {
                             </Card>
                         </motion.div>
 
-                        {/* Registration Details Card */}
                         <motion.div variants={fadeUpVariants}>
-                            <Card className="border border-slate-200/80 rounded-[2.5rem] shadow-xl shadow-slate-200/30 bg-white/80 backdrop-blur-md overflow-hidden">
+                            <Card className="pt-0 border border-slate-200/80 rounded-[2.5rem] shadow-xl shadow-slate-200/30 bg-white/80 backdrop-blur-md overflow-hidden">
                                 <CardHeader className="p-8 md:p-10 border-b border-slate-100">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 border border-blue-100 text-primary">
@@ -411,9 +394,7 @@ export default function WaitingRoomPage({ registration }) {
                         </motion.div>
                     </div>
 
-                    {/* Sidebar Area (Onboarding/Actions) */}
                     <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-                        {/* Time Estimate Box */}
                         <motion.div variants={fadeUpVariants}>
                             <div className="rounded-3xl p-6 bg-linear-to-br from-primary to-[#0055a5] border border-blue-900/10 text-white shadow-xl shadow-blue-900/10 relative overflow-hidden">
                                 <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-white/5" />
@@ -441,9 +422,8 @@ export default function WaitingRoomPage({ registration }) {
                             </div>
                         </motion.div>
 
-                        {/* Next Steps List */}
                         <motion.div variants={fadeUpVariants}>
-                            <Card className="border border-slate-200/80 rounded-[2.5rem] shadow-xl shadow-slate-200/30 bg-white/80 backdrop-blur-md overflow-hidden">
+                            <Card className="pt-0 border border-slate-200/80 rounded-[2.5rem] shadow-xl shadow-slate-200/30 bg-white/80 backdrop-blur-md overflow-hidden">
                                 <CardHeader className="p-6 md:p-8 border-b border-slate-100">
                                     <CardTitle className="text-sm font-bold text-slate-800">
                                         Langkah Selanjutnya
@@ -491,7 +471,6 @@ export default function WaitingRoomPage({ registration }) {
                             </Card>
                         </motion.div>
 
-                        {/* Customer Support Button */}
                         <motion.div
                             variants={fadeUpVariants}
                             className="space-y-3"
@@ -515,7 +494,6 @@ export default function WaitingRoomPage({ registration }) {
                     </div>
                 </div>
 
-                {/* Footer Security Badge */}
                 <motion.div
                     className="mt-16 mb-4 text-center flex items-center justify-center gap-2 text-xs text-slate-400 font-medium"
                     initial={{ opacity: 0 }}

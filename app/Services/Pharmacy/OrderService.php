@@ -132,6 +132,11 @@ class OrderService
 
             return $order;
         });
+
+        // Dispatch status changed event to notify customer and pharmacy staff (outside transaction to prevent race conditions)
+        OrderStatusChangedEvent::dispatch($order, 'NONE', 'PENDING');
+
+        return $order;
     }
 
     protected function reduceStock($medicine, $quantity)

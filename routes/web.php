@@ -32,7 +32,7 @@ use App\Http\Controllers\Pharmacy\{
 
 use App\Http\Controllers\WaitingRoomController;
 
-Route::get('/', fn() => Inertia::render('index'))->name('home');
+Route::redirect('/', '/auth/login');
 
 /*
 |--------------------------------------------------------------------------

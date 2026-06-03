@@ -2,9 +2,14 @@
 
 namespace App\Services\Admin;
 
+use App\Enums\UserRole;
+use App\Events\UserSuspensionChanged;
+use App\Models\Pharmacy;
+use App\Models\PharmacyStaff;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserService
 {
@@ -63,8 +68,26 @@ class UserService
 
     public function toggleActive(User $user)
     {
-        $user->update(['is_active' => !$user->is_active]);
-        return $user;
+        return DB::transaction(function () use ($user) {
+            $newActiveStatus = !$user->is_active;
+
+            $user->update(['is_active' => $newActiveStatus]);
+
+            $isApoteker = PharmacyStaff::where('user_id', $user->id)
+                ->where('role', 'APOTEKER')
+                ->exists();
+
+            if ($isApoteker) {
+                Pharmacy::whereHas('staffs', function ($query) use ($user) {
+                    $query->where('user_id', $user->id)
+                        ->where('role', 'APOTEKER');
+                })->update(['is_active' => $newActiveStatus]);
+            }
+
+            event(new UserSuspensionChanged($user, $newActiveStatus));
+
+            return $user;
+        });
     }
 
     public function resetPassword(User $user)
@@ -86,8 +109,8 @@ class UserService
                     $path = str_replace(url('storage') . '/', '', $oldAvatar);
                     $path = ltrim(str_replace('/storage/', '', $path), '/');
 
-                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                    if (Storage::disk('public')->exists($path)) {
+                        Storage::disk('public')->delete($path);
                     }
                 }
             }
