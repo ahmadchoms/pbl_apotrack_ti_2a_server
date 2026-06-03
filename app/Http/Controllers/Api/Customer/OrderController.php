@@ -435,4 +435,28 @@ class OrderController extends BaseApiController
             return $this->errorResponse($e->getMessage(), $code);
         }
     }
+
+        public function requestCancellation(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        try {
+            $order = $this->orderService->requestCancellation(
+                $request->user(),
+                $id,
+                $request->reason
+            );
+
+            return $this->successResponse(
+                new OrderResource($order),
+                'Permintaan pembatalan berhasil dikirim'
+            );
+        } catch (\Exception $e) {
+            $code = $e->getCode() >= 400 && $e->getCode() <= 500
+                ? $e->getCode() : 422;
+            return $this->errorResponse($e->getMessage(), $code);
+        }
+    }
 }

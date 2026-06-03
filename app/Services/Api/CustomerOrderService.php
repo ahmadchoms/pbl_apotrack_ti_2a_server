@@ -41,7 +41,14 @@ class CustomerOrderService
      */
     public function showOrder(User $user, string $id): Order
     {
-        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription'])
+        return Order::with([
+            'items.medicine',
+            'pharmacy',
+            'tracking',
+            'statusLogs',
+            'prescription',
+            'address',
+        ])
             ->where('user_id', $user->id)
             ->findOrFail($id);
     }
@@ -52,16 +59,18 @@ class CustomerOrderService
     public function uploadPrescription(User $user, string $id, $file): Prescription
     {
         return DB::transaction(function () use ($user, $id, $file) {
-            $order = Order::where('user_id', $user->id)->lockForUpdate()->findOrFail($id);
+            $order = Order::where('user_id', $user->id)
+                ->lockForUpdate()
+                ->findOrFail($id);
 
             // Simpan file sementara di local disk agar proses HTTP tidak terblokir
             $localPath = $file->store('temp/prescriptions', 'local');
 
             $prescription = Prescription::create([
-                'user_id' => $user->id,
-                'order_id' => $order->id,
-                'image_url' => url('api/temp-prescription/' . basename($localPath)), // Placeholder URL sementara
-                'status' => 'UPLOADING', // Status baru untuk menandakan sedang diunggah ke cloud
+                'user_id'   => $user->id,
+                'order_id'  => $order->id,
+                'image_url' => url('api/temp-prescription/' . basename($localPath)),
+                'status'    => 'UPLOADING',
             ]);
 
             $order->update(['prescription_id' => $prescription->id]);
@@ -80,7 +89,10 @@ class CustomerOrderService
     {
         return Order::with(['items.medicine', 'pharmacy'])
             ->where('user_id', $user->id)
-            ->whereIn('order_status', [Order::STATUS_COMPLETED, Order::STATUS_CANCELLED])
+            ->whereIn('order_status', [
+                Order::STATUS_COMPLETED,
+                Order::STATUS_CANCELLED,
+            ])
             ->latest()
             ->paginate($perPage);
     }
@@ -95,7 +107,10 @@ class CustomerOrderService
             ->findOrFail($id);
 
         if (!$order->deliveryTracking) {
-            throw new \Exception('Informasi pengiriman tidak ditemukan untuk pesanan ini.', 404);
+            throw new \Exception(
+                'Informasi pengiriman tidak ditemukan untuk pesanan ini.',
+                404
+            );
         }
 
         return $order->deliveryTracking;
@@ -107,18 +122,78 @@ class CustomerOrderService
     public function simulatePayment(User $user, string $id): Order
     {
         return DB::transaction(function () use ($user, $id) {
-            $order = Order::where('user_id', $user->id)->lockForUpdate()->findOrFail($id);
+            $order = Order::where('user_id', $user->id)
+                ->lockForUpdate()
+                ->findOrFail($id);
 
             if ($order->payment_status !== 'UNPAID') {
-                throw new \Exception('Pesanan ini sudah dibayar atau status tidak valid.', 422);
+                throw new \Exception(
+                    'Pesanan ini sudah dibayar atau status tidak valid.',
+                    422
+                );
             }
 
             $order->update([
                 'payment_status' => 'PAID',
-                'paid_at' => now(),
+                'paid_at'        => now(),
             ]);
 
             return $order;
+        });
+    }
+
+    public function requestCancellation(User $user, string $id, string $reason): Order
+    {
+        return DB::transaction(function () use ($user, $id, $reason) {
+            $order = Order::where('user_id', $user->id)
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($order->order_status !== Order::STATUS_PENDING) {
+                throw new \Exception(
+                    'Hanya pesanan dengan status PENDING yang dapat dibatalkan.'
+                );
+            }
+
+            $order->update([
+                'order_status'        => Order::STATUS_CANCELLATION_REQUESTED,
+                'cancellation_reason' => $reason,
+            ]);
+
+            $order->statusLogs()->create([
+                'status'      => Order::STATUS_CANCELLATION_REQUESTED,
+                'description' => 'Customer mengajukan pembatalan: ' . $reason,
+                'source'      => 'CUSTOMER',
+            ]);
+
+            return $order->fresh(['items.medicine', 'pharmacy', 'statusLogs']);
+        });
+    }
+    public function confirmReceived(User $user, string $id): Order
+    {
+        return DB::transaction(function () use ($user, $id) {
+            $order = Order::where('user_id', $user->id)
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($order->order_status !== 'SHIPPED') {
+                throw new \Exception(
+                    'Pesanan harus dalam status SHIPPED untuk dikonfirmasi.',
+                    422
+                );
+            }
+
+            $order->update([
+                'order_status' => Order::STATUS_COMPLETED,
+            ]);
+
+            $order->statusLogs()->create([
+                'status'      => Order::STATUS_COMPLETED,
+                'description' => 'Customer mengkonfirmasi pesanan telah diterima.',
+                'source'      => 'CUSTOMER',
+            ]);
+
+            return $order->fresh(['items.medicine', 'pharmacy', 'statusLogs']);
         });
     }
 }

@@ -418,4 +418,50 @@ class OrderController extends BaseApiController
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
+
+    // ── TAMBAHAN BARU ─────────────────────────────────────────────
+
+    public function approveCancellation(Request $request, $id)
+    {
+        try {
+            $order = $this->staffOrderService->approveCancellation(
+                $request->user(), $id
+            );
+
+            AuditHelper::log(
+                'APPROVE_CANCELLATION',
+                "Menyetujui pembatalan pesanan {$order->order_number}.",
+                ['order_id' => $order->id]
+            );
+
+            return $this->successResponse(
+                new OrderResource($order),
+                'Pembatalan pesanan disetujui'
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
+    }
+
+    public function rejectCancellation(Request $request, $id)
+    {
+        try {
+            $order = $this->staffOrderService->rejectCancellation(
+                $request->user(), $id
+            );
+
+            AuditHelper::log(
+                'REJECT_CANCELLATION',
+                "Menolak pembatalan pesanan {$order->order_number}.",
+                ['order_id' => $order->id]
+            );
+
+            return $this->successResponse(
+                new OrderResource($order),
+                'Pembatalan pesanan ditolak'
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
+    }
 }

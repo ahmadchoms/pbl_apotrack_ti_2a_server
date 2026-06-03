@@ -93,4 +93,45 @@ class OrderController extends BaseApiController
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
+
+    public function requestCancellation(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        try {
+            $order = $this->customerOrderService->requestCancellation(
+                $request->user(),
+                $id,
+                $request->reason
+            );
+
+            return $this->successResponse(
+                new OrderResource($order),
+                'Permintaan pembatalan berhasil dikirim'
+            );
+        } catch (\Exception $e) {
+            $code = $e->getCode() >= 400 && $e->getCode() <= 500
+                ? $e->getCode() : 422;
+            return $this->errorResponse($e->getMessage(), $code);
+        }
+    }
+    public function confirmReceived(Request $request, $id)
+    {
+        try {
+            $order = $this->customerOrderService->confirmReceived(
+                $request->user(), $id
+            );
+
+            return $this->successResponse(
+                new OrderResource($order),
+                'Pesanan berhasil dikonfirmasi diterima'
+            );
+        } catch (\Exception $e) {
+            $code = $e->getCode() >= 400 && $e->getCode() <= 500
+                ? $e->getCode() : 422;
+            return $this->errorResponse($e->getMessage(), $code);
+        }
+    }
 }

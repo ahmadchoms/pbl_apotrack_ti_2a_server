@@ -75,6 +75,8 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         // Uploads
         Route::post('/orders/{id}/prescription', [OrderController::class, 'uploadPrescription']);
         Route::post('/orders/{id}/simulate-payment', [OrderController::class, 'simulatePayment']);
+        Route::post('/orders/{id}/cancel', [OrderController::class, 'requestCancellation']);
+        Route::post('/orders/{id}/confirm-received', [OrderController::class, 'confirmReceived']);
 
         // Reviews
         Route::post('/reviews', [ReviewController::class, 'store']);
@@ -89,6 +91,8 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::patch('/orders/{id}/status', [StaffOrderController::class, 'updateStatus']);
         Route::post('/orders/verify', [StaffOrderController::class, 'verify']);
         Route::post('/orders/{id}/ship', [StaffOrderController::class, 'shipOrder']);
+        Route::post('/orders/{id}/approve-cancellation', [StaffOrderController::class, 'approveCancellation']);
+        Route::post('/orders/{id}/reject-cancellation', [StaffOrderController::class, 'rejectCancellation']);
         Route::post('/pos/orders', [StaffOrderController::class, 'storePOS']);
 
         // Inventory Management

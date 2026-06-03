@@ -4,6 +4,7 @@ namespace App\Services\Api;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Enums\OrderStatus;
 use App\Services\Pharmacy\OrderService;
 use App\Jobs\CreateBiteshipOrderJob;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,10 @@ class StaffOrderService
             ->first();
 
         if (!$order) {
-            throw new \Exception('Kode verifikasi tidak valid atau pesanan tidak ditemukan di apotek ini.', 404);
+            throw new \Exception(
+                'Kode verifikasi tidak valid atau pesanan tidak ditemukan di apotek ini.',
+                404
+            );
         }
 
         return $order->load(['items', 'user']);
@@ -80,50 +84,53 @@ class StaffOrderService
                 ->findOrFail($id);
 
             if ($order->order_status !== Order::STATUS_READY_FOR_PICKUP) {
-                throw new \Exception('Pesanan harus dalam status READY_FOR_PICKUP sebelum dikirim.', 422);
+                throw new \Exception(
+                    'Pesanan harus dalam status READY_FOR_PICKUP sebelum dikirim.',
+                    422
+                );
             }
 
             $items = $order->items->map(function ($item) {
                 return [
-                    'name' => $item->medicine_name,
+                    'name'     => $item->medicine_name,
                     'quantity' => $item->quantity,
-                    'value' => (int) $item->price,
+                    'value'    => (int) $item->price,
                 ];
             })->toArray();
 
             $payload = [
-                'shipper_contact_name' => $order->pharmacy->name,
-                'shipper_contact_phone' => $order->pharmacy->phone ?? '081234567890',
-                'shipper_contact_email' => $order->pharmacy->email ?? 'admin@apotrack.com',
-                'shipper_organization' => $order->pharmacy->name,
-                'origin_contact_name' => $order->pharmacy->name,
-                'origin_contact_phone' => $order->pharmacy->phone ?? '081234567890',
-                'origin_address' => $order->pharmacy->address,
-                'origin_coordinate' => [
-                    'latitude' => (float) $order->pharmacy->latitude,
+                'shipper_contact_name'    => $order->pharmacy->name,
+                'shipper_contact_phone'   => $order->pharmacy->phone ?? '081234567890',
+                'shipper_contact_email'   => $order->pharmacy->email ?? 'admin@apotrack.com',
+                'shipper_organization'    => $order->pharmacy->name,
+                'origin_contact_name'     => $order->pharmacy->name,
+                'origin_contact_phone'    => $order->pharmacy->phone ?? '081234567890',
+                'origin_address'          => $order->pharmacy->address,
+                'origin_coordinate'       => [
+                    'latitude'  => (float) $order->pharmacy->latitude,
                     'longitude' => (float) $order->pharmacy->longitude,
                 ],
-                'destination_contact_name' => $order->user->username,
+                'destination_contact_name'  => $order->user->username,
                 'destination_contact_phone' => $order->user->phone ?? '081234567890',
                 'destination_contact_email' => $order->user->email,
-                'destination_address' => $order->address->complete_address,
-                'destination_coordinate' => [
-                    'latitude' => (float) $order->address->latitude,
+                'destination_address'       => $order->address->complete_address,
+                'destination_coordinate'    => [
+                    'latitude'  => (float) $order->address->latitude,
                     'longitude' => (float) $order->address->longitude,
                 ],
                 'courier_company' => $data['courier_code'],
-                'courier_type' => $data['courier_service'],
-                'delivery_type' => 'now',
-                'items' => $items,
+                'courier_type'    => $data['courier_service'],
+                'delivery_type'   => 'now',
+                'items'           => $items,
             ];
 
             // Buat record tracking sementara
             $order->tracking()->updateOrCreate(
                 ['order_id' => $order->id],
                 [
-                    'courier_code' => $data['courier_code'],
+                    'courier_code'    => $data['courier_code'],
                     'courier_service' => $data['courier_service'],
-                    'status' => 'PENDING_BITESHIP',
+                    'status'          => 'PENDING_BITESHIP',
                 ]
             );
 
@@ -155,5 +162,65 @@ class StaffOrderService
         $order = Order::where('pharmacy_id', $staff->pharmacy_id)->findOrFail($id);
 
         return $this->orderService->updateStatus($order->id, \App\Enums\OrderStatus::from($status), $note);
+    }
+
+    public function approveCancellation(User $user, string $id): Order
+    {
+        $staff = $user->pharmacyStaff;
+
+        return DB::transaction(function () use ($staff, $id) {
+            $order = Order::where('pharmacy_id', $staff->pharmacy_id)
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($order->order_status !== Order::STATUS_CANCELLATION_REQUESTED) {
+                throw new \Exception(
+                    'Pesanan tidak dalam status permintaan pembatalan.'
+                );
+            }
+
+            $order->update([
+                'order_status' => Order::STATUS_CANCELLED,
+            ]);
+
+            $order->statusLogs()->create([
+                'status'      => Order::STATUS_CANCELLED,
+                'description' => 'Staff menyetujui pembatalan pesanan.',
+                'source'      => 'STAFF',
+            ]);
+
+            return $order->fresh(['items.medicine', 'pharmacy', 'statusLogs']);
+        });
+    }
+
+    public function rejectCancellation(User $user, string $id): Order
+    {
+        $staff = $user->pharmacyStaff;
+
+        return DB::transaction(function () use ($staff, $id) {
+            $order = Order::where('pharmacy_id', $staff->pharmacy_id)
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($order->order_status !== Order::STATUS_CANCELLATION_REQUESTED) {
+                throw new \Exception(
+                    'Pesanan tidak dalam status permintaan pembatalan.'
+                );
+            }
+
+            // Kembalikan ke PENDING agar customer bisa lanjut
+            $order->update([
+                'order_status'        => Order::STATUS_PENDING,
+                'cancellation_reason' => null,
+            ]);
+
+            $order->statusLogs()->create([
+                'status'      => Order::STATUS_PENDING,
+                'description' => 'Staff menolak pembatalan, pesanan dikembalikan ke PENDING.',
+                'source'      => 'STAFF',
+            ]);
+
+            return $order->fresh(['items.medicine', 'pharmacy', 'statusLogs']);
+        });
     }
 }
