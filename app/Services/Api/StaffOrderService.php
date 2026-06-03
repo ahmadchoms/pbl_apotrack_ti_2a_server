@@ -154,6 +154,6 @@ class StaffOrderService
         $staff = $user->pharmacyStaff;
         $order = Order::where('pharmacy_id', $staff->pharmacy_id)->findOrFail($id);
 
-        return $this->orderService->updateStatus($order->id, $status, $note);
+        return $this->orderService->updateStatus($order->id, \App\Enums\OrderStatus::from($status), $note);
     }
 }

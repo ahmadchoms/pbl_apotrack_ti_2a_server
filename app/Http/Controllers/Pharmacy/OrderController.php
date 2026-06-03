@@ -88,7 +88,7 @@ class OrderController extends Controller
             return redirect()->back()
                 ->withErrors(['items' => $e->getMessage()])
                 ->withInput();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()
                 ->with('error', 'Gagal membuat pesanan: ' . $e->getMessage())
                 ->withInput();
@@ -122,7 +122,7 @@ class OrderController extends Controller
             $this->orderService->updateStatus($id, OrderStatus::from($request->status), $request->note);
         } catch (InvalidOrderStatusTransitionException $e) {
             return redirect()->back()->with('error', $e->getMessage());
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui status: ' . $e->getMessage());
         }
 

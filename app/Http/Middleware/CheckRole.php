@@ -33,35 +33,50 @@ class CheckRole
             }
         }
 
-        // 1. Cek role utama di tabel users
-        if (in_array($user->role, $normalizedRoles)) {
-            return $next($request);
-        }
+        // 1. Cek jika role ini berkaitan dengan Staff (STAFF atau APOTEKER)
+        $isStaffRole = in_array($user->role, ['STAFF', 'APOTEKER']) || 
+                       in_array('STAFF', $normalizedRoles) || 
+                       in_array('APOTEKER', $normalizedRoles);
 
-        // 2. Logika Khusus Staf
-        $user->loadMissing('pharmacyStaff');
-        $staff = $user->pharmacyStaff;
+        if ($isStaffRole) {
+            $user->loadMissing('pharmacyStaff');
+            $staff = $user->pharmacyStaff;
 
-        if ($staff && $staff->is_active) {
-            // Izinkan jika rute ini memang ditujukan untuk staf (role STAFF atau APOTEKER diminta)
-            if (in_array('STAFF', $normalizedRoles) || in_array('APOTEKER', $normalizedRoles)) {
+            if (!$staff || !$staff->is_active) {
+                return $request->expectsJson() || $request->is('api/*')
+                    ? response()->json([
+                        'status' => 'error',
+                        'message' => 'Anda tidak terdaftar sebagai staf apotek aktif. Silakan hubungi admin.',
+                    ], 403)
+                    : abort(403, 'Anda tidak terdaftar sebagai staf apotek aktif. Silakan hubungi admin.');
+            }
+
+            // Izinkan jika role utama di tabel users cocok
+            if (in_array($user->role, $normalizedRoles)) {
                 return $next($request);
             }
             
-            // Cek role spesifik milik staf tersebut
+            // Cek role spesifik milik staf tersebut di tabel staffs
             if (in_array($staff->role, $normalizedRoles)) {
+                return $next($request);
+            }
+        } else {
+            // Untuk non-staff (misal SUPER_ADMIN atau USER)
+            if (in_array($user->role, $normalizedRoles)) {
                 return $next($request);
             }
         }
 
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Anda tidak memiliki otoritas untuk mengakses halaman ini.',
-            'debug' => [
-                'user_role' => $user->role,
-                'staff_found' => (bool)$staff,
-                'required_roles' => $normalizedRoles
-            ]
-        ], 403);
+        return $request->expectsJson() || $request->is('api/*')
+            ? response()->json([
+                'status' => 'error',
+                'message' => 'Anda tidak memiliki otoritas untuk mengakses halaman ini.',
+                'debug' => [
+                    'user_role' => $user->role,
+                    'staff_found' => isset($staff) ? (bool)$staff : false,
+                    'required_roles' => $normalizedRoles
+                ]
+            ], 403)
+            : abort(403, 'Anda tidak memiliki otoritas untuk mengakses halaman ini.');
     }
 }

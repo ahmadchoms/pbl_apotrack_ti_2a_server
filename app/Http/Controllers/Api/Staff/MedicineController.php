@@ -141,7 +141,7 @@ class MedicineController extends BaseApiController
             );
 
             return $this->successResponse($batch, 'Stok berhasil diperbarui');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
     }

@@ -85,7 +85,7 @@ class OrderController extends BaseApiController
             );
 
             return $this->successResponse(new OrderResource($order), 'Permintaan pengiriman berhasil dikirim ke Biteship');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $code = $e->getCode() >= 400 && $e->getCode() <= 500 ? $e->getCode() : 422;
             return $this->errorResponse('Gagal memproses pengiriman: ' . $e->getMessage(), $code);
         }
@@ -148,7 +148,7 @@ class OrderController extends BaseApiController
             $orders = $this->staffOrderService->listOrders($request->user(), $request->only('status'), 20);
 
             return $this->successResponse(OrderResource::collection($orders), 'Daftar pesanan apotek berhasil diambil');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), 403);
         }
     }
@@ -203,7 +203,7 @@ class OrderController extends BaseApiController
             $order = $this->staffOrderService->showOrder($request->user(), $id);
 
             return $this->successResponse(new OrderResource($order), 'Detail pesanan berhasil diambil');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse('Pesanan tidak ditemukan di apotek ini.', 404);
         }
     }
@@ -279,7 +279,7 @@ class OrderController extends BaseApiController
             );
 
             return $this->successResponse(new OrderResource($updatedOrder), "Status pesanan berhasil diperbarui menjadi {$request->status}");
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
@@ -341,7 +341,7 @@ class OrderController extends BaseApiController
             );
 
             return $this->successResponse(new OrderResource($order), 'Kode verifikasi valid');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), 404);
         }
     }
@@ -414,7 +414,7 @@ class OrderController extends BaseApiController
             );
 
             return $this->successResponse(new OrderResource($order->load('items')), 'Pesanan kasir berhasil dibuat', 201);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
