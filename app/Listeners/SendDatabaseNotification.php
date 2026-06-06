@@ -6,6 +6,8 @@ use App\Models\Notification;
 use App\Events\PharmacyVerificationChanged;
 use App\Events\UserSuspensionChanged;
 use App\Models\PharmacyStaff;
+use App\Events\PharmacyThresholdBreached;
+use App\Models\User;
 
 class SendDatabaseNotification
 {
@@ -59,6 +61,26 @@ class SendDatabaseNotification
             'type'           => 'SECURITY_ALERT',
             'reference_type' => 'USER',
             'reference_id'   => $user->id,
+            'is_read'        => false,
+        ]);
+    }
+
+    public function handleThresholdBreach(PharmacyThresholdBreached $event)
+    {
+        $admin = User::where('role', 'ADMIN')->first();
+
+        if (!$admin) {
+            \Illuminate\Support\Facades\Log::warning("Gagal mengirim notifikasi threshold breach karena tidak ada user dengan role ADMIN.");
+            return;
+        }
+
+        Notification::create([
+            'user_id'        => $admin->id,
+            'title'          => 'Peringatan Moderasi Apotek',
+            'message'        => "Apotek '{$event->pharmacy->name}' telah menerima {$event->badReviewsCount} review buruk dalam 7 hari terakhir. Mohon segera lakukan investigasi pada kolom komentar.",
+            'type'           => 'MODERATION_ALERT',
+            'reference_type' => 'PHARMACY',
+            'reference_id'   => $event->pharmacy->id,
             'is_read'        => false,
         ]);
     }

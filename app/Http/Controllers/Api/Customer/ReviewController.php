@@ -12,6 +12,7 @@ use App\Http\Resources\Api\ReviewResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Annotations as OA;
+use App\Services\Admin\PharmacyService;
 
 class ReviewController extends BaseApiController
 {
@@ -214,7 +215,7 @@ class ReviewController extends BaseApiController
      *     )
      * )
      */
-    public function store(StoreReviewRequest $request)
+    public function store(StoreReviewRequest $request, PharmacyService $pharmacyService)
     {
         try {
             $user = $request->user();
@@ -248,6 +249,13 @@ class ReviewController extends BaseApiController
                 'rating' => $request->rating,
                 'comment' => $request->comment,
             ]);
+
+            if (in_array((int) $review->rating, [1, 2])) {
+                $pharmacy = $review->pharmacy;
+                if ($pharmacy) {
+                    $pharmacyService->checkModerationThreshold($pharmacy);
+                }
+            }
 
             return $this->successResponse(new ReviewResource($review->load('user')), 'Ulasan berhasil dikirim.', 201);
             

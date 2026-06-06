@@ -4,6 +4,8 @@ namespace App\Services\Admin;
 
 use App\Events\PharmacyVerificationChanged;
 use App\Models\Pharmacy;
+use App\Models\Review;
+use App\Events\PharmacyThresholdBreached;
 use Illuminate\Support\Facades\DB;
 
 class PharmacyService
@@ -157,6 +159,18 @@ class PharmacyService
 
             return $pharmacy;
         });
+    }
+
+    public function checkModerationThreshold(Pharmacy $pharmacy)
+    {
+        $badReviewsCount = Review::where('pharmacy_id', $pharmacy->id)
+            ->whereIn('rating', [1, 2])
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
+
+        if ($badReviewsCount >= 3) {
+            event(new PharmacyThresholdBreached($pharmacy, $badReviewsCount));
+        }
     }
 
     public function toggleSuspend(Pharmacy $pharmacy)
