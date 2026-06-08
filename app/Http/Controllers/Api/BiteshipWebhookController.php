@@ -21,12 +21,6 @@ class BiteshipWebhookController extends BaseApiController
                 ], 200);
             }
 
-            $signature = $request->header(config('services.biteship.key'));
-            if ($signature !== config('services.biteship.webhook_secret')) {
-                return response()->json(['message' => 'Unauthorized'], 401);
-            }
-
-            // Dispatch job ke antrean latar belakang agar Biteship (!mengalami timeout)
             ProcessBiteshipWebhookJob::dispatch($request->all());
 
             return $this->successResponse(null, 'Webhook received and queued for processing');
