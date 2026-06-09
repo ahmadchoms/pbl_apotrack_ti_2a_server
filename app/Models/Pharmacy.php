@@ -53,8 +53,8 @@ class Pharmacy extends Model
                 'verified' => $q->where('verification_status', 'VERIFIED'),
                 'pending' => $q->where('verification_status', 'PENDING'),
                 'rejected' => $q->where('verification_status', 'REJECTED'),
-                'active' => $q->where('is_active', true)->where('is_force_closed', false),
-                'closed' => $q->where(fn($sq) => $sq->where('is_active', false)->orWhere('is_force_closed', true)),
+                'active' => $q->whereRaw('is_active IS TRUE')->whereRaw('is_force_closed IS FALSE'),
+                'closed' => $q->where(fn($sq) => $sq->whereRaw('is_active IS FALSE')->orWhereRaw('is_force_closed IS TRUE')),
                 default => null,
             };
         });

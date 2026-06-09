@@ -6,6 +6,10 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Services\Api\CustomerOrderService;
 use App\Http\Requests\Api\Customer\StoreCustomerOrderRequest;
 use App\Http\Requests\Api\Customer\UploadPrescriptionRequest;
+use App\Http\Requests\Api\Customer\CheckShippingRatesRequest;
+use App\Models\Pharmacy;
+use App\Models\UserAddress;
+use App\Services\BiteshipService;
 use App\Http\Resources\Api\OrderResource;
 use App\Http\Resources\Api\DeliveryTrackingResource;
 use Illuminate\Http\Request;
@@ -15,7 +19,8 @@ use Illuminate\Support\Facades\Log;
 class OrderController extends BaseApiController
 {
     public function __construct(
-        protected CustomerOrderService $customerOrderService
+        protected CustomerOrderService $customerOrderService,
+        protected BiteshipService $biteshipService
     ) {}
 
     public function index(Request $request)
@@ -92,5 +97,91 @@ class OrderController extends BaseApiController
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
+    }
+
+    public function shippingRates(CheckShippingRatesRequest $request)
+    {
+        try {
+            $pharmacy = Pharmacy::findOrFail($request->pharmacy_id);
+            $address = UserAddress::where('user_id', $request->user()->id)
+                ->findOrFail($request->address_id);
+
+            $items = [];
+            if ($request->has('items') && is_array($request->items)) {
+                $items = $request->items;
+            }
+
+            try {
+                $rates = $this->biteshipService->checkRates([
+                    'origin_latitude' => (float) $pharmacy->latitude,
+                    'origin_longitude' => (float) $pharmacy->longitude,
+                    'destination_latitude' => (float) $address->latitude,
+                    'destination_longitude' => (float) $address->longitude,
+                    'items' => $items,
+                ]);
+
+                return $this->successResponse($rates, 'Tarif pengiriman berhasil diambil');
+            } catch (\Exception $e) {
+                Log::info('Biteship rates unavailable, using manual fallback: ' . $e->getMessage());
+                $manualRates = $this->calculateManualRates($pharmacy, $address);
+                return $this->successResponse($manualRates, 'Tarif pengiriman berhasil diambil');
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse('Gagal mengambil tarif: ' . $e->getMessage(), 500);
+        }
+    }
+
+    private function calculateManualRates(Pharmacy $pharmacy, UserAddress $address): array
+    {
+        $lat1 = deg2rad((float) $pharmacy->latitude);
+        $lon1 = deg2rad((float) $pharmacy->longitude);
+        $lat2 = deg2rad((float) $address->latitude);
+        $lon2 = deg2rad((float) $address->longitude);
+
+        $dlat = $lat2 - $lat1;
+        $dlon = $lon2 - $lon1;
+        $a = sin($dlat / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dlon / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $distanceKm = round(6371 * $c, 1);
+
+        $couriers = [
+            [
+                'company'         => 'JNE',
+                'courier_code'    => 'jne',
+                'courier_service' => 'Reguler',
+                'service_type'    => 'standard',
+                'price'           => max(8000, (int) round($distanceKm * 1500)),
+                'etd'             => $distanceKm <= 50 ? '1 - 2 days' : '2 - 4 days',
+            ],
+            [
+                'company'         => 'SiCepat',
+                'courier_code'    => 'sicepat',
+                'courier_service' => 'Reguler',
+                'service_type'    => 'standard',
+                'price'           => max(10000, (int) round($distanceKm * 1800)),
+                'etd'             => $distanceKm <= 50 ? '1 - 2 days' : '2 - 4 days',
+            ],
+            [
+                'company'         => 'JNE',
+                'courier_code'    => 'jne',
+                'courier_service' => 'YES (Yakin Esok Sampai)',
+                'service_type'    => 'overnight',
+                'price'           => max(15000, (int) round($distanceKm * 2500)),
+                'etd'             => '1 day',
+            ],
+            [
+                'company'         => 'AnterAja',
+                'courier_code'    => 'anteraja',
+                'courier_service' => 'Reguler',
+                'service_type'    => 'standard',
+                'price'           => max(7000, (int) round($distanceKm * 1200)),
+                'etd'             => $distanceKm <= 50 ? '1 - 3 days' : '2 - 5 days',
+            ],
+        ];
+
+        return [
+            'pricing'     => $couriers,
+            'distance_km' => $distanceKm,
+        ];
     }
 }

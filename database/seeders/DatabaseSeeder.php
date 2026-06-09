@@ -74,6 +74,13 @@ class DatabaseSeeder extends Seeder
             ['username' => 'Rina Staff', 'email' => 'rina@apotek.id', 'phone' => '085555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
             ['username' => 'Dr. Andi Apoteker', 'email' => 'andi@apotek2.id', 'phone' => '087777777777', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true], // Apoteker cabang lain
             ['username' => 'Hanif Nakal', 'email' => 'hanif@banned.id', 'phone' => '086666666666', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => false],
+
+            // User Tembalang
+            ['username' => 'Budi Hartono', 'email' => 'budi.hartono@apotek.id', 'phone' => '087111111111', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dewi Sartika', 'email' => 'dewi@apotek.id', 'phone' => '087222222222', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Agus Widodo', 'email' => 'agus@apotek.id', 'phone' => '087333333333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rina Marlina', 'email' => 'rina.marlina@apotek.id', 'phone' => '087444444444', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Bambang Staff', 'email' => 'bambang@apotek.id', 'phone' => '087555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
         ];
 
         $createdUsers = [];
@@ -177,6 +184,56 @@ class DatabaseSeeder extends Seeder
                 'is_force_closed' => false,
                 'verified_by' => null,
                 'verified_at' => null
+            ],
+
+            // Apotek Tembalang
+            [
+                'name' => 'Apotek Tembalang',
+                'address' => 'Jl. Adipati Unus / Prof. Sudarto No.35, Tembalang, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 7475442',
+                'latitude' => -7.0596,
+                'longitude' => 110.4391,
+                'rating' => 4.5,
+                'total_reviews' => 56,
+                'sia_number' => 'SIA-2024-1001',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(3)
+            ],
+            [
+                'name' => 'Apotek KeluargaKu Banjarsari',
+                'address' => 'Jl. Banjarsari Raya No.58H, Tembalang, Kec. Tembalang, Kota Semarang',
+                'phone' => '0812-1409-6959',
+                'latitude' => -7.0580,
+                'longitude' => 110.4410,
+                'rating' => 4.3,
+                'total_reviews' => 34,
+                'sia_number' => 'SIA-2024-1002',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(2)
+            ],
+            [
+                'name' => 'Kimia Farma Bulusan',
+                'address' => 'Jl. Timoho Raya No.287, Bulusan, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 1234567',
+                'latitude' => -7.0604,
+                'longitude' => 110.4436,
+                'rating' => 4.6,
+                'total_reviews' => 78,
+                'sia_number' => 'SIA-2024-1003',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(4)
             ]
         ];
 
@@ -215,6 +272,13 @@ class DatabaseSeeder extends Seeder
         // Dokter Andi adalah Apoteker di cabang 'Apotek Farma Prima'
         PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[1]->id, 'user_id' => $createdUsers['andi@apotek2.id']->id], ['role' => 'APOTEKER']);
 
+        // Staff Tembalang
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id, 'user_id' => $createdUsers['budi.hartono@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id, 'user_id' => $createdUsers['dewi@apotek.id']->id], ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[5]->id, 'user_id' => $createdUsers['agus@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id, 'user_id' => $createdUsers['rina.marlina@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id, 'user_id' => $createdUsers['bambang@apotek.id']->id], ['role' => 'STAFF']);
+
         // ==========================================
         // 4. MEDICINE SEEDS (EXPANDED)
         // ==========================================
@@ -230,6 +294,13 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Tolak Angin Cair', 'generic_name' => 'Herbal Extract', 'category' => 'Batuk & Flu', 'form' => 'Sachet', 'type' => 'Herbal', 'unit' => 'Box', 'manufacturer' => 'Sido Muncul', 'price' => 35000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Mengatasi masuk angin.', 'dosage' => '1 sachet jika perlu'],
             ['name' => 'Amlodipine 5mg', 'generic_name' => 'Amlodipine Besylate', 'category' => 'Antihipertensi', 'form' => 'Tablet', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Dexa Medica', 'price' => 6000, 'weight_in_grams' => 10, 'requires_prescription' => true, 'desc' => 'Obat penurun darah tinggi.', 'dosage' => 'Sesuai petunjuk dokter'],
             ['name' => 'Metformin 500mg', 'generic_name' => 'Metformin HCl', 'category' => 'Antidiabetes', 'form' => 'Tablet', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Bernofarm', 'price' => 5000, 'weight_in_grams' => 10, 'requires_prescription' => true, 'desc' => 'Obat diabetes melitus tipe 2.', 'dosage' => 'Sesuai petunjuk dokter'],
+
+            // Obat tambahan Tembalang
+            ['name' => 'Bodrex', 'generic_name' => 'Paracetamol, Phenylpropanolamine', 'category' => 'Analgesik', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma', 'price' => 5500, 'weight_in_grams' => 10, 'requires_prescription' => false, 'desc' => 'Obat sakit kepala dan demam.', 'dosage' => 'Dewasa: 1 tablet 3x sehari'],
+            ['name' => 'Diapet', 'generic_name' => 'Attapulgite', 'category' => 'Antasida & GERD', 'form' => 'Kapsul', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Meprofarm', 'price' => 7000, 'weight_in_grams' => 8, 'requires_prescription' => false, 'desc' => 'Mengatasi diare.', 'dosage' => '2 kapsul setiap kali buang air'],
+            ['name' => 'Antangin JRG', 'generic_name' => 'Herbal Extract', 'category' => 'Batuk & Flu', 'form' => 'Sachet', 'type' => 'Herbal', 'unit' => 'Box', 'manufacturer' => 'Sido Muncul', 'price' => 3500, 'weight_in_grams' => 15, 'requires_prescription' => false, 'desc' => 'Meredakan masuk angin.', 'dosage' => '1 sachet 3x sehari'],
+            ['name' => 'Mylanta', 'generic_name' => 'Aluminium Hydroxide, Magnesium Hydroxide, Simethicone', 'category' => 'Antasida & GERD', 'form' => 'Suspensi', 'type' => 'Obat Bebas', 'unit' => 'Botol', 'manufacturer' => 'Johnson & Johnson', 'price' => 25000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Obat maag dan kembung.', 'dosage' => '1-2 sendok teh 3x sehari'],
+            ['name' => 'Enervon-C', 'generic_name' => 'Vitamin C, Vitamin B Kompleks', 'category' => 'Vitamin & Suplemen', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma', 'price' => 8500, 'weight_in_grams' => 10, 'requires_prescription' => false, 'desc' => 'Suplemen vitamin C dan B.', 'dosage' => '1 tablet 1x sehari'],
         ];
 
         $insertedMedicines = [];

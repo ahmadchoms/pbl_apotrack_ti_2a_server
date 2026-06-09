@@ -19,7 +19,7 @@ class NotificationController extends BaseApiController
             ->paginate(20);
 
         return $this->successResponse($notifications, 'Daftar notifikasi berhasil diambil', 200, [
-            'unread_count' => $request->user()->notifications()->where('is_read', false)->count(),
+            'unread_count' => $request->user()->notifications()->whereRaw('is_read IS FALSE')->count(),
         ]);
     }
 
@@ -43,7 +43,7 @@ class NotificationController extends BaseApiController
      */
     public function markAllAsRead(Request $request)
     {
-        $request->user()->notifications()->where('is_read', false)->update([
+        $request->user()->notifications()->whereRaw('is_read IS FALSE')->update([
             'is_read' => true,
             'read_at' => Carbon::now(),
         ]);

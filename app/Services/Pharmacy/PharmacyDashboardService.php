@@ -47,11 +47,11 @@ class PharmacyDashboardService
             ->count();
 
         $totalMedicinesCount = Medicine::where('pharmacy_id', $pharmacyId)
-            ->where('is_active', true)
-            ->count();
+                ->whereRaw('is_active IS TRUE')
+                ->count();
 
         $totalStaffCount = PharmacyStaff::where('pharmacy_id', $pharmacyId)
-            ->where('is_active', true)
+            ->whereRaw('is_active IS TRUE')
             ->count();
 
         return [

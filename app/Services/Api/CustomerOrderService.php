@@ -90,15 +90,15 @@ class CustomerOrderService
      */
     public function getTracking(User $user, string $id)
     {
-        $order = Order::with(['deliveryTracking.logs'])
+        $order = Order::with(['tracking.logs'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
-        if (!$order->deliveryTracking) {
+        if (!$order->tracking) {
             throw new \Exception('Informasi pengiriman tidak ditemukan untuk pesanan ini.', 404);
         }
 
-        return $order->deliveryTracking;
+        return $order->tracking;
     }
 
     /**
@@ -111,6 +111,10 @@ class CustomerOrderService
 
             if ($order->payment_status !== 'UNPAID') {
                 throw new \Exception('Pesanan ini sudah dibayar atau status tidak valid.', 422);
+            }
+
+            if ($order->payment_method !== 'QRIS') {
+                throw new \Exception('Simulasi pembayaran hanya untuk metode QRIS.', 422);
             }
 
             $order->update([

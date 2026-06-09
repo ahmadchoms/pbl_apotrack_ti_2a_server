@@ -48,11 +48,15 @@ class BiteshipWebhookService
 
             $order = $tracking->order;
             
+            $shippedStatuses = ['allocated', 'pickingUp', 'picked', 'inTransit', 'droppingOff', 'returnInTransit'];
+            $cancelledStatuses = ['cancelled', 'rejected', 'courierNotFound', 'returned', 'disposed'];
+
             if ($biteshipStatus === 'delivered') {
                 $order->update(['order_status' => Order::STATUS_COMPLETED]);
-            } elseif ($biteshipStatus === 'picking_up' || $biteshipStatus === 'picked_up') {
+            } elseif (in_array($biteshipStatus, $shippedStatuses, true)) {
                 $order->update(['order_status' => Order::STATUS_SHIPPED]);
-            } elseif ($biteshipStatus === 'cancelled' || $biteshipStatus === 'rejected') {
+            } elseif (in_array($biteshipStatus, $cancelledStatuses, true)) {
+                $order->update(['order_status' => Order::STATUS_CANCELLED]);
                 Log::warning("Shipment for Order {$order->order_number} was cancelled by Biteship/Courier.");
             }
         });

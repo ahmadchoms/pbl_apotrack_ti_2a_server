@@ -209,6 +209,41 @@ class OrderController extends BaseApiController
     }
 
     /**
+     * Simulasi perubahan status tracking Biteship (Sandbox only).
+     */
+    public function simulateTracking(Request $request, $id, $status)
+    {
+        try {
+            $validStatuses = [
+                'confirmed', 'allocated', 'pickingUp', 'picked', 'inTransit',
+                'droppingOff', 'returnInTransit', 'onHold', 'delivered',
+                'rejected', 'courierNotFound', 'returned', 'cancelled', 'disposed',
+            ];
+
+            if (!in_array($status, $validStatuses)) {
+                return $this->errorResponse("Status '{$status}' tidak valid.", 422);
+            }
+
+            $order = $this->staffOrderService->simulateTrackingStatus(
+                $request->user(),
+                $id,
+                $status
+            );
+
+            AuditHelper::log(
+                'SIMULATE_TRACKING',
+                "Simulasi status tracking {$order->order_number} menjadi {$status}.",
+                ['order_id' => $order->id, 'tracking_status' => $status]
+            );
+
+            return $this->successResponse(new OrderResource($order), "Status tracking disimulasikan menjadi {$status}");
+        } catch (\Exception $e) {
+            $code = $e->getCode() >= 400 && $e->getCode() <= 500 ? $e->getCode() : 422;
+            return $this->errorResponse($e->getMessage(), $code);
+        }
+    }
+
+    /**
      * @OA\Patch(
      *     path="/api/staff/orders/{id}/status",
      *     summary="Perbarui status pesanan (Staff)",

@@ -14,7 +14,7 @@ class ReviewPolicy
     /**
      * Determine whether the user can create a review for the medicine.
      */
-    public function create(User $user, int $medicineId): bool
+    public function create(User $user, string $medicineId): bool
     {
         if ($user->role !== 'USER') {
             return false;

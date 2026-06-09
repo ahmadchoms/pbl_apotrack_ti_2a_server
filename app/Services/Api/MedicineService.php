@@ -23,7 +23,7 @@ class MedicineService
                 'pharmacy:id,name'
             ])
             ->withTotalActiveStock() // Custom scope
-            ->where('is_active', true);
+            ->whereRaw('is_active IS TRUE');
 
         // Filters
         $query->when($filters['search'] ?? null, function (Builder $q, $search) {

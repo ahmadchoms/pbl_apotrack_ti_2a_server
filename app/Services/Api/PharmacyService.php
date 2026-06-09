@@ -18,7 +18,7 @@ class PharmacyService
                 $q->select(['id', 'pharmacy_id', 'day_of_week', 'open_time', 'close_time', 'is_closed']);
             }])
             ->where('verification_status', 'VERIFIED')
-            ->where('is_active', true);
+            ->whereRaw('is_active IS TRUE');
 
         // Search by name
         if (isset($filters['search'])) {

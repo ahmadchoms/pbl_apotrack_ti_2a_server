@@ -72,6 +72,9 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/orders/{id}', [OrderController::class, 'show']);
         Route::get('/orders/{id}/tracking', [OrderController::class, 'tracking']);
         
+        // Shipping Rates
+        Route::post('/shipping/rates', [OrderController::class, 'shippingRates']);
+
         // Uploads
         Route::post('/orders/{id}/prescription', [OrderController::class, 'uploadPrescription']);
         Route::post('/orders/{id}/simulate-payment', [OrderController::class, 'simulatePayment']);
@@ -89,6 +92,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::patch('/orders/{id}/status', [StaffOrderController::class, 'updateStatus']);
         Route::post('/orders/verify', [StaffOrderController::class, 'verify']);
         Route::post('/orders/{id}/ship', [StaffOrderController::class, 'shipOrder']);
+        Route::post('/orders/{id}/simulate-tracking/{status}', [StaffOrderController::class, 'simulateTracking']);
         Route::post('/pos/orders', [StaffOrderController::class, 'storePOS']);
 
         // Inventory Management

@@ -4,15 +4,19 @@ namespace App\Services\Api;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Enums\OrderStatus;
+use App\Services\BiteshipService;
 use App\Services\Pharmacy\OrderService;
 use App\Jobs\CreateBiteshipOrderJob;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class StaffOrderService
 {
     public function __construct(
-        protected OrderService $orderService
+        protected OrderService $orderService,
+        protected BiteshipService $biteshipService
     ) {}
 
     /**
@@ -49,7 +53,7 @@ class StaffOrderService
     }
 
     /**
-     * Verify order by verification code.
+     * Verify order by verification code and complete it.
      */
     public function verifyOrder(User $user, string $code): Order
     {
@@ -63,7 +67,13 @@ class StaffOrderService
             throw new \Exception('Kode verifikasi tidak valid atau pesanan tidak ditemukan di apotek ini.', 404);
         }
 
-        return $order->load(['items', 'user']);
+        $this->orderService->updateStatus(
+            $order->id,
+            OrderStatus::COMPLETED,
+            'Pesanan diambil oleh customer (verifikasi kode pickup).'
+        );
+
+        return $order->fresh()->load(['items', 'user']);
     }
 
     /**
@@ -88,6 +98,7 @@ class StaffOrderService
                     'name' => $item->medicine_name,
                     'quantity' => $item->quantity,
                     'value' => (int) $item->price,
+                    'weight' => $item->medicine?->weight_in_grams ?? 200,
                 ];
             })->toArray();
 
@@ -147,6 +158,55 @@ class StaffOrderService
     }
 
     /**
+     * Simulasi perubahan status tracking Biteship (Sandbox only).
+     */
+    public function simulateTrackingStatus(User $user, string $id, string $status): Order
+    {
+        $staff = $user->pharmacyStaff;
+
+        $order = Order::with(['tracking', 'address', 'user'])
+            ->where('pharmacy_id', $staff->pharmacy_id)
+            ->findOrFail($id);
+
+        $tracking = $order->tracking;
+
+        if (!$tracking || !$tracking->biteship_id) {
+            throw new \Exception('Pesanan ini belum memiliki tracking Biteship.', 422);
+        }
+
+        // Panggil Biteship simulate API
+        // $this->biteshipService->simulateTracking($tracking->biteship_id, $status);
+        try {
+            $this->biteshipService->simulateTracking($tracking->biteship_id, $status);
+        } catch (\Exception $e) {
+            Log::warning("Biteship simulateTracking gagal, lanjut update lokal: " . $e->getMessage());
+        }
+
+        // Update local tracking status
+        $internalStatus = strtoupper($status);
+        $tracking->update(['status' => $internalStatus]);
+
+        $tracking->logs()->create([
+            'status' => $internalStatus,
+            'description' => "Status simulasi: {$internalStatus}",
+        ]);
+
+        // Mapping order status (sama seperti webhook)
+        $shippedStatuses = ['allocated', 'pickingUp', 'picked', 'inTransit', 'droppingOff', 'returnInTransit'];
+        $cancelledStatuses = ['cancelled', 'rejected', 'courierNotFound', 'returned', 'disposed'];
+
+        if ($status === 'delivered') {
+            $order->update(['order_status' => Order::STATUS_COMPLETED]);
+        } elseif (in_array($status, $shippedStatuses, true)) {
+            $order->update(['order_status' => Order::STATUS_SHIPPED]);
+        } elseif (in_array($status, $cancelledStatuses, true)) {
+            $order->update(['order_status' => Order::STATUS_CANCELLED]);
+        }
+
+        return $order->fresh()->load(['tracking', 'address', 'user']);
+    }
+
+    /**
      * Update order status.
      */
     public function updateStatus(User $user, string $id, string $status, ?string $note): Order
@@ -154,6 +214,7 @@ class StaffOrderService
         $staff = $user->pharmacyStaff;
         $order = Order::where('pharmacy_id', $staff->pharmacy_id)->findOrFail($id);
 
-        return $this->orderService->updateStatus($order->id, $status, $note);
+        $orderStatus = OrderStatus::tryFrom($status) ?? throw new \InvalidArgumentException("Status '{$status}' tidak valid.");
+        return $this->orderService->updateStatus($order->id, $orderStatus, $note);
     }
 }

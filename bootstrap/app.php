@@ -36,6 +36,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, Throwable $exception, \Illuminate\Http\Request $request) {
+            // API requests should always return JSON, not Inertia HTML
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return $response;
+            }
+
             if (!app()->isLocal() && in_array($response->getStatusCode(), [500, 503, 404, 403, 401])) {
                 return \Inertia\Inertia::render('error', [
                     'status' => $response->getStatusCode(),

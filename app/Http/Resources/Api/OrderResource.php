@@ -36,6 +36,7 @@ class OrderResource extends JsonResource
                 'email' => $this->user->email,
                 'phone' => $this->user->phone,
             ]),
+            'verification_code' => $this->verification_code,
             'prescription' => $this->whenLoaded('prescription'),
             'requires_prescription' => $this->relationLoaded('items') ? $this->items->contains('requires_prescription', true) : false,
             'items' => OrderItemResource::collection($this->whenLoaded('items')),

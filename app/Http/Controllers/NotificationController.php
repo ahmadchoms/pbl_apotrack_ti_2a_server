@@ -19,7 +19,7 @@ class NotificationController extends Controller
             ->get();
 
         $unreadCount = $request->user()->notifications()
-            ->where('is_read', false)
+            ->whereRaw('is_read IS FALSE')
             ->count();
 
         return response()->json([
@@ -52,7 +52,7 @@ class NotificationController extends Controller
      */
     public function markAllAsRead(Request $request)
     {
-        $request->user()->notifications()->where('is_read', false)->update([
+        $request->user()->notifications()->whereRaw('is_read IS FALSE')->update([
             'is_read' => true,
             'read_at' => Carbon::now(),
         ]);

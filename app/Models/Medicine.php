@@ -67,16 +67,6 @@ class Medicine extends Model
         return $this->hasMany(StockMovement::class);
     }
 
-    // Accessors
-    public function getTotalActiveStockAttribute()
-    {
-        // Hitung dinamis dari relasi batches yang aktif (bukan yang di-soft delete)
-        // dan belum kadaluarsa
-        return (int) $this->batches()
-            ->where('expired_date', '>=', now()->startOfDay())
-            ->sum('stock') ?? 0;
-    }
-
     // Local Scopes
     public function scopeWithTotalActiveStock($query)
     {

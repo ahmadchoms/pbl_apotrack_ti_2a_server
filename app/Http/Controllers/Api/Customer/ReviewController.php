@@ -93,12 +93,12 @@ class ReviewController extends BaseApiController
 
         $reviews = Review::with(['user:id,username,avatar_url'])
             ->where('medicine_id', $medicine->id)
-            ->where('is_visible', true)
+            ->whereRaw('is_visible IS TRUE')
             ->latest()
             ->paginate(10);
 
         $averageRating = Review::where('medicine_id', $medicine->id)
-            ->where('is_visible', true)
+            ->whereRaw('is_visible IS TRUE')
             ->avg('rating');
 
         return $this->successResponse(
@@ -221,7 +221,7 @@ class ReviewController extends BaseApiController
             $medicineId = $request->medicine_id;
 
             // Delegasikan pengecekan otorisasi ke ReviewPolicy
-            if ($user->cannot('create', [Review::class, (int) $medicineId])) {
+            if ($user->cannot('create', [Review::class, $medicineId])) {
                 return $this->errorResponse('Anda belum pernah membeli obat ini dengan status selesai (COMPLETED) atau sudah mengulas seluruh pembelian Anda.', 403);
             }
 
