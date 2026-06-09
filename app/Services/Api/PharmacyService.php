@@ -13,7 +13,7 @@ class PharmacyService
     public function listActivePharmacies(array $filters)
     {
         $query = Pharmacy::query()
-            ->select(['id', 'name', 'address', 'latitude', 'longitude', 'rating', 'verification_status', 'is_active'])
+            ->select(['id', 'name', 'address', 'phone', 'logo_url', 'latitude', 'longitude', 'rating', 'total_reviews', 'verification_status', 'is_active', 'is_force_closed'])
             ->with(['operatingHours' => function ($q) {
                 $q->select(['id', 'pharmacy_id', 'day_of_week', 'open_time', 'close_time', 'is_closed']);
             }])
@@ -25,15 +25,19 @@ class PharmacyService
             $query->where('name', 'ilike', '%' . $filters['search'] . '%');
         }
 
-        // Distance Calculation
+        // Distance Calculation & Radius Filter
         if (isset($filters['latitude']) && isset($filters['longitude'])) {
             $lat = $filters['latitude'];
             $lng = $filters['longitude'];
 
-            $query->selectRaw(
-                "( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance",
-                [$lat, $lng, $lat]
-            )->orderBy('distance');
+            $haversine = "( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) )";
+            $query->selectRaw("{$haversine} AS distance", [$lat, $lng, $lat])
+                  ->orderBy('distance');
+
+            if (isset($filters['radius'])) {
+                $radius = (float) $filters['radius'];
+                $query->havingRaw("distance <= ?", [$radius]);
+            }
         } else {
             $query->latest();
         }

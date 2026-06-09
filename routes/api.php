@@ -71,6 +71,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
         Route::get('/orders/{id}/tracking', [OrderController::class, 'tracking']);
+        Route::post('/orders/{id}/confirm-received', [OrderController::class, 'confirmReceived']);
         
         // Shipping Rates
         Route::post('/shipping/rates', [OrderController::class, 'shippingRates']);

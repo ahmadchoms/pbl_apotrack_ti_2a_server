@@ -99,6 +99,17 @@ class OrderController extends BaseApiController
         }
     }
 
+    public function confirmReceived($id, Request $request)
+    {
+        try {
+            $order = $this->customerOrderService->confirmReceived($request->user(), $id);
+
+            return $this->successResponse(new OrderResource($order), 'Pesanan berhasil dikonfirmasi diterima.');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
+    }
+
     public function shippingRates(CheckShippingRatesRequest $request)
     {
         try {
@@ -144,38 +155,37 @@ class OrderController extends BaseApiController
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
         $distanceKm = round(6371 * $c, 1);
 
+        $estimatedMinutes = match (true) {
+            $distanceKm <= 3 => '15 - 25',
+            $distanceKm <= 7 => '25 - 40',
+            $distanceKm <= 15 => '40 - 60',
+            default => '60 - 90',
+        };
+
         $couriers = [
             [
-                'company'         => 'JNE',
-                'courier_code'    => 'jne',
-                'courier_service' => 'Reguler',
-                'service_type'    => 'standard',
-                'price'           => max(8000, (int) round($distanceKm * 1500)),
-                'etd'             => $distanceKm <= 50 ? '1 - 2 days' : '2 - 4 days',
+                'company'         => 'GrabExpress',
+                'courier_code'    => 'grab',
+                'courier_service' => 'Instant',
+                'service_type'    => 'instant',
+                'price'           => max(12000, (int) round($distanceKm * 2500)),
+                'etd'             => "$estimatedMinutes menit",
             ],
             [
-                'company'         => 'SiCepat',
-                'courier_code'    => 'sicepat',
-                'courier_service' => 'Reguler',
-                'service_type'    => 'standard',
-                'price'           => max(10000, (int) round($distanceKm * 1800)),
-                'etd'             => $distanceKm <= 50 ? '1 - 2 days' : '2 - 4 days',
+                'company'         => 'GoSend',
+                'courier_code'    => 'gojek',
+                'courier_service' => 'Instant',
+                'service_type'    => 'instant',
+                'price'           => max(10000, (int) round($distanceKm * 2200)),
+                'etd'             => "$estimatedMinutes menit",
             ],
             [
-                'company'         => 'JNE',
-                'courier_code'    => 'jne',
-                'courier_service' => 'YES (Yakin Esok Sampai)',
-                'service_type'    => 'overnight',
-                'price'           => max(15000, (int) round($distanceKm * 2500)),
-                'etd'             => '1 day',
-            ],
-            [
-                'company'         => 'AnterAja',
-                'courier_code'    => 'anteraja',
-                'courier_service' => 'Reguler',
-                'service_type'    => 'standard',
-                'price'           => max(7000, (int) round($distanceKm * 1200)),
-                'etd'             => $distanceKm <= 50 ? '1 - 3 days' : '2 - 5 days',
+                'company'         => 'Maxim',
+                'courier_code'    => 'maxim',
+                'courier_service' => 'Instant',
+                'service_type'    => 'instant',
+                'price'           => max(9000, (int) round($distanceKm * 2000)),
+                'etd'             => "$estimatedMinutes menit",
             ],
         ];
 

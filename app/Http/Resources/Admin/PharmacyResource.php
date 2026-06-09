@@ -16,6 +16,7 @@ class PharmacyResource extends JsonResource
             'phone' => $this->phone,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'distance' => $this->distance ?? null,
             'rating' => $this->rating,
             'total_reviews' => $this->total_reviews,
             'legality' => $this->whenLoaded('legality'),

@@ -22,7 +22,7 @@ class CustomerOrderService
      */
     public function listOrders(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        return Order::with(['items.medicine', 'pharmacy'])
+        return Order::with(['items.medicine', 'pharmacy', 'reviews'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate($perPage);
@@ -41,7 +41,7 @@ class CustomerOrderService
      */
     public function showOrder(User $user, string $id): Order
     {
-        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription'])
+        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription', 'reviews'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
     }
@@ -78,7 +78,7 @@ class CustomerOrderService
      */
     public function listHistory(User $user, int $perPage = 15): LengthAwarePaginator
     {
-        return Order::with(['items.medicine', 'pharmacy'])
+        return Order::with(['items.medicine', 'pharmacy', 'reviews'])
             ->where('user_id', $user->id)
             ->whereIn('order_status', [Order::STATUS_COMPLETED, Order::STATUS_CANCELLED])
             ->latest()
@@ -124,5 +124,23 @@ class CustomerOrderService
 
             return $order;
         });
+    }
+
+    /**
+     * Confirm order received by customer (DELIVERED -> COMPLETED).
+     */
+    public function confirmReceived(User $user, string $id): Order
+    {
+        $order = Order::where('user_id', $user->id)->findOrFail($id);
+
+        if ($order->order_status !== Order::STATUS_DELIVERED) {
+            throw new \Exception('Pesanan harus dalam status TERKIRIM sebelum dikonfirmasi diterima.', 422);
+        }
+
+        return $this->orderService->updateStatus(
+            $order->id,
+            \App\Enums\OrderStatus::COMPLETED,
+            'Pesanan dikonfirmasi diterima oleh customer.'
+        );
     }
 }

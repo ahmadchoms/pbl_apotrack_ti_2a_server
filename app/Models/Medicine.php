@@ -28,6 +28,11 @@ class Medicine extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active'             => 'boolean',
+        'requires_prescription' => 'boolean',
+    ];
+
     protected array $searchColumns = ['name', 'generic_name'];
 
     public function pharmacy()

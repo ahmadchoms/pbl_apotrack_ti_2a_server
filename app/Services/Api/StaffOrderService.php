@@ -78,19 +78,26 @@ class StaffOrderService
 
     /**
      * Ship order via Biteship asynchronously (Non-Blocking & ACID Protected).
+     * Uses courier info from existing DeliveryTracking record (set by customer during checkout).
      */
     public function shipOrder(User $user, string $id, array $data): Order
     {
         $staff = $user->pharmacyStaff;
 
         return DB::transaction(function () use ($staff, $id, $data) {
-            $order = Order::with(['address', 'items.medicine', 'pharmacy', 'user'])
+            $order = Order::with(['address', 'items.medicine', 'pharmacy', 'user', 'tracking'])
                 ->where('pharmacy_id', $staff->pharmacy_id)
                 ->lockForUpdate()
                 ->findOrFail($id);
 
             if ($order->order_status !== Order::STATUS_READY_FOR_PICKUP) {
                 throw new \Exception('Pesanan harus dalam status READY_FOR_PICKUP sebelum dikirim.', 422);
+            }
+
+            // Gunakan kurir yang sudah dipilih customer dari tracking record
+            $tracking = $order->tracking;
+            if (!$tracking || !$tracking->courier_code || !$tracking->courier_service) {
+                throw new \Exception('Pesanan ini belum memiliki data kurir. Customer harus memilih kurir saat checkout.', 422);
             }
 
             $items = $order->items->map(function ($item) {
@@ -122,27 +129,27 @@ class StaffOrderService
                     'latitude' => (float) $order->address->latitude,
                     'longitude' => (float) $order->address->longitude,
                 ],
-                'courier_company' => $data['courier_code'],
-                'courier_type' => $data['courier_service'],
+                'courier_company' => $tracking->courier_code,
+                'courier_type' => $tracking->courier_service,
                 'delivery_type' => 'now',
                 'items' => $items,
             ];
 
-            // Buat record tracking sementara
-            $order->tracking()->updateOrCreate(
-                ['order_id' => $order->id],
-                [
-                    'courier_code' => $data['courier_code'],
-                    'courier_service' => $data['courier_service'],
-                    'status' => 'PENDING_BITESHIP',
-                ]
-            );
+            $courierData = [
+                'courier_code' => $tracking->courier_code,
+                'courier_service' => $tracking->courier_service,
+                'courier_name' => $tracking->courier_name ?? $tracking->courier_code,
+                'shipping_cost' => $order->shipping_cost,
+            ];
+
+            // Update status tracking
+            $tracking->update(['status' => 'PENDING_BITESHIP']);
 
             // Ubah status order menjadi sedang mengalokasikan kurir
             $order->update(['order_status' => 'ALLOCATING_COURIER']);
 
             // Dispatch job ke antrean latar belakang
-            CreateBiteshipOrderJob::dispatch($order->id, $payload, $data);
+            CreateBiteshipOrderJob::dispatch($order->id, $payload, $courierData);
 
             return $order->load(['tracking', 'address', 'user']);
         });
@@ -196,7 +203,7 @@ class StaffOrderService
         $cancelledStatuses = ['cancelled', 'rejected', 'courierNotFound', 'returned', 'disposed'];
 
         if ($status === 'delivered') {
-            $order->update(['order_status' => Order::STATUS_COMPLETED]);
+            $order->update(['order_status' => Order::STATUS_DELIVERED]);
         } elseif (in_array($status, $shippedStatuses, true)) {
             $order->update(['order_status' => Order::STATUS_SHIPPED]);
         } elseif (in_array($status, $cancelledStatuses, true)) {

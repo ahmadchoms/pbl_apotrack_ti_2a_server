@@ -52,7 +52,7 @@ class BiteshipWebhookService
             $cancelledStatuses = ['cancelled', 'rejected', 'courierNotFound', 'returned', 'disposed'];
 
             if ($biteshipStatus === 'delivered') {
-                $order->update(['order_status' => Order::STATUS_COMPLETED]);
+                $order->update(['order_status' => Order::STATUS_DELIVERED]);
             } elseif (in_array($biteshipStatus, $shippedStatuses, true)) {
                 $order->update(['order_status' => Order::STATUS_SHIPPED]);
             } elseif (in_array($biteshipStatus, $cancelledStatuses, true)) {

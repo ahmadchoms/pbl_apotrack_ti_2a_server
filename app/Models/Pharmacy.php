@@ -12,6 +12,11 @@ class Pharmacy extends Model
 
     protected $fillable = ['name', 'address', 'phone', 'logo_url', 'latitude', 'longitude', 'rating', 'total_reviews', 'verification_status', 'is_active', 'is_force_closed'];
 
+    protected $casts = [
+        'is_active'       => 'boolean',
+        'is_force_closed' => 'boolean',
+    ];
+
     protected array $searchColumns = ['name', 'address', 'phone'];
 
 

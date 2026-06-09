@@ -22,8 +22,8 @@ class ShipOrderRequest extends BaseApiRequest
     public function rules(): array
     {
         return [
-            'courier_code' => 'required|string',
-            'courier_service' => 'required|string',
+            'courier_code' => 'nullable|string',
+            'courier_service' => 'nullable|string',
         ];
     }
 }
