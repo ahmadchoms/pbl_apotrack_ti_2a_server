@@ -67,7 +67,7 @@ class SendDatabaseNotification
 
     public function handleThresholdBreach(PharmacyThresholdBreached $event)
     {
-        $admin = User::where('role', 'ADMIN')->first();
+        $admin = User::where('role', 'SUPER_ADMIN')->first();
 
         if (!$admin) {
             \Illuminate\Support\Facades\Log::warning("Gagal mengirim notifikasi threshold breach karena tidak ada user dengan role ADMIN.");

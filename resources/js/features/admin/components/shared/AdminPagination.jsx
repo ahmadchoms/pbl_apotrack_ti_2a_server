@@ -9,7 +9,6 @@ export function AdminPagination({ pagination, itemLabel = "item" }) {
     const onPageChange = (url) => {
         if (url) router.get(url, {}, { preserveState: true });
     };
-    console.log(pagination);
 
     return (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-4">

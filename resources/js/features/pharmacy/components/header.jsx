@@ -4,7 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { usePage, router } from "@inertiajs/react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import axios from "axios";
 import { formatTime } from "@/lib/utils";
 
@@ -35,7 +39,9 @@ export function Header({ mobileSidebar }) {
     const handleMarkAllAsRead = async () => {
         try {
             await axios.patch("/notifications/read-all");
-            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+            setNotifications((prev) =>
+                prev.map((n) => ({ ...n, is_read: true })),
+            );
             setUnreadCount(0);
         } catch (err) {
             console.error("Gagal menandai semua notifikasi:", err);
@@ -46,10 +52,12 @@ export function Header({ mobileSidebar }) {
         if (!notif.is_read) {
             try {
                 await axios.patch(`/notifications/${notif.id}/read`);
-                setNotifications(prev =>
-                    prev.map(n => n.id === notif.id ? { ...n, is_read: true } : n)
+                setNotifications((prev) =>
+                    prev.map((n) =>
+                        n.id === notif.id ? { ...n, is_read: true } : n,
+                    ),
                 );
-                setUnreadCount(prev => Math.max(0, prev - 1));
+                setUnreadCount((prev) => Math.max(0, prev - 1));
             } catch (err) {
                 console.error("Gagal menandai notifikasi:", err);
             }
@@ -60,7 +68,9 @@ export function Header({ mobileSidebar }) {
             if (path.startsWith("/pharmacy")) {
                 router.visit(route("pharmacy.orders.show", notif.reference_id));
             } else if (path.startsWith("/admin")) {
-                router.visit(route("admin.pharmacies.show", notif.reference_id));
+                router.visit(
+                    route("admin.pharmacies.show", notif.reference_id),
+                );
             }
         }
     };
@@ -108,11 +118,16 @@ export function Header({ mobileSidebar }) {
                             )}
                         </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80 sm:w-96 rounded-2xl border-slate-100 p-0 shadow-2xl bg-white overflow-hidden" align="end">
+                    <PopoverContent
+                        className="w-80 sm:w-96 rounded-2xl border-slate-100 p-0 gap-0 shadow-2xl bg-white overflow-hidden"
+                        align="end"
+                    >
                         <div className="p-4 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Bell className="w-4 h-4 text-primary" />
-                                <span className="text-xs font-bold text-slate-800">Notifikasi</span>
+                                <span className="text-xs font-bold text-slate-800">
+                                    Notifikasi
+                                </span>
                                 {unreadCount > 0 && (
                                     <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-100 text-rose-600 font-bold text-[9px] scale-90">
                                         {unreadCount} Baru
@@ -134,9 +149,13 @@ export function Header({ mobileSidebar }) {
                                 notifications.map((notif) => (
                                     <div
                                         key={notif.id}
-                                        onClick={() => handleNotificationClick(notif)}
+                                        onClick={() =>
+                                            handleNotificationClick(notif)
+                                        }
                                         className={`p-4 flex gap-3 hover:bg-slate-50/50 transition-colors cursor-pointer text-left relative ${
-                                            !notif.is_read ? "bg-blue-50/10" : ""
+                                            !notif.is_read
+                                                ? "bg-blue-50/10"
+                                                : ""
                                         }`}
                                     >
                                         {!notif.is_read && (
@@ -150,10 +169,13 @@ export function Header({ mobileSidebar }) {
                                                 {notif.message}
                                             </p>
                                             <p className="text-[9px] text-slate-400 font-medium mt-1">
-                                                {new Date(notif.created_at).toLocaleDateString("id-ID", {
+                                                {new Date(
+                                                    notif.created_at,
+                                                ).toLocaleDateString("id-ID", {
                                                     day: "numeric",
                                                     month: "short",
-                                                })} • {formatTime(notif.created_at)}
+                                                })}{" "}
+                                                • {formatTime(notif.created_at)}
                                             </p>
                                         </div>
                                     </div>
@@ -161,7 +183,9 @@ export function Header({ mobileSidebar }) {
                             ) : (
                                 <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-2">
                                     <Bell className="w-8 h-8 opacity-20" />
-                                    <p className="text-xs font-bold">Tidak ada notifikasi baru</p>
+                                    <p className="text-xs font-bold">
+                                        Tidak ada notifikasi baru
+                                    </p>
                                 </div>
                             )}
                         </div>

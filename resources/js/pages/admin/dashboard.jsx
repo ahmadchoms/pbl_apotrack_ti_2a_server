@@ -36,6 +36,8 @@ export default function AdminDashboard({
         });
     };
 
+    console.log("Audit Logs:", auditLogs);
+
     return (
         <DashboardAdminLayout activeMenu="dashboard">
             <div className="space-y-8 font-sans pb-20">
@@ -103,7 +105,7 @@ export default function AdminDashboard({
                             />
                         </div>
                         <div className="lg:col-span-4 h-full">
-                            <AuditFeed auditLogs={auditLogs} />
+                            <AuditFeed auditLogs={auditLogs.data} />
                         </div>
                     </div>
                 </motion.div>

@@ -25,7 +25,7 @@ export function SecurityCard() {
                 <div className="space-y-8">
                     <div className="space-y-2">
                         <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                            Current Access Key
+                            Password Saat Ini
                         </Label>
                         <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
@@ -40,7 +40,7 @@ export function SecurityCard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                                New Secret Key
+                                Password Baru
                             </Label>
                             <div className="relative">
                                 <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
@@ -53,7 +53,7 @@ export function SecurityCard() {
                         </div>
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                                Verify Secret Key
+                                Konfirmasi Password Baru
                             </Label>
                             <div className="relative">
                                 <RefreshCw className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />

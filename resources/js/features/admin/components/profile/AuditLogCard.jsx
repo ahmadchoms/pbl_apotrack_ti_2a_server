@@ -75,8 +75,8 @@ export function AuditLogCard({ logs = [] }) {
             <CardContent className="p-10 pt-4 flex-1">
                 <div className="space-y-8 relative">
                     <div className="absolute left-1.5 top-2 bottom-2 w-px bg-slate-100"></div>
-                    {logs.length > 0 ? (
-                        logs.map((log) => {
+                    {logs.data.length > 0 ? (
+                        logs.data.map((log) => {
                             const config =
                                 ACTION_MAP[log.action] || ACTION_MAP["DEFAULT"];
                             const Icon = config.icon;
