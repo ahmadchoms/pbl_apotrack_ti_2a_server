@@ -218,6 +218,7 @@ class OrderController extends BaseApiController
                 'confirmed', 'allocated', 'pickingUp', 'picked', 'inTransit',
                 'droppingOff', 'returnInTransit', 'onHold', 'delivered',
                 'rejected', 'courierNotFound', 'returned', 'cancelled', 'disposed',
+                'picking_up', 'dropping_off', 'in_transit', 'return_in_transit',
             ];
 
             if (!in_array($status, $validStatuses)) {

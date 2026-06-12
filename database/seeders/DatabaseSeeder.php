@@ -588,8 +588,38 @@ class DatabaseSeeder extends Seeder
             'expired_at' => Carbon::now()->addHours(24)
         ]);
         OrderItem::firstOrCreate(['order_id' => $o4->id, 'medicine_id' => $medsPhar1['Sanmol Sirup 60ml']->id], ['medicine_name' => 'Sanmol Sirup 60ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 22000, 'subtotal' => 22000]);
-        $track4 = DeliveryTracking::firstOrCreate(['order_id' => $o4->id], ['biteship_id' => 'bts_shipped_123', 'courier_name' => 'Grab Express', 'tracking_number' => 'GRB-99999', 'status' => 'DROPPING_OFF']);
-        DeliveryTrackingLog::create(['delivery_tracking_id' => $track4->id, 'status' => 'PICKED_UP', 'description' => 'Pesanan dibawa kurir']);
+        DeliveryTracking::firstOrCreate(['order_id' => $o4->id], [
+            'biteship_order_id'    => 'BTS-TEST-001',
+            'biteship_tracking_id' => 'TRK-TEST-001',
+            'tracking_number'      => 'GRB-99999',
+            'tracking_link'        => 'https://biteship.com/tracking/GRB-99999',
+            'status'               => 'dropping_off',
+            'delivery_fee'         => 15000,
+            'courier' => [
+                'company'             => 'grab',
+                'driver_name'         => 'Budi Santoso',
+                'driver_phone'        => '08111222333',
+                'driver_photo_url'    => 'https://picsum.photos/200',
+                'driver_plate_number' => 'H 4321 ZZ',
+            ],
+            'origin' => [
+                'contact_name'  => 'Apotek Sehat Selalu',
+                'contact_phone' => '021-12345678',
+                'address'       => 'Jl. Sudirman No. 10, Jakarta Pusat',
+            ],
+            'destination' => [
+                'contact_name'  => 'Siti Rahayu',
+                'contact_phone' => '083333333333',
+                'address'       => 'Gedung Cyber, Jl. Kuningan Barat No. 8, Jakarta Selatan',
+            ],
+            'history' => [
+                ['status' => 'confirmed',    'note' => 'Pesanan dikonfirmasi.',        'service_type' => 'instant', 'updated_at' => Carbon::now()->subHours(3)->toIso8601String()],
+                ['status' => 'allocated',    'note' => 'Kurir ditemukan.',             'service_type' => 'instant', 'updated_at' => Carbon::now()->subHours(2)->toIso8601String()],
+                ['status' => 'picking_up',   'note' => 'Kurir menuju apotek.',         'service_type' => 'instant', 'updated_at' => Carbon::now()->subMinutes(90)->toIso8601String()],
+                ['status' => 'picked',       'note' => 'Paket diambil kurir.',         'service_type' => 'instant', 'updated_at' => Carbon::now()->subMinutes(60)->toIso8601String()],
+                ['status' => 'dropping_off', 'note' => 'Dalam perjalanan ke customer.','service_type' => 'instant', 'updated_at' => Carbon::now()->subMinutes(30)->toIso8601String()],
+            ],
+        ]);
 
         // 5. COMPLETED (Dengan Resep)
         // Membuat data Prescription terlebih dahulu

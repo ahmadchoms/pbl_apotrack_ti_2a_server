@@ -96,7 +96,8 @@ class StaffOrderService
 
             // Gunakan kurir yang sudah dipilih customer dari tracking record
             $tracking = $order->tracking;
-            if (!$tracking || !$tracking->courier_code || !$tracking->courier_service) {
+            $courierInfo = $tracking->courier ?? [];
+            if (!$tracking || !($courierInfo['company'] ?? null)) {
                 throw new \Exception('Pesanan ini belum memiliki data kurir. Customer harus memilih kurir saat checkout.', 422);
             }
 
@@ -129,16 +130,14 @@ class StaffOrderService
                     'latitude' => (float) $order->address->latitude,
                     'longitude' => (float) $order->address->longitude,
                 ],
-                'courier_company' => $tracking->courier_code,
-                'courier_type' => $tracking->courier_service,
+                'courier_company' => $courierInfo['company'],
+                'courier_type' => $courierInfo['service_type'] ?? 'instant',
                 'delivery_type' => 'now',
                 'items' => $items,
             ];
 
             $courierData = [
-                'courier_code' => $tracking->courier_code,
-                'courier_service' => $tracking->courier_service,
-                'courier_name' => $tracking->courier_name ?? $tracking->courier_code,
+                'courier' => $courierInfo,
                 'shipping_cost' => $order->shipping_cost,
             ];
 
@@ -177,29 +176,47 @@ class StaffOrderService
 
         $tracking = $order->tracking;
 
-        if (!$tracking || !$tracking->biteship_id) {
+        if (!$tracking || !$tracking->biteship_order_id) {
             throw new \Exception('Pesanan ini belum memiliki tracking Biteship.', 422);
         }
 
-        // Panggil Biteship simulate API
-        // $this->biteshipService->simulateTracking($tracking->biteship_id, $status);
         try {
-            $this->biteshipService->simulateTracking($tracking->biteship_id, $status);
+            $this->biteshipService->simulateTracking($tracking->biteship_order_id, $status);
         } catch (\Exception $e) {
             Log::warning("Biteship simulateTracking gagal, lanjut update lokal: " . $e->getMessage());
         }
 
-        // Update local tracking status
-        $internalStatus = strtoupper($status);
-        $tracking->update(['status' => $internalStatus]);
+        // Normalize camelCase statuses to snake_case for consistency with webhook
+        $normalized = match ($status) {
+            'pickingUp' => 'picking_up',
+            'droppingOff' => 'dropping_off',
+            'inTransit' => 'in_transit',
+            'returnInTransit' => 'return_in_transit',
+            default => $status,
+        };
+        $status = $normalized;
 
-        $tracking->logs()->create([
-            'status' => $internalStatus,
-            'description' => "Status simulasi: {$internalStatus}",
+        // Append history entry (matching webhook history structure)
+        $history = $tracking->history ?? [];
+        $history[] = [
+            'status'       => $status,
+            'note'         => "Status simulasi: {$status}",
+            'service_type' => 'instant',
+            'updated_at'   => now()->toIso8601String(),
+        ];
+
+        $internalStatus = strtoupper($status);
+        $tracking->update([
+            'status'        => $internalStatus,
+            'tracking_link' => 'https://track.biteship.com/test',
+            'history'       => $history,
         ]);
 
         // Mapping order status (sama seperti webhook)
-        $shippedStatuses = ['allocated', 'pickingUp', 'picked', 'inTransit', 'droppingOff', 'returnInTransit'];
+        $shippedStatuses = [
+            'allocated', 'pickingUp', 'picked', 'inTransit', 'droppingOff', 'returnInTransit',
+            'picking_up', 'dropping_off', 'in_transit', 'return_in_transit',
+        ];
         $cancelledStatuses = ['cancelled', 'rejected', 'courierNotFound', 'returned', 'disposed'];
 
         if ($status === 'delivered') {

@@ -90,7 +90,7 @@ class CustomerOrderService
      */
     public function getTracking(User $user, string $id)
     {
-        $order = Order::with(['tracking.logs'])
+        $order = Order::with(['tracking'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 

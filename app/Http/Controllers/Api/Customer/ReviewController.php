@@ -249,6 +249,8 @@ class ReviewController extends BaseApiController
                 'comment' => $request->comment,
             ]);
 
+            $order->pharmacy->recalculateRating();
+
             return $this->successResponse(new ReviewResource($review->load('user')), 'Ulasan berhasil dikirim.', 201);
             
         } catch (\Exception $e) {

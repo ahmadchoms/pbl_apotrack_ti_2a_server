@@ -45,6 +45,14 @@ class Pharmacy extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function recalculateRating(): void
+    {
+        $this->update([
+            'rating'        => round($this->reviews()->avg('rating') ?? 0, 1),
+            'total_reviews' => $this->reviews()->count(),
+        ]);
+    }
+
     public function legality()
     {
         return $this->hasOne(PharmacyLegality::class);

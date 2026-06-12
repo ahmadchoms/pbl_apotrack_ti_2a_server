@@ -62,14 +62,13 @@ class CreateBiteshipOrderJob implements ShouldQueue
                 $order->tracking()->updateOrCreate(
                     ['order_id' => $order->id],
                     [
-                        'biteship_id' => $biteshipOrder['id'],
-                        'courier_name' => $biteshipOrder['courier']['company'],
-                        'courier_code' => $this->courierData['courier_code'],
-                        'courier_service' => $biteshipOrder['courier']['type'],
-                        'tracking_number' => $biteshipOrder['courier']['waybill_id'] ?? null,
-                        'tracking_url' => $biteshipOrder['courier']['link'] ?? null,
-                        'delivery_fee' => $biteshipOrder['price'],
-                        'status' => 'ALLOCATING_COURIER',
+                        'biteship_order_id'    => $biteshipOrder['id'],
+                        'biteship_tracking_id' => $biteshipOrder['courier']['waybill_id'] ?? null,
+                        'tracking_number'      => $biteshipOrder['courier']['waybill_id'] ?? null,
+                        'tracking_link'        => $biteshipOrder['courier']['link'] ?? null,
+                        'courier'              => $biteshipOrder['courier'] ?? null,
+                        'delivery_fee'         => $biteshipOrder['price'] ?? 0,
+                        'status'               => 'ALLOCATING_COURIER',
                     ]
                 );
 
@@ -82,12 +81,10 @@ class CreateBiteshipOrderJob implements ShouldQueue
                 $order->tracking()->updateOrCreate(
                     ['order_id' => $order->id],
                     [
-                        'biteship_id' => 'mock_' . Str::uuid(),
-                        'courier_code' => $this->courierData['courier_code'],
-                        'courier_service' => $this->courierData['courier_service'],
-                        'courier_name' => $this->courierData['courier_name'] ?? $this->courierData['courier_code'],
-                        'delivery_fee' => $this->courierData['shipping_cost'] ?? 0,
-                        'status' => 'ALLOCATING_COURIER',
+                        'biteship_order_id' => 'mock_' . Str::uuid(),
+                        'courier'           => $this->courierData['courier'] ?? ['company' => 'unknown'],
+                        'delivery_fee'      => $this->courierData['shipping_cost'] ?? 0,
+                        'status'            => 'ALLOCATING_COURIER',
                     ]
                 );
 

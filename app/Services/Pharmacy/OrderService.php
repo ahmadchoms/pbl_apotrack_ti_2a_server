@@ -113,8 +113,10 @@ class OrderService
             if ($isDelivery) {
                 \App\Models\DeliveryTracking::create([
                     'order_id' => $order->id,
-                    'courier_code' => $data['courier_code'] ?? null,
-                    'courier_service' => $data['courier_service'] ?? null,
+                    'courier' => [
+                        'company'      => $data['courier_code'] ?? null,
+                        'service_type' => $data['courier_service'] ?? null,
+                    ],
                     'delivery_fee' => $data['shipping_cost'] ?? 0,
                     'status' => 'WAITING_PICKUP',
                 ]);

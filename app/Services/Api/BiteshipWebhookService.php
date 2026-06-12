@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class BiteshipWebhookService
 {
-    /**
-     * Handle incoming Biteship webhook payload (ACID Protected & Pessimistic Locking).
-     */
     public function handleWebhook(array $payload): void
     {
         DB::transaction(function () use ($payload) {
@@ -24,9 +21,8 @@ class BiteshipWebhookService
                 throw new \InvalidArgumentException('Invalid payload', 400);
             }
 
-            // Lock tracking row to prevent race conditions from duplicate/concurrent webhooks
             $tracking = DeliveryTracking::with('order')
-                ->where('biteship_id', $biteshipId)
+                ->where('biteship_order_id', $biteshipId)
                 ->lockForUpdate()
                 ->first();
 
@@ -35,20 +31,24 @@ class BiteshipWebhookService
             }
 
             $internalStatus = strtoupper($biteshipStatus);
-            
-            $tracking->update([
-                'status' => $internalStatus,
-                'tracking_number' => $payload['courier']['waybill_id'] ?? $tracking->tracking_number,
-            ]);
 
-            $tracking->logs()->create([
-                'status' => $internalStatus,
-                'description' => "Status kurir diperbarui menjadi {$internalStatus}",
-            ]);
+            $updateData = [
+                'status'               => $internalStatus,
+                'tracking_number'      => $payload['waybill_id'] ?? $tracking->tracking_number,
+                'tracking_link'        => $payload['link'] ?? $tracking->tracking_link,
+                'biteship_tracking_id' => $payload['waybill_id'] ?? $tracking->biteship_tracking_id,
+                'courier'              => $payload['courier'] ?? $tracking->courier,
+                'history'              => $payload['history'] ?? $tracking->history,
+            ];
+
+            $tracking->update($updateData);
 
             $order = $tracking->order;
-            
-            $shippedStatuses = ['allocated', 'pickingUp', 'picked', 'inTransit', 'droppingOff', 'returnInTransit'];
+
+            $shippedStatuses = [
+                'allocated', 'pickingUp', 'picked', 'inTransit', 'droppingOff', 'returnInTransit',
+                'picking_up', 'dropping_off', 'in_transit', 'return_in_transit',
+            ];
             $cancelledStatuses = ['cancelled', 'rejected', 'courierNotFound', 'returned', 'disposed'];
 
             if ($biteshipStatus === 'delivered') {

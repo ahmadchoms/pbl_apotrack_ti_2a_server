@@ -11,27 +11,22 @@ class DeliveryTrackingResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'biteship_order_id' => $this->biteship_id,
-            'biteship_tracking_id' => $this->biteship_id,
-            'courier' => [
-                'company' => $this->courier_service ?? $this->courier_code,
-                'driver_name' => $this->courier_name,
-                'driver_phone' => null,
-                'driver_photo_url' => null,
-                'driver_plate_number' => null,
-            ],
-            'origin' => null,
-            'destination' => null,
+            'biteship_order_id' => $this->biteship_order_id,
+            'biteship_tracking_id' => $this->biteship_tracking_id,
+            'courier' => $this->courier,
+            'origin' => $this->origin,
+            'destination' => $this->destination,
             'tracking_number' => $this->tracking_number,
-            'tracking_link' => $this->tracking_url,
+            'tracking_link' => $this->tracking_link,
             'delivery_fee' => (float) $this->delivery_fee,
             'status' => match (strtolower($this->status)) {
                 'pickingup' => 'picking_up',
                 'droppingoff' => 'dropping_off',
                 'intransit' => 'dropping_off',
+                'in_transit' => 'dropping_off',
                 default => strtolower($this->status),
             },
-            'history' => $this->whenLoaded('logs'),
+            'history' => $this->history,
         ];
     }
 }

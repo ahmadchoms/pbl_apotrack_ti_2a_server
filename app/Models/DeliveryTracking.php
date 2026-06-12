@@ -11,6 +11,13 @@ class DeliveryTracking extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'courier'     => 'array',
+        'origin'      => 'array',
+        'destination' => 'array',
+        'history'     => 'array',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);
