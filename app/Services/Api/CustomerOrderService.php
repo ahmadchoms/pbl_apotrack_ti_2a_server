@@ -41,7 +41,7 @@ class CustomerOrderService
      */
     public function showOrder(User $user, string $id): Order
     {
-        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription', 'reviews'])
+        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription', 'reviews', 'address'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
     }
