@@ -106,35 +106,31 @@ return new class extends Migration
             DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_quantity_positive CHECK (quantity > 0)');
         }
 
+        // ✅ delivery_trackings — struktur baru sesuai Biteship
         Schema::create('delivery_trackings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->unique()->constrained('orders')->cascadeOnDelete();
-            $table->string('biteship_id', 100)->nullable()->unique();
-            $table->string('courier_name', 100)->nullable();
-            $table->string('courier_service', 50)->nullable();
-            $table->string('tracking_number', 50)->nullable();
-            $table->string('status', 30)->default('WAITING_PICKUP');
-            $table->decimal('delivery_fee', 12, 2)->default(0)->after('status');
-            $table->string('courier_code', 50)->nullable()->after('courier_name');
-            $table->text('tracking_url')->nullable()->after('tracking_number');
-            $table->text('notes')->nullable();
+
+            $table->string('biteship_order_id', 100)->nullable()->unique();
+            $table->string('biteship_tracking_id', 100)->nullable()->unique();
+            $table->string('tracking_number', 50)->nullable()->comment('Waybill ID');
+            $table->text('tracking_link')->nullable()->comment('Link tracking publik Biteship');
+            $table->string('status', 30)->default('confirmed');
+            $table->decimal('delivery_fee', 12, 2)->default(0);
+
+            $table->jsonb('courier')->nullable();
+            $table->jsonb('origin')->nullable();
+            $table->jsonb('destination')->nullable();
+            $table->jsonb('history')->default('[]');
+
             $table->timestamps();
         });
 
-        Schema::create('delivery_tracking_logs', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('delivery_tracking_id')->constrained('delivery_trackings')->cascadeOnDelete();
-            $table->string('status', 30);
-            $table->text('description')->nullable();
-            $table->float('latitude', 10, 6)->nullable();
-            $table->float('longitude', 10, 6)->nullable();
-            $table->timestamp('created_at')->useCurrent();
-        });
+        // ✅ delivery_tracking_logs DIHAPUS — diganti history JSONB
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('delivery_tracking_logs');
         Schema::dropIfExists('delivery_trackings');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('carts');
@@ -143,9 +139,6 @@ return new class extends Migration
 
         Schema::table('prescriptions', function (Blueprint $table) {
             $table->dropForeign(['order_id']);
-        });
-        Schema::table('delivery_trackings', function (Blueprint $table) {
-            $table->dropColumn(['delivery_fee', 'courier_code', 'tracking_url']);
         });
 
         Schema::dropIfExists('orders');

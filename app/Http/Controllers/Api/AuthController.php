@@ -13,6 +13,8 @@ use App\Http\Requests\Api\Auth\UpdateProfileRequest;
 use App\Http\Requests\Api\Auth\ChangePasswordRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use OpenApi\Annotations as OA;
 use App\Helpers\AuditHelper;
 
@@ -514,6 +516,31 @@ class AuthController extends BaseApiController
             return $this->successResponse(null, 'Password berhasil diperbarui');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->errorResponse(collect($e->errors())->first()[0], 422, $e->errors());
+        }
+    }
+    public function deleteAccount(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->password, $user->password)) {
+            return $this->errorResponse('Password tidak sesuai.', 422);
+        }
+
+        try {
+            DB::transaction(function () use ($user) {
+                // Revoke semua token
+                $user->tokens()->delete();
+                // Hapus user (cascade ke data terkait)
+                $user->delete();
+            });
+
+            return $this->successResponse(null, 'Akun berhasil dihapus.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Gagal menghapus akun: ' . $e->getMessage(), 500);
         }
     }
 }

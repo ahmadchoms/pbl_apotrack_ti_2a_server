@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::put('/password', [AuthController::class, 'changePassword']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::delete('/account', [AuthController::class, 'deleteAccount']);
 
     // Catalog & Exploration (Moved to Protected for Security)
     Route::get('/pharmacies', [PharmacyController::class, 'index']);
@@ -80,6 +81,9 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
 
         // Reviews
         Route::post('/reviews', [ReviewController::class, 'store']);
+
+        // Staff Invitation (for Customers invited to join as Staff)
+        Route::post('/staff/join', [App\Http\Controllers\Api\StaffInvitationController::class, 'join']);
     });
 
     // --- PHARMACY STAFF ROUTES (role:STAFF|APOTEKER) ---

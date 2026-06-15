@@ -61,14 +61,22 @@ class CreateBiteshipOrderJob implements ShouldQueue
                 $order->tracking()->updateOrCreate(
                     ['order_id' => $order->id],
                     [
-                        'biteship_id' => $biteshipOrder['id'],
-                        'courier_name' => $biteshipOrder['courier']['company'],
-                        'courier_code' => $this->courierData['courier_code'],
-                        'courier_service' => $biteshipOrder['courier']['type'],
-                        'tracking_number' => $biteshipOrder['courier']['waybill_id'] ?? null,
-                        'tracking_url' => $biteshipOrder['courier']['link'] ?? null,
-                        'delivery_fee' => $biteshipOrder['price'],
-                        'status' => 'ALLOCATING_COURIER',
+                        'biteship_order_id'    => $biteshipOrder['id'],
+                        'biteship_tracking_id' => $biteshipOrder['courier']['tracking_id'] ?? null,
+                        'tracking_number'      => $biteshipOrder['courier']['waybill_id'] ?? null,
+                        'tracking_link'        => $biteshipOrder['courier']['link'] ?? null,
+                        'delivery_fee'         => $biteshipOrder['price'],
+                        'status'               => $biteshipOrder['status'],
+                        'courier' => [
+                            'company'             => $biteshipOrder['courier']['company'] ?? null,
+                            'driver_name'         => $biteshipOrder['courier']['driver_name'] ?? null,
+                            'driver_phone'        => $biteshipOrder['courier']['driver_phone'] ?? null,
+                            'driver_photo_url'    => $biteshipOrder['courier']['driver_photo_url'] ?? null,
+                            'driver_plate_number' => $biteshipOrder['courier']['driver_plate_number'] ?? null,
+                        ],
+                        'origin'      => $biteshipOrder['origin'],
+                        'destination' => $biteshipOrder['destination'],
+                        'history'     => $biteshipOrder['courier']['history'] ?? [],
                     ]
                 );
 
@@ -96,9 +104,7 @@ class CreateBiteshipOrderJob implements ShouldQueue
 
                 $order->tracking()->updateOrCreate(
                     ['order_id' => $order->id],
-                    [
-                        'status' => 'FAILED_ALLOCATION',
-                    ]
+                    ['status' => 'failed']
                 );
             }
         });

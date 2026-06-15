@@ -23,7 +23,7 @@ class ShipOrderRequest extends BaseApiRequest
     {
         return [
             'courier_code' => 'required|string',
-            'courier_service' => 'required|string',
+            'courier_type' => 'required|string', // instant / same_day / regular
         ];
     }
 }

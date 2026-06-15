@@ -102,18 +102,18 @@ class CustomerOrderService
      */
     public function getTracking(User $user, string $id)
     {
-        $order = Order::with(['deliveryTracking.logs'])
+        $order = Order::with(['tracking'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
-        if (!$order->deliveryTracking) {
+        if (!$order->tracking) {
             throw new \Exception(
                 'Informasi pengiriman tidak ditemukan untuk pesanan ini.',
                 404
             );
         }
 
-        return $order->deliveryTracking;
+        return $order->tracking;
     }
 
     /**
@@ -176,9 +176,9 @@ class CustomerOrderService
                 ->lockForUpdate()
                 ->findOrFail($id);
 
-            if ($order->order_status !== 'SHIPPED') {
+            if (!in_array($order->order_status, ['SHIPPED', 'DELIVERED'])) {
                 throw new \Exception(
-                    'Pesanan harus dalam status SHIPPED untuk dikonfirmasi.',
+                    'Pesanan harus dalam status SHIPPED atau DELIVERED untuk dikonfirmasi.',
                     422
                 );
             }
@@ -193,7 +193,7 @@ class CustomerOrderService
                 'source'      => 'CUSTOMER',
             ]);
 
-            return $order->fresh(['items.medicine', 'pharmacy', 'statusLogs']);
+            return $order;
         });
     }
 }

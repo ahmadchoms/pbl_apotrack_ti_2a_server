@@ -9,24 +9,20 @@ use Illuminate\Support\Facades\DB;
 
 class BiteshipWebhookService
 {
-    /**
-     * Handle incoming Biteship webhook payload (ACID Protected & Pessimistic Locking).
-     */
     public function handleWebhook(array $payload): void
     {
         DB::transaction(function () use ($payload) {
-            $biteshipId = $payload['order_id'] ?? null;
-            $biteshipStatus = $payload['status'] ?? null;
+            $biteshipOrderId = $payload['order_id'] ?? null;
+            $biteshipStatus  = $payload['status'] ?? null;
 
-            Log::info("Biteship Webhook Received: ID {$biteshipId}, Status {$biteshipStatus}");
+            Log::info("Biteship Webhook Received: ID {$biteshipOrderId}, Status {$biteshipStatus}");
 
-            if (!$biteshipId || !$biteshipStatus) {
+            if (!$biteshipOrderId || !$biteshipStatus) {
                 throw new \InvalidArgumentException('Invalid payload', 400);
             }
 
-            // Lock tracking row to prevent race conditions from duplicate/concurrent webhooks
             $tracking = DeliveryTracking::with('order')
-                ->where('biteship_id', $biteshipId)
+                ->where('biteship_order_id', $biteshipOrderId)
                 ->lockForUpdate()
                 ->first();
 
@@ -34,26 +30,23 @@ class BiteshipWebhookService
                 throw new \Exception('Tracking record not found', 404);
             }
 
-            $internalStatus = strtoupper($biteshipStatus);
-            
             $tracking->update([
-                'status' => $internalStatus,
-                'tracking_number' => $payload['courier']['waybill_id'] ?? $tracking->tracking_number,
-            ]);
-
-            $tracking->logs()->create([
-                'status' => $internalStatus,
-                'description' => "Status kurir diperbarui menjadi {$internalStatus}",
+                'status'               => $biteshipStatus,
+                'biteship_tracking_id' => $payload['id'] ?? $tracking->biteship_tracking_id,
+                'tracking_number'      => $payload['waybill_id'] ?? $tracking->tracking_number,
+                'tracking_link'        => $payload['link'] ?? $tracking->tracking_link,
+                'courier'              => $payload['courier'] ?? $tracking->courier,
+                'history'              => $payload['history'] ?? $tracking->history,
             ]);
 
             $order = $tracking->order;
-            
+
             if ($biteshipStatus === 'delivered') {
-                $order->update(['order_status' => Order::STATUS_COMPLETED]);
-            } elseif ($biteshipStatus === 'picking_up' || $biteshipStatus === 'picked_up') {
+                $order->update(['order_status' => Order::STATUS_DELIVERED]);
+            } elseif (in_array($biteshipStatus, ['picking_up', 'picked'])) {
                 $order->update(['order_status' => Order::STATUS_SHIPPED]);
-            } elseif ($biteshipStatus === 'cancelled' || $biteshipStatus === 'rejected') {
-                Log::warning("Shipment for Order {$order->order_number} was cancelled by Biteship/Courier.");
+            } elseif (in_array($biteshipStatus, ['cancelled', 'rejected'])) {
+                Log::warning("Shipment for Order {$order->order_number} was cancelled/rejected.");
             }
         });
     }
