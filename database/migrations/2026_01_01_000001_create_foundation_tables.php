@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('role', 20)->default('USERS');
             $table->string('avatar_url')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
 

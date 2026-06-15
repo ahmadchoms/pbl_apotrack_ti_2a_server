@@ -21,7 +21,7 @@ class AuthService
 
         if (!$user || !Hash::check($credentials['password'], $user->password_hash)) {
             throw ValidationException::withMessages([
-                'email' => [trans('auth.failed')],
+                'email' => ['Email atau password yang Anda masukkan salah.'],
             ]);
         }
 
@@ -31,7 +31,9 @@ class AuthService
             ]);
         }
 
-        Auth::login($user, $credentials['remember'] ?? false);
+        $remember = filter_var($credentials['remember'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        Auth::login($user, $remember);
 
         return $user->load('pharmacyStaff');
     }
