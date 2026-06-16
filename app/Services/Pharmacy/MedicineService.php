@@ -248,7 +248,7 @@ class MedicineService
             ])
             ->withTotalActiveStock()
             ->where('pharmacy_id', $pharmacyId)
-            ->where('is_active', true)
+            ->whereRaw('is_active IS TRUE')
             ->whereHas('batches', function ($q) {
                 $q->where('expired_date', '>', now())
                     ->where('stock', '>', 0);

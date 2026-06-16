@@ -13,7 +13,7 @@ class MedicineCategoryController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $categories = MedicineCategory::select('id', 'name', 'description')
+        $categories = MedicineCategory::select('id', 'name')
             ->orderBy('name')
             ->get();
 

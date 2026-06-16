@@ -10,14 +10,17 @@ use Illuminate\Http\Request;
 class MedicineController extends BaseApiController
 {
     /**
-     * Display a listing of active medicines (Public Catalog).
+     * Display a listing of medicines per pharmacy (Public Catalog).
      */
     public function index(Request $request)
     {
         $query = Medicine::with(['pharmacy:id,name,address', 'category:id,name', 'form:id,name', 'type:id,name', 'unit:id,name'])
-            ->where('is_active', true)
             ->whereHas('pharmacy', function ($q) {
                 $q->where('verification_status', 'VERIFIED');
+            })
+            ->whereHas('batches', function ($q) {
+                $q->where('expired_date', '>=', now()->startOfDay())
+                  ->where('stock', '>', 0);
             });
 
         if ($request->has('search')) {
@@ -76,9 +79,12 @@ class MedicineController extends BaseApiController
     public function show($id)
     {
         $medicine = Medicine::with(['pharmacy:id,name,address,phone', 'category', 'form', 'type', 'unit', 'batches'])
-            ->where('is_active', true)
             ->whereHas('pharmacy', function ($q) {
                 $q->where('verification_status', 'VERIFIED');
+            })
+            ->whereHas('batches', function ($q) {
+                $q->where('expired_date', '>=', now()->startOfDay())
+                  ->where('stock', '>', 0);
             })
             ->withSum(['batches as total_active_stock' => function ($sq) {
                 $sq->where('expired_date', '>=', now()->startOfDay());

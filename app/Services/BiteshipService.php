@@ -20,18 +20,15 @@ class BiteshipService
 
     /**
      * Mengecek tarif ongkos kirim dari berbagai kurir.
+     * Menerima parameter area_id ATAU latitude/longitude sebagai origin/destination.
      */
-    public function checkRates(string $originAreaId, string $destinationAreaId, array $items)
+    public function checkRates(array $params): array
     {
-        return $this->safeRequest(function () use ($originAreaId, $destinationAreaId, $items) {
+        return $this->safeRequest(function () use ($params) {
             $response = Http::withHeaders([
                 'Authorization' => $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post("{$this->baseUrl}/rates/couriers", [
-                'origin_area_id' => $originAreaId,
-                'destination_area_id' => $destinationAreaId,
-                'items' => $items,
-            ]);
+            ])->post("{$this->baseUrl}/rates/couriers", $params);
 
             return $response->json();
         }, 'Check Rates');
@@ -64,6 +61,21 @@ class BiteshipService
 
             return $response->json();
         }, 'Get Tracking');
+    }
+
+    /**
+     * Simulasi perubahan status tracking (Sandbox only).
+     */
+    public function simulateTracking(string $biteshipId, string $status)
+    {
+        return $this->safeRequest(function () use ($biteshipId, $status) {
+            $response = Http::withHeaders([
+                'Authorization' => $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->post("{$this->baseUrl}/trackings/{$biteshipId}/simulate/{$status}");
+
+            return $response->json();
+        }, 'Simulate Tracking');
     }
 
     /**

@@ -21,11 +21,11 @@ class StoreCustomerOrderRequest extends BaseApiRequest
             'items.*.price' => 'required|numeric',
             'subtotal_amount' => 'required|numeric',
             'service_type' => 'required|string|in:PICK_UP,DELIVERY',
-            'payment_method' => 'required|string|in:CASH,TRANSFER,E-WALLET',
+            'payment_method' => 'required|string|in:CASH,TRANSFER,E-WALLET,QRIS',
             
             'address_id' => 'required_if:service_type,DELIVERY|nullable|exists:user_addresses,id',
-            'courier_code' => 'required_if:service_type,DELIVERY|nullable|string',
-            'courier_service' => 'required_if:service_type,DELIVERY|nullable|string',
+            'courier_code' => 'nullable|string',
+            'courier_service' => 'nullable|string',
             'shipping_cost' => 'required_if:service_type,DELIVERY|numeric',
             'notes' => 'nullable|string'
         ];

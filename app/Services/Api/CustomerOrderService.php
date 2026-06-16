@@ -22,7 +22,7 @@ class CustomerOrderService
      */
     public function listOrders(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        return Order::with(['items.medicine', 'pharmacy'])
+        return Order::with(['items.medicine', 'pharmacy', 'reviews'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate($perPage);
@@ -41,14 +41,7 @@ class CustomerOrderService
      */
     public function showOrder(User $user, string $id): Order
     {
-        return Order::with([
-            'items.medicine',
-            'pharmacy',
-            'tracking',
-            'statusLogs',
-            'prescription',
-            'address',
-        ])
+        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription', 'reviews', 'address'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
     }
@@ -87,7 +80,7 @@ class CustomerOrderService
      */
     public function listHistory(User $user, int $perPage = 15): LengthAwarePaginator
     {
-        return Order::with(['items.medicine', 'pharmacy'])
+        return Order::with(['items.medicine', 'pharmacy', 'reviews'])
             ->where('user_id', $user->id)
             ->whereIn('order_status', [
                 Order::STATUS_COMPLETED,
@@ -107,12 +100,10 @@ class CustomerOrderService
             ->findOrFail($id);
 
         if (!$order->tracking) {
-            throw new \Exception(
-                'Informasi pengiriman tidak ditemukan untuk pesanan ini.',
-                404
-            );
+            throw new \Exception('Informasi pengiriman tidak ditemukan untuk pesanan ini.', 404);
         }
 
+        return $order->tracking;
         return $order->tracking;
     }
 
@@ -131,6 +122,14 @@ class CustomerOrderService
                     'Pesanan ini sudah dibayar atau status tidak valid.',
                     422
                 );
+            }
+
+            if ($order->payment_method !== 'QRIS') {
+                throw new \Exception('Simulasi pembayaran hanya untuk metode QRIS.', 422);
+            }
+
+            if ($order->payment_method !== 'QRIS') {
+                throw new \Exception('Simulasi pembayaran hanya untuk metode QRIS.', 422);
             }
 
             $order->update([

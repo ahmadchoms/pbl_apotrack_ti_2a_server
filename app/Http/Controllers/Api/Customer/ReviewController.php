@@ -94,12 +94,12 @@ class ReviewController extends BaseApiController
 
         $reviews = Review::with(['user:id,username,avatar_url'])
             ->where('medicine_id', $medicine->id)
-            ->where('is_visible', true)
+            ->whereRaw('is_visible IS TRUE')
             ->latest()
             ->paginate(10);
 
         $averageRating = Review::where('medicine_id', $medicine->id)
-            ->where('is_visible', true)
+            ->whereRaw('is_visible IS TRUE')
             ->avg('rating');
 
         return $this->successResponse(
@@ -222,16 +222,16 @@ class ReviewController extends BaseApiController
             $medicineId = $request->medicine_id;
 
             // Delegasikan pengecekan otorisasi ke ReviewPolicy
-            if ($user->cannot('create', [Review::class, (int) $medicineId])) {
+            if ($user->cannot('create', [Review::class, $medicineId])) {
                 return $this->errorResponse('Anda belum pernah membeli obat ini dengan status selesai (COMPLETED) atau sudah mengulas seluruh pembelian Anda.', 403);
             }
 
             $completedOrdersWithMedicine = OrderItem::whereHas('order', function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                      ->where('order_status', 'COMPLETED');
+                    ->where('order_status', 'COMPLETED');
             })
-            ->where('medicine_id', $medicineId)
-            ->pluck('order_id');
+                ->where('medicine_id', $medicineId)
+                ->pluck('order_id');
 
             $reviewedOrderIds = Review::whereIn('order_id', $completedOrdersWithMedicine)
                 ->where('medicine_id', $medicineId)
@@ -250,6 +250,8 @@ class ReviewController extends BaseApiController
                 'comment' => $request->comment,
             ]);
 
+            $order->pharmacy->recalculateRating();
+
             if (in_array((int) $review->rating, [1, 2])) {
                 $pharmacy = $review->pharmacy;
                 if ($pharmacy) {
@@ -258,7 +260,6 @@ class ReviewController extends BaseApiController
             }
 
             return $this->successResponse(new ReviewResource($review->load('user')), 'Ulasan berhasil dikirim.', 201);
-            
         } catch (\Exception $e) {
             Log::error('Gagal membuat review: ' . $e->getMessage());
             return $this->errorResponse('Terjadi kesalahan saat memproses ulasan. Silakan coba lagi.', 500);

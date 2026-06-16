@@ -73,6 +73,23 @@ class DatabaseSeeder extends Seeder
             ['username' => 'Rina Staff', 'email' => 'rina@apotek.id', 'phone' => '085555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
             ['username' => 'Dr. Andi Apoteker', 'email' => 'andi@apotek2.id', 'phone' => '087777777777', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true], // Apoteker cabang lain
             ['username' => 'Hanif Nakal', 'email' => 'hanif@banned.id', 'phone' => '086666666666', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => false],
+
+            // User Tembalang
+            ['username' => 'Budi Hartono', 'email' => 'budi.hartono@apotek.id', 'phone' => '087111111111', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dewi Sartika', 'email' => 'dewi@apotek.id', 'phone' => '087222222222', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Agus Widodo', 'email' => 'agus@apotek.id', 'phone' => '087333333333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rina Marlina', 'email' => 'rina.marlina@apotek.id', 'phone' => '087444444444', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Bambang Staff', 'email' => 'bambang@apotek.id', 'phone' => '087555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+
+            // User Staff Apotek Baru Tembalang
+            ['username' => 'Dr. Hadi Apoteker', 'email' => 'hadi@apotek.id', 'phone' => '088111111111', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Siska Staff', 'email' => 'siska@apotek.id', 'phone' => '088222222222', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Maya Sari', 'email' => 'maya@apotek.id', 'phone' => '088333333333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rudi Staff', 'email' => 'rudi@apotek.id', 'phone' => '088444444444', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Farida Dewi', 'email' => 'farida@apotek.id', 'phone' => '088555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Yoga Pratama', 'email' => 'yoga@apotek.id', 'phone' => '088666666666', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Nina Staff', 'email' => 'nina@apotek.id', 'phone' => '088777777777', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Indah Lestari', 'email' => 'indah@apotek.id', 'phone' => '088888888888', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
         ];
 
         $createdUsers = [];
@@ -176,6 +193,140 @@ class DatabaseSeeder extends Seeder
                 'is_force_closed' => false,
                 'verified_by' => null,
                 'verified_at' => null
+            ],
+
+            // Apotek Tembalang
+            [
+                'name' => 'Apotek Tembalang',
+                'address' => 'Jl. Adipati Unus / Prof. Sudarto No.35, Tembalang, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 7475442',
+                'latitude' => -7.0596,
+                'longitude' => 110.4391,
+                'rating' => 4.5,
+                'total_reviews' => 56,
+                'sia_number' => 'SIA-2024-1001',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(3)
+            ],
+            [
+                'name' => 'Apotek KeluargaKu Banjarsari',
+                'address' => 'Jl. Banjarsari Raya No.58H, Tembalang, Kec. Tembalang, Kota Semarang',
+                'phone' => '0812-1409-6959',
+                'latitude' => -7.0580,
+                'longitude' => 110.4410,
+                'rating' => 4.3,
+                'total_reviews' => 34,
+                'sia_number' => 'SIA-2024-1002',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(2)
+            ],
+            [
+                'name' => 'Kimia Farma Bulusan',
+                'address' => 'Jl. Timoho Raya No.287, Bulusan, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 1234567',
+                'latitude' => -7.0604,
+                'longitude' => 110.4436,
+                'rating' => 4.6,
+                'total_reviews' => 78,
+                'sia_number' => 'SIA-2024-1003',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(4)
+            ],
+
+            // ══════════════════════════════════════════════
+            // APOTEK BARU — Sekitar Tembalang (Radius 20 km)
+            // ══════════════════════════════════════════════
+            [
+                'name' => 'Apotek K-24 Kedungmundu',
+                'address' => 'Jl. Kedungmundu No.137, Tandang, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 76738208',
+                'latitude' => -7.0380,
+                'longitude' => 110.4350,
+                'rating' => 4.2,
+                'total_reviews' => 45,
+                'sia_number' => 'SIA-2024-2001',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(3)
+            ],
+            [
+                'name' => 'Kimia Farma Sendang Mulyo',
+                'address' => 'Jl. Fatmawati No.42, Sendangmulyo, Kec. Tembalang, Kota Semarang',
+                'phone' => '0811-2922-310',
+                'latitude' => -7.0520,
+                'longitude' => 110.4420,
+                'rating' => 4.4,
+                'total_reviews' => 62,
+                'sia_number' => 'SIA-2024-2002',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(2)
+            ],
+            [
+                'name' => 'Apotek Sehit',
+                'address' => 'Jl. Bougenvile Raya No.30, Sendangmulyo, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 76419235',
+                'latitude' => -7.0500,
+                'longitude' => 110.4450,
+                'rating' => 4.1,
+                'total_reviews' => 28,
+                'sia_number' => 'SIA-2024-2003',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(1)
+            ],
+            [
+                'name' => 'Apotek Subur Sehat',
+                'address' => 'Jl. Klipang Golf Raya No. A I/1, Sendangmulyo, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 74712345',
+                'latitude' => -7.0470,
+                'longitude' => 110.4490,
+                'rating' => 4.0,
+                'total_reviews' => 19,
+                'sia_number' => 'SIA-2024-2004',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(2)
+            ],
+            [
+                'name' => 'Apotek Surya Sehat',
+                'address' => 'Ruko Pandanaran Hills Blok AC-05, Mangunharjo, Kec. Tembalang, Kota Semarang',
+                'phone' => '(024) 76456789',
+                'latitude' => -7.0620,
+                'longitude' => 110.4320,
+                'rating' => 4.3,
+                'total_reviews' => 37,
+                'sia_number' => 'SIA-2024-2005',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(1)
             ]
         ];
 
@@ -214,6 +365,28 @@ class DatabaseSeeder extends Seeder
         // Dokter Andi adalah Apoteker di cabang 'Apotek Farma Prima'
         PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[1]->id, 'user_id' => $createdUsers['andi@apotek2.id']->id], ['role' => 'APOTEKER']);
 
+        // Staff Tembalang
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id, 'user_id' => $createdUsers['budi.hartono@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id, 'user_id' => $createdUsers['dewi@apotek.id']->id], ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[5]->id, 'user_id' => $createdUsers['agus@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id, 'user_id' => $createdUsers['rina.marlina@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id, 'user_id' => $createdUsers['bambang@apotek.id']->id], ['role' => 'STAFF']);
+
+        // Staff Apotek Baru Tembalang
+        // K-24 Kedungmundu (index 7)
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[7]->id, 'user_id' => $createdUsers['hadi@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[7]->id, 'user_id' => $createdUsers['siska@apotek.id']->id], ['role' => 'STAFF']);
+        // Kimia Farma Sendang Mulyo (index 8)
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[8]->id, 'user_id' => $createdUsers['maya@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[8]->id, 'user_id' => $createdUsers['rudi@apotek.id']->id], ['role' => 'STAFF']);
+        // Apotek Sehit (index 9)
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[9]->id, 'user_id' => $createdUsers['farida@apotek.id']->id], ['role' => 'APOTEKER']);
+        // Apotek Subur Sehat (index 10)
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[10]->id, 'user_id' => $createdUsers['yoga@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[10]->id, 'user_id' => $createdUsers['nina@apotek.id']->id], ['role' => 'STAFF']);
+        // Apotek Surya Sehat (index 11)
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[11]->id, 'user_id' => $createdUsers['indah@apotek.id']->id], ['role' => 'APOTEKER']);
+
         // ==========================================
         // 4. MEDICINE SEEDS (EXPANDED)
         // ==========================================
@@ -229,16 +402,58 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Tolak Angin Cair', 'generic_name' => 'Herbal Extract', 'category' => 'Batuk & Flu', 'form' => 'Sachet', 'type' => 'Herbal', 'unit' => 'Box', 'manufacturer' => 'Sido Muncul', 'price' => 35000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Mengatasi masuk angin.', 'dosage' => '1 sachet jika perlu'],
             ['name' => 'Amlodipine 5mg', 'generic_name' => 'Amlodipine Besylate', 'category' => 'Antihipertensi', 'form' => 'Tablet', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Dexa Medica', 'price' => 6000, 'weight_in_grams' => 10, 'requires_prescription' => true, 'desc' => 'Obat penurun darah tinggi.', 'dosage' => 'Sesuai petunjuk dokter'],
             ['name' => 'Metformin 500mg', 'generic_name' => 'Metformin HCl', 'category' => 'Antidiabetes', 'form' => 'Tablet', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Bernofarm', 'price' => 5000, 'weight_in_grams' => 10, 'requires_prescription' => true, 'desc' => 'Obat diabetes melitus tipe 2.', 'dosage' => 'Sesuai petunjuk dokter'],
+
+            // Obat tambahan Tembalang
+            ['name' => 'Bodrex', 'generic_name' => 'Paracetamol, Phenylpropanolamine', 'category' => 'Analgesik', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma', 'price' => 5500, 'weight_in_grams' => 10, 'requires_prescription' => false, 'desc' => 'Obat sakit kepala dan demam.', 'dosage' => 'Dewasa: 1 tablet 3x sehari'],
+            ['name' => 'Diapet', 'generic_name' => 'Attapulgite', 'category' => 'Antasida & GERD', 'form' => 'Kapsul', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Meprofarm', 'price' => 7000, 'weight_in_grams' => 8, 'requires_prescription' => false, 'desc' => 'Mengatasi diare.', 'dosage' => '2 kapsul setiap kali buang air'],
+            ['name' => 'Antangin JRG', 'generic_name' => 'Herbal Extract', 'category' => 'Batuk & Flu', 'form' => 'Sachet', 'type' => 'Herbal', 'unit' => 'Box', 'manufacturer' => 'Sido Muncul', 'price' => 3500, 'weight_in_grams' => 15, 'requires_prescription' => false, 'desc' => 'Meredakan masuk angin.', 'dosage' => '1 sachet 3x sehari'],
+            ['name' => 'Mylanta', 'generic_name' => 'Aluminium Hydroxide, Magnesium Hydroxide, Simethicone', 'category' => 'Antasida & GERD', 'form' => 'Suspensi', 'type' => 'Obat Bebas', 'unit' => 'Botol', 'manufacturer' => 'Johnson & Johnson', 'price' => 25000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Obat maag dan kembung.', 'dosage' => '1-2 sendok teh 3x sehari'],
+            ['name' => 'Enervon-C', 'generic_name' => 'Vitamin C, Vitamin B Kompleks', 'category' => 'Vitamin & Suplemen', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma', 'price' => 8500, 'weight_in_grams' => 10, 'requires_prescription' => false, 'desc' => 'Suplemen vitamin C dan B.', 'dosage' => '1 tablet 1x sehari'],
+        ];
+
+        // ── Mapping Obat per Apotek (Berdasarkan Kategori Fokus) ──
+        // Apotek lama (lengkap) tetap mendapat semua obat.
+        // Apotek baru mendapat subset sesuai kategori fokus.
+        $allMedicineNames = array_map(fn($m) => $m['name'], $medicines);
+        $medicinesByName = [];
+        foreach ($medicines as $m) {
+            $medicinesByName[$m['name']] = $m;
+        }
+
+        $pharmacyMedicineMap = [
+            'Apotek Sehat Selalu'            => $allMedicineNames,
+            'Apotek Farma Prima (Tutup Sementara)' => $allMedicineNames,
+            'Apotek Tembalang'               => $allMedicineNames,
+            'Apotek KeluargaKu Banjarsari'   => $allMedicineNames,
+            'Kimia Farma Bulusan'            => $allMedicineNames,
+
+            // K-24 Kedungmundu → OTC: Batuk & Flu, Vitamin, Antasida
+            'Apotek K-24 Kedungmundu'        => ['Tolak Angin Cair', 'Antangin JRG', 'Promag Tablet', 'Mylanta', 'Imboost Force', 'Enervon-C', 'Panadol Extra 500mg', 'Sanmol Sirup 60ml'],
+
+            // Kimia Farma Sendang Mulyo → Obat Keras: Antibiotik, Antihipertensi, Antidiabetes
+            'Kimia Farma Sendang Mulyo'      => ['Amoxicillin 500mg', 'Amlodipine 5mg', 'Metformin 500mg', 'Betadine Antiseptic 15ml', 'Insto Regular 7.5ml', 'Panadol Extra 500mg'],
+
+            // Apotek Sehit → P3K, Analgesik, Antipiretik
+            'Apotek Sehit'                   => ['Panadol Extra 500mg', 'Betadine Antiseptic 15ml', 'Sanmol Sirup 60ml', 'Bodrex', 'Diapet', 'Promag Tablet'],
+
+            // Apotek Subur Sehat → Kesehatan Mata, Vitamin, P3K
+            'Apotek Subur Sehat'             => ['Insto Regular 7.5ml', 'Enervon-C', 'Imboost Force', 'Betadine Antiseptic 15ml', 'Sanmol Sirup 60ml', 'Bodrex'],
+
+            // Apotek Surya Sehat → Herbal, Vitamin, Antasida
+            'Apotek Surya Sehat'             => ['Tolak Angin Cair', 'Antangin JRG', 'Promag Tablet', 'Mylanta', 'Imboost Force', 'Enervon-C', 'Panadol Extra 500mg'],
         ];
 
         $insertedMedicines = [];
 
         foreach ($pharmaModels as $pModel) {
-            // Hanya seed obat ke apotek yang Verified (index 0 dan 1)
             if ($pModel->verification_status !== 'VERIFIED') continue;
 
-            foreach ($medicines as $med) {
-                // Variasikan stok dan status aktif untuk testing
+            $assignedMeds = $pharmacyMedicineMap[$pModel->name] ?? [];
+
+            foreach ($assignedMeds as $medName) {
+                $med = $medicinesByName[$medName] ?? null;
+                if (!$med) continue;
+
                 $isActive = (rand(1, 10) > 1); // 90% obat aktif
 
                 $m = Medicine::firstOrCreate([
@@ -261,8 +476,6 @@ class DatabaseSeeder extends Seeder
                 ]);
 
                 $insertedMedicines[$pModel->id][$med['name']] = $m;
-
-
 
                 // Buat 2 batch untuk setiap obat (untuk test expired date & pergerakan stok)
                 $batchCode1 = 'BCH1-' . strtoupper(substr(md5($med['name'] . '1'), 0, 5));
@@ -403,7 +616,7 @@ class DatabaseSeeder extends Seeder
                 ['status' => 'allocated',    'note' => 'Kurir ditemukan.',             'service_type' => 'instant', 'updated_at' => now()->subHours(2)->toIso8601String()],
                 ['status' => 'picking_up',   'note' => 'Kurir menuju apotek.',         'service_type' => 'instant', 'updated_at' => now()->subMinutes(90)->toIso8601String()],
                 ['status' => 'picked',       'note' => 'Paket diambil kurir.',         'service_type' => 'instant', 'updated_at' => now()->subMinutes(60)->toIso8601String()],
-                ['status' => 'dropping_off', 'note' => 'Dalam perjalanan ke customer.','service_type' => 'instant', 'updated_at' => now()->subMinutes(30)->toIso8601String()],
+                ['status' => 'dropping_off', 'note' => 'Dalam perjalanan ke customer.', 'service_type' => 'instant', 'updated_at' => now()->subMinutes(30)->toIso8601String()],
             ],
         ]);
 

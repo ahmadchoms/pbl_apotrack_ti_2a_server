@@ -31,7 +31,11 @@ class AddressService
                     ->lockForUpdate()
                     ->get();
 
-                $user->addresses()->update(['is_primary' => false]);
+                $user->addresses()->update(['is_primary' => DB::raw('false')]);
+            }
+
+            if (array_key_exists('is_primary', $data)) {
+                $data['is_primary'] = $data['is_primary'] ? DB::raw('true') : DB::raw('false');
             }
 
             return $user->addresses()->create($data);
@@ -53,7 +57,11 @@ class AddressService
 
                 UserAddress::where('user_id', $address->user_id)
                     ->where('id', '!=', $address->id)
-                    ->update(['is_primary' => false]);
+                    ->update(['is_primary' => DB::raw('false')]);
+            }
+
+            if (array_key_exists('is_primary', $data)) {
+                $data['is_primary'] = $data['is_primary'] ? DB::raw('true') : DB::raw('false');
             }
 
             $address->update($data);

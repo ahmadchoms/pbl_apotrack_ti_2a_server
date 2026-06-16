@@ -12,7 +12,7 @@ class DashboardService
     {
         $totalUsers = User::count();
         $totalPharmacies = Pharmacy::count();
-        $activePharmacies = Pharmacy::where('is_active', true)->count();
+        $activePharmacies = Pharmacy::whereRaw('is_active IS TRUE')->count();
 
         $lastMonth = now()->subMonth();
         $lastMonthUsers = User::whereYear('created_at', $lastMonth->year)

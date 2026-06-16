@@ -15,6 +15,10 @@ class User extends Authenticatable
 
     protected $fillable = ['username', 'phone', 'email', 'password_hash', 'role', 'avatar_url', 'is_active'];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     protected array $searchColumns = ['username', 'email'];
 
     protected $hidden = [

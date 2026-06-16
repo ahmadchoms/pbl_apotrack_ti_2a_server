@@ -28,6 +28,11 @@ class Medicine extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active'             => 'boolean',
+        'requires_prescription' => 'boolean',
+    ];
+
     protected array $searchColumns = ['name', 'generic_name'];
 
     public function pharmacy()
@@ -65,16 +70,6 @@ class Medicine extends Model
     public function stockMovements()
     {
         return $this->hasMany(StockMovement::class);
-    }
-
-    // Accessors
-    public function getTotalActiveStockAttribute()
-    {
-        // Hitung dinamis dari relasi batches yang aktif (bukan yang di-soft delete)
-        // dan belum kadaluarsa
-        return (int) $this->batches()
-            ->where('expired_date', '>=', now()->startOfDay())
-            ->sum('stock') ?? 0;
     }
 
     // Local Scopes

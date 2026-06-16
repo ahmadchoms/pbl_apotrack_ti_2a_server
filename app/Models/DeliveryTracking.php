@@ -31,6 +31,13 @@ class DeliveryTracking extends Model
         'delivery_fee' => 'decimal:2',
     ];
 
+    protected $casts = [
+        'courier'     => 'array',
+        'origin'      => 'array',
+        'destination' => 'array',
+        'history'     => 'array',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);

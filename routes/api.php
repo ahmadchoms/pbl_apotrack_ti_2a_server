@@ -72,7 +72,11 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
         Route::get('/orders/{id}/tracking', [OrderController::class, 'tracking']);
-        
+        Route::post('/orders/{id}/confirm-received', [OrderController::class, 'confirmReceived']);
+
+        // Shipping Rates
+        Route::post('/shipping/rates', [OrderController::class, 'shippingRates']);
+
         // Uploads
         Route::post('/orders/{id}/prescription', [OrderController::class, 'uploadPrescription']);
         Route::post('/orders/{id}/simulate-payment', [OrderController::class, 'simulatePayment']);
@@ -88,7 +92,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
 
     // --- PHARMACY STAFF ROUTES (role:STAFF|APOTEKER) ---
     Route::middleware('role:STAFF|APOTEKER')->prefix('staff')->group(function () {
-        
+
         // Order Management & POS
         Route::get('/orders', [StaffOrderController::class, 'index']);
         Route::get('/orders/{id}', [StaffOrderController::class, 'show']);
@@ -97,6 +101,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::post('/orders/{id}/ship', [StaffOrderController::class, 'shipOrder']);
         Route::post('/orders/{id}/approve-cancellation', [StaffOrderController::class, 'approveCancellation']);
         Route::post('/orders/{id}/reject-cancellation', [StaffOrderController::class, 'rejectCancellation']);
+        Route::post('/orders/{id}/simulate-tracking/{status}', [StaffOrderController::class, 'simulateTracking']);
         Route::post('/pos/orders', [StaffOrderController::class, 'storePOS']);
 
         // Inventory Management
