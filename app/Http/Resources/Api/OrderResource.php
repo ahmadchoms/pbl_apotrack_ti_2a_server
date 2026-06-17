@@ -36,6 +36,7 @@ class OrderResource extends JsonResource
                 'name' => $this->pharmacy->name,
                 'address' => $this->pharmacy->address,
                 'phone' => $this->pharmacy->phone,
+                'logo_url' => $this->pharmacy->logo_url,
             ]),
             'service_type' => $this->service_type,
             'payment_method' => $this->payment_method,

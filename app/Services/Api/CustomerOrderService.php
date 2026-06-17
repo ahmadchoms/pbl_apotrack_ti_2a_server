@@ -104,7 +104,6 @@ class CustomerOrderService
         }
 
         return $order->tracking;
-        return $order->tracking;
     }
 
     /**
@@ -122,10 +121,6 @@ class CustomerOrderService
                     'Pesanan ini sudah dibayar atau status tidak valid.',
                     422
                 );
-            }
-
-            if ($order->payment_method !== 'QRIS') {
-                throw new \Exception('Simulasi pembayaran hanya untuk metode QRIS.', 422);
             }
 
             if ($order->payment_method !== 'QRIS') {
