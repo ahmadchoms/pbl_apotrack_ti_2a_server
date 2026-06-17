@@ -37,15 +37,15 @@ class MedicineController extends BaseApiController
         }
 
         if ($request->has('category_id')) {
-            $query->where('medicine_category_id', $request->category_id);
+            $query->where('category_id', $request->category_id);
         }
 
         if ($request->has('type_id')) {
-            $query->where('medicine_type_id', $request->type_id);
+            $query->where('type_id', $request->type_id);
         }
 
         if ($request->has('form_id')) {
-            $query->where('medicine_form_id', $request->form_id);
+            $query->where('form_id', $request->form_id);
         }
 
         if ($request->has('min_price')) {

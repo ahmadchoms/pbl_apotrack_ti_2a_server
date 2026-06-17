@@ -49,6 +49,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
     Route::get('/pharmacies/{id}', [PharmacyController::class, 'show']);
     Route::get('/medicines', [MedicineController::class, 'index']);
     Route::get('/medicines/{id}', [MedicineController::class, 'show']);
+    Route::get('/categories/popular', [MedicineCategoryController::class, 'popular']);
     Route::get('/categories', [MedicineCategoryController::class, 'index']);
 
     // Shared Features (Notifications)
