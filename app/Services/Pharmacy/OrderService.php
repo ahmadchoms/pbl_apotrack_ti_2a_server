@@ -74,7 +74,7 @@ class OrderService
 
     public function createCustomerOrder(\App\Models\User $user, array $data)
     {
-        return DB::transaction(function () use ($user, $data) {
+        $order = DB::transaction(function () use ($user, $data) {
             $isDelivery = ($data['service_type'] ?? 'PICK_UP') === 'DELIVERY';
 
             $order = Order::create([

@@ -99,16 +99,6 @@ class OrderController extends BaseApiController
         }
     }
 
-    public function confirmReceived($id, Request $request)
-    {
-        try {
-            $order = $this->customerOrderService->confirmReceived($request->user(), $id);
-
-            return $this->successResponse(new OrderResource($order), 'Pesanan berhasil dikonfirmasi diterima.');
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), 422);
-        }
-    }
 
     public function shippingRates(CheckShippingRatesRequest $request)
     {

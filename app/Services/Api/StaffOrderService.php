@@ -107,12 +107,6 @@ class StaffOrderService
                 throw new \Exception('Pesanan ini belum memiliki data kurir. Customer harus memilih kurir saat checkout.', 422);
             }
 
-            // Gunakan kurir yang sudah dipilih customer dari tracking record
-            $tracking = $order->tracking;
-            $courierInfo = $tracking->courier ?? [];
-            if (!$tracking || !($courierInfo['company'] ?? null)) {
-                throw new \Exception('Pesanan ini belum memiliki data kurir. Customer harus memilih kurir saat checkout.', 422);
-            }
 
             $items = $order->items->map(function ($item) {
                 return [
