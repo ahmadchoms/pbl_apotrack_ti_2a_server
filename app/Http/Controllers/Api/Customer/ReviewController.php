@@ -94,12 +94,12 @@ class ReviewController extends BaseApiController
 
         $reviews = Review::with(['user:id,username,avatar_url'])
             ->where('medicine_id', $medicine->id)
-            ->whereRaw('is_visible IS TRUE')
+            ->where('is_visible', true)
             ->latest()
             ->paginate(10);
 
         $averageRating = Review::where('medicine_id', $medicine->id)
-            ->whereRaw('is_visible IS TRUE')
+            ->where('is_visible', true)
             ->avg('rating');
 
         return $this->successResponse(
@@ -222,16 +222,16 @@ class ReviewController extends BaseApiController
             $medicineId = $request->medicine_id;
 
             // Delegasikan pengecekan otorisasi ke ReviewPolicy
-            if ($user->cannot('create', [Review::class, $medicineId])) {
+            if ($user->cannot('create', [Review::class, (int) $medicineId])) {
                 return $this->errorResponse('Anda belum pernah membeli obat ini dengan status selesai (COMPLETED) atau sudah mengulas seluruh pembelian Anda.', 403);
             }
 
             $completedOrdersWithMedicine = OrderItem::whereHas('order', function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                    ->where('order_status', 'COMPLETED');
+                      ->where('order_status', 'COMPLETED');
             })
-                ->where('medicine_id', $medicineId)
-                ->pluck('order_id');
+            ->where('medicine_id', $medicineId)
+            ->pluck('order_id');
 
             $reviewedOrderIds = Review::whereIn('order_id', $completedOrdersWithMedicine)
                 ->where('medicine_id', $medicineId)
@@ -250,16 +250,21 @@ class ReviewController extends BaseApiController
                 'comment' => $request->comment,
             ]);
 
-            $order->pharmacy->recalculateRating();
+            // Update pharmacy rating (denormalized) — only visible reviews
+            $pharmacy = $review->pharmacy;
+            if ($pharmacy) {
+                $pharmacy->update([
+                    'rating' => round(Review::where('pharmacy_id', $pharmacy->id)->where('is_visible', true)->avg('rating') ?? 0, 1),
+                    'total_reviews' => Review::where('pharmacy_id', $pharmacy->id)->where('is_visible', true)->count(),
+                ]);
+            }
 
-            if (in_array((int) $review->rating, [1, 2])) {
-                $pharmacy = $review->pharmacy;
-                if ($pharmacy) {
-                    $pharmacyService->checkModerationThreshold($pharmacy);
-                }
+            if (in_array((int) $review->rating, [1, 2]) && $pharmacy) {
+                $pharmacyService->checkModerationThreshold($pharmacy);
             }
 
             return $this->successResponse(new ReviewResource($review->load('user')), 'Ulasan berhasil dikirim.', 201);
+            
         } catch (\Exception $e) {
             Log::error('Gagal membuat review: ' . $e->getMessage());
             return $this->errorResponse('Terjadi kesalahan saat memproses ulasan. Silakan coba lagi.', 500);
