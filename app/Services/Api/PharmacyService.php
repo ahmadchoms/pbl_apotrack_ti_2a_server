@@ -52,7 +52,7 @@ class PharmacyService
 
             if (isset($filters['radius'])) {
                 $radius = (float) $filters['radius'];
-                $query->havingRaw("distance <= ?", [$radius]);
+                $query->whereRaw("{$haversine} <= ?", [$lat, $lng, $lat, $radius]);
             }
         } else {
             $query->latest();
