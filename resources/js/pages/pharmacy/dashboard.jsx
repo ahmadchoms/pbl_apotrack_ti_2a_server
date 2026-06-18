@@ -94,7 +94,7 @@ export default function PharmacistDashboard({
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="relative overflow-hidden rounded-[2.5rem] bg-primary text-white p-8 md:p-10 shadow-2xl shadow-blue-900/10 border border-blue-900/10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8"
+                    className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] bg-primary text-white p-5 sm:p-8 md:p-10 shadow-2xl shadow-blue-900/10 border border-blue-900/10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 sm:gap-8"
                 >
                     <div
                         className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -105,27 +105,27 @@ export default function PharmacistDashboard({
                     />
                     <div className="absolute -right-32 -bottom-32 w-96 h-96 rounded-full bg-blue-500/10 filter blur-[80px] pointer-events-none" />
 
-                    <div className="space-y-4 relative z-10">
+                    <div className="space-y-3 sm:space-y-4 relative z-10 w-full">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs font-semibold text-blue-200">
                             <Sun className="w-3.5 h-3.5 text-amber-400" />
-                            <span>
+                            <span className="truncate">
                                 {getGreeting()}, {user?.username || "Apoteker"}
                             </span>
                         </div>
 
                         <div className="space-y-1">
-                            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
+                            <h2 className="text-xl sm:text-2xl md:text-4xl font-black tracking-tight text-white leading-tight">
                                 Dasbor Utama Apotek
                             </h2>
-                            <p className="text-sm font-medium text-slate-300 max-w-lg leading-relaxed">
+                            <p className="text-xs sm:text-sm font-medium text-slate-300 max-w-lg leading-relaxed">
                                 Evaluasi performa penjualan obat dan koordinasi
                                 stok real-time dalam satu halaman modular
                                 terpusat.
                             </p>
                         </div>
 
-                        <div className="text-xs font-medium text-slate-300 w-fit flex items-center gap-2 bg-white/5 border border-white/5 px-3 py-1.5 rounded-xl">
-                            <DollarSign className="w-3.5 h-3.5 text-indigo-300" />
+                        <div className="text-[10px] sm:text-xs font-medium text-slate-300 w-fit flex items-center gap-2 bg-white/5 border border-white/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl">
+                            <DollarSign className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-indigo-300" />
                             <span>
                                 Total Penjualan Bulan Ini:{" "}
                                 <strong className="text-white">
@@ -138,23 +138,23 @@ export default function PharmacistDashboard({
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-6 shrink-0 relative z-10 w-full sm:w-auto">
-                        <div className="text-left sm:text-right lg:text-right space-y-1">
-                            <div className="flex items-center gap-2 sm:justify-end text-sm text-blue-200 font-semibold">
-                                <Clock className="w-4 h-4 text-blue-300" />
+                    <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-3 sm:gap-6 shrink-0 relative z-10 w-full sm:w-auto">
+                        <div className="text-left sm:text-right lg:text-right space-y-0.5 sm:space-y-1">
+                            <div className="flex items-center gap-2 sm:justify-end text-xs sm:text-sm text-blue-200 font-semibold">
+                                <Clock className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-blue-300" />
                                 <span>{currentTime}</span>
                             </div>
-                            <p className="text-xs text-slate-400 font-medium">
+                            <p className="text-[10px] sm:text-xs text-slate-400 font-medium">
                                 {currentDate}
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                             <Button
                                 variant="outline"
                                 size="icon"
                                 onClick={handleRefresh}
-                                className="rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 text-white transition-all duration-300 active:scale-95 shrink-0"
+                                className="rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 text-white transition-all duration-300 active:scale-95 shrink-0 w-9 h-9 sm:w-11 sm:h-11"
                             >
                                 <motion.div
                                     animate={{ rotate: isSpinning ? 360 : 0 }}
@@ -163,7 +163,7 @@ export default function PharmacistDashboard({
                                         ease: "easeInOut",
                                     }}
                                 >
-                                    <RefreshCw className="h-5 w-5 text-slate-300" />
+                                    <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 text-slate-300" />
                                 </motion.div>
                             </Button>
 
@@ -181,9 +181,9 @@ export default function PharmacistDashboard({
                                         )
                                     }
                                 >
-                                    <SelectTrigger className="h-12 rounded-2xl bg-white/5 border-white/10 text-white font-semibold text-xs tracking-wider focus:ring-blue-500/30 w-28 sm:w-32 hover:bg-white/10 hover:border-white/20 transition-all">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-slate-400" />
+                                    <SelectTrigger className="h-10 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border-white/10 text-white font-semibold text-[10px] sm:text-xs tracking-wider focus:ring-blue-500/30 w-24 sm:w-32 hover:bg-white/10 hover:border-white/20 transition-all">
+                                        <div className="flex items-center gap-1 sm:gap-2">
+                                            <Calendar className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
                                             <SelectValue placeholder="Bulan" />
                                         </div>
                                     </SelectTrigger>
@@ -226,7 +226,7 @@ export default function PharmacistDashboard({
                                         )
                                     }
                                 >
-                                    <SelectTrigger className="h-12 rounded-2xl bg-white/5 border-white/10 text-white font-semibold text-xs tracking-wider focus:ring-blue-500/30 w-24 sm:w-28 hover:bg-white/10 hover:border-white/20 transition-all">
+                                    <SelectTrigger className="h-10 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border-white/10 text-white font-semibold text-[10px] sm:text-xs tracking-wider focus:ring-blue-500/30 w-20 sm:w-28 hover:bg-white/10 hover:border-white/20 transition-all">
                                         <SelectValue placeholder="Tahun" />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-2xl border-slate-100 shadow-2xl p-2 bg-white text-slate-800">

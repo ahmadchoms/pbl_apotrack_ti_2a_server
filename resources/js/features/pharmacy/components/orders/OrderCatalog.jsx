@@ -132,7 +132,7 @@ export function OrderCatalog({
                                 whileTap={{ scale: 0.95 }}
                                 className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full text-[11px] font-bold border whitespace-nowrap transition-all duration-200 shrink-0 ${
                                     isActive
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                                        ? "bg-primary text-white border-primary shadow-md"
                                         : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                                 }`}
                             >
@@ -156,7 +156,7 @@ export function OrderCatalog({
             </div>
 
             <ScrollArea className="flex-1 min-h-0 -mr-2 pr-2 scrollbar-thin">
-                <div className="grid grid-cols-2 gap-4 pb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 pb-6">
                     <AnimatePresence mode="popLayout">
                         {filteredDrugs.length === 0 ? (
                             <motion.div
@@ -202,7 +202,7 @@ export function OrderCatalog({
                                                 : "border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300"
                                         } ${isOutOfStock ? "opacity-60" : ""}`}
                                     >
-                                        <div className="relative aspect-4/3 bg-linear-to-br from-slate-50 to-slate-100 overflow-hidden">
+                                        <div className="relative aspect-4/3 sm:aspect-4/3 bg-linear-to-br from-slate-50 to-slate-100 overflow-hidden">
                                             {drug.image_url ? (
                                                 <img
                                                     src={drug.image_url}
@@ -245,11 +245,11 @@ export function OrderCatalog({
                                             )}
                                         </div>
 
-                                        <div className="p-4 flex flex-col flex-1">
-                                            <div className="mb-3 flex-1">
+                                        <div className="p-3 sm:p-4 flex flex-col flex-1">
+                                            <div className="mb-2 sm:mb-3 flex-1">
                                                 <div className="flex items-start justify-between gap-1 mb-1">
                                                     <span
-                                                        className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${catColor.pill}`}
+                                                        className={`inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border ${catColor.pill}`}
                                                     >
                                                         <span
                                                             className={`w-1 h-1 rounded-full ${catColor.dot}`}
@@ -257,10 +257,10 @@ export function OrderCatalog({
                                                         {drug.category}
                                                     </span>
                                                 </div>
-                                                <h4 className="text-sm font-black text-slate-900 leading-snug mt-1.5 group-hover:text-primary transition-colors">
+                                                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug mt-1 sm:mt-1.5 group-hover:text-primary transition-colors">
                                                     {drug.name}
                                                 </h4>
-                                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                                                <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">
                                                     {drug.form} · {drug.unit}
                                                 </p>
                                                 <p className="text-[10px] text-slate-400 mt-1.5 line-clamp-2 leading-relaxed hidden xl:block">
@@ -268,8 +268,8 @@ export function OrderCatalog({
                                                 </p>
                                             </div>
 
-                                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50">
-                                                <p className="text-base font-black text-slate-900 tabular-nums tracking-tight">
+                                            <div className="flex items-center justify-between mt-auto pt-2 sm:pt-3 border-t border-slate-50">
+                                                <p className="text-sm sm:text-base font-black text-slate-900 tabular-nums tracking-tight">
                                                     {formatRupiah(drug.price)}
                                                 </p>
                                                 {inCart ? (
@@ -281,11 +281,11 @@ export function OrderCatalog({
                                                                     -1,
                                                                 )
                                                             }
-                                                            className="w-7 h-7 flex items-center justify-center rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-sm font-black"
+                                                            className="w-6 sm:w-7 h-6 sm:h-7 flex items-center justify-center rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-xs sm:text-sm font-black"
                                                         >
                                                             −
                                                         </button>
-                                                        <span className="w-7 text-center text-xs font-black text-primary tabular-nums">
+                                                        <span className="w-6 sm:w-7 text-center text-[11px] sm:text-xs font-black text-primary tabular-nums">
                                                             {cartQty}
                                                         </span>
                                                         <button
@@ -298,7 +298,7 @@ export function OrderCatalog({
                                                             disabled={
                                                                 isOutOfStock
                                                             }
-                                                            className="w-7 h-7 flex items-center justify-center rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-sm font-black disabled:opacity-40"
+                                                            className="w-6 sm:w-7 h-6 sm:h-7 flex items-center justify-center rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-xs sm:text-sm font-black disabled:opacity-40"
                                                         >
                                                             +
                                                         </button>
@@ -312,10 +312,10 @@ export function OrderCatalog({
                                                         whileTap={{
                                                             scale: 0.93,
                                                         }}
-                                                        className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-primary text-white px-3.5 py-2 rounded-xl font-bold text-[11px] transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                                                        className="inline-flex items-center gap-1 sm:gap-1.5 bg-slate-900 hover:bg-primary text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-bold text-[10px] sm:text-[11px] transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                                                     >
-                                                        <Plus className="w-3.5 h-3.5" />
-                                                        Tambah
+                                                        <Plus className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                                                        <span className="hidden xs:inline">Tambah</span>
                                                     </motion.button>
                                                 )}
                                             </div>

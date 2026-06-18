@@ -1,5 +1,5 @@
-import React from "react";
-import { Search, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     InputGroup,
@@ -32,27 +32,33 @@ import {
  * - actions: React Node (optional buttons/actions on the right)
  */
 export function FilterBar({ configs, currentFilters, onFilterChange, onReset, actions }) {
-    const [searchTerm, setSearchTerm] = React.useState(currentFilters.search || "");
+    const [localFilters, setLocalFilters] = useState({ ...currentFilters });
 
-    React.useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            if (searchTerm !== (currentFilters.search || "")) {
-                onFilterChange({ search: searchTerm });
-            }
-        }, 500);
+    useEffect(() => {
+        setLocalFilters({ ...currentFilters });
+    }, [currentFilters]);
 
-        return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm]);
+    const updateLocal = (key, value) => {
+        setLocalFilters((prev) => ({ ...prev, [key]: value }));
+    };
 
-    // Sync local state if currentFilters.search changes externally (e.g. on reset)
-    React.useEffect(() => {
-        setSearchTerm(currentFilters.search || "");
-    }, [currentFilters.search]);
+    const handleApply = () => {
+        onFilterChange(localFilters);
+    };
+
+    const handleReset = () => {
+        setLocalFilters({});
+        onReset();
+    };
 
     const hasActiveFilters = Object.entries(currentFilters).some(([key, val]) => {
         if (key === 'page') return false;
         if (val === 'all' || val === '' || val === null || val === undefined) return false;
         return true;
+    });
+
+    const hasChanges = Object.entries(localFilters).some(([key, val]) => {
+        return val !== currentFilters[key];
     });
 
     return (
@@ -65,8 +71,8 @@ export function FilterBar({ configs, currentFilters, onFilterChange, onReset, ac
                                 <InputGroupInput
                                     placeholder={config.placeholder || "Cari..."}
                                     className="h-11 text-sm border-0 focus:ring-0"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={localFilters[config.key] || ""}
+                                    onChange={(e) => updateLocal(config.key, e.target.value)}
                                 />
                                 <InputGroupAddon className="pr-4">
                                     <Search className="w-4 h-4 text-slate-400" />
@@ -79,8 +85,8 @@ export function FilterBar({ configs, currentFilters, onFilterChange, onReset, ac
                         return (
                             <Select 
                                 key={config.key}
-                                value={currentFilters[config.key] || "all"} 
-                                onValueChange={(val) => onFilterChange({ [config.key]: val })}
+                                value={localFilters[config.key] || "all"} 
+                                onValueChange={(val) => updateLocal(config.key, val === "all" ? "" : val)}
                             >
                                 <SelectTrigger className="h-11 min-w-40 rounded-2xl bg-white border-slate-200 shadow-sm text-xs font-bold text-slate-600">
                                     <SelectValue placeholder={config.label || "Semua"} />
@@ -104,10 +110,18 @@ export function FilterBar({ configs, currentFilters, onFilterChange, onReset, ac
                     return null;
                 })}
 
+                <Button
+                    onClick={handleApply}
+                    disabled={!hasChanges}
+                    className="h-11 px-5 rounded-2xl bg-primary text-white font-bold text-xs hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <Filter className="w-4 h-4 mr-1.5" /> Terapkan Filter
+                </Button>
+
                 {hasActiveFilters && (
                     <Button
                         variant="ghost"
-                        onClick={onReset}
+                        onClick={handleReset}
                         className="h-11 px-4 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-2xl font-bold text-xs"
                     >
                         <X className="w-4 h-4 mr-2" /> Reset
