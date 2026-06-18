@@ -14,18 +14,7 @@ import {
     TableRow,
     TableCell,
 } from "@/components/ui/table";
-import {
-    PlusCircle,
-    Package,
-    Info,
-    X,
-    Trash2,
-    ArrowUpDown,
-    ArrowDownAZ,
-    ArrowUpAZ,
-    DollarSign,
-    Package2,
-} from "lucide-react";
+import { PlusCircle, Package, Info, X, Trash2 } from "lucide-react";
 import { FILTER_TABS } from "@/features/pharmacy/lib/constants";
 import { router, Link } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
@@ -41,15 +30,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
-const SORT_OPTIONS = [
-    { key: "name_asc", label: "Nama A-Z", icon: ArrowDownAZ },
-    { key: "name_desc", label: "Nama Z-A", icon: ArrowUpAZ },
-    { key: "stock_asc", label: "Stok Tersedikit", icon: Package2 },
-    { key: "stock_desc", label: "Stok Terbanyak", icon: Package2 },
-    { key: "price_asc", label: "Harga Terendah", icon: DollarSign },
-    { key: "price_desc", label: "Harga Tertinggi", icon: DollarSign },
-];
-
 export default function PharmacistMedicineCatalog({
     medicines,
     categories = [],
@@ -60,10 +40,6 @@ export default function PharmacistMedicineCatalog({
         open: false,
         data: null,
     });
-
-    const currentSort = filters.sort || "name_asc";
-    const currentSortLabel =
-        SORT_OPTIONS.find((s) => s.key === currentSort)?.label || "Urutkan";
 
     const handleFilter = (newFilters) => {
         router.get(
@@ -107,62 +83,20 @@ export default function PharmacistMedicineCatalog({
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2"
+                    className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2"
                 >
                     <PageHeader
                         title="Manajemen Obat Apotek"
                         description="Kelola inventori obat Anda dengan mudah. Tambah, edit, atau hapus data obat untuk memastikan stok selalu akurat dan up-to-date."
                     />
 
-                    <div className="flex items-center gap-2 w-full md:w-auto">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="inline-flex items-center justify-center gap-2 bg-white text-slate-600 font-semibold text-xs px-4 h-11 rounded-xl border-slate-200 hover:bg-slate-50 shadow-sm transition-all shrink-0"
-                                >
-                                    <ArrowUpDown className="w-4 h-4" />
-                                    <span className="hidden sm:inline">{currentSortLabel}</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                className="rounded-2xl border-slate-200 shadow-xl w-48 p-2"
-                            >
-                                {SORT_OPTIONS.map((opt) => {
-                                    const Icon = opt.icon;
-                                    const isActive = currentSort === opt.key;
-                                    return (
-                                        <DropdownMenuItem
-                                            key={opt.key}
-                                            onClick={() =>
-                                                handleFilter({ sort: opt.key })
-                                            }
-                                            className={`rounded-xl text-xs font-bold gap-2 py-2.5 cursor-pointer ${
-                                                isActive
-                                                    ? "bg-primary/10 text-primary"
-                                                    : "text-slate-600 focus:bg-slate-50"
-                                            }`}
-                                        >
-                                            <Icon className="w-4 h-4" />
-                                            {opt.label}
-                                            {isActive && (
-                                                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
-                                            )}
-                                        </DropdownMenuItem>
-                                    );
-                                })}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <Link
-                            href={route("pharmacy.medicines.create")}
-                            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/80 text-white font-semibold text-xs tracking-wide px-4 h-11 rounded-xl shadow-sm hover:shadow-md hover:shadow-blue-600/10 transition-all duration-200 group shrink-0 active:scale-[0.98] flex-1 md:flex-none"
-                        >
-                            <PlusCircle className="w-4 h-4 text-white/90 group-hover:rotate-90 transition-transform duration-300 stroke-[2.2]" />
-                            <span>Tambah Obat</span>
-                        </Link>
-                    </div>
+                    <Link
+                        href={route("pharmacy.medicines.create")}
+                        className="inline-flex items-center justify-center gap-2.5 bg-primary hover:bg-primary/80 text-white font-semibold text-xs tracking-wide px-5 h-11 rounded-xl shadow-sm hover:shadow-md hover:shadow-blue-600/10 transition-all duration-200 group shrink-0 active:scale-[0.98]"
+                    >
+                        <PlusCircle className="w-4 h-4 text-white/90 group-hover:rotate-90 transition-transform duration-300 stroke-[2.2]" />
+                        <span>Tambah Obat</span>
+                    </Link>
                 </motion.div>
 
                 <FilterBar

@@ -102,9 +102,9 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                             scale: 0.95,
                                             transition: { duration: 0.18 },
                                         }}
-                                        className="flex items-start gap-2 sm:gap-3 group p-2 sm:p-3 rounded-xl sm:rounded-2xl hover:bg-slate-50/80 transition-colors"
+                                        className="flex items-start gap-3 group p-3 rounded-2xl hover:bg-slate-50/80 transition-colors"
                                     >
-                                        <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                                        <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
                                             {item.image_url ? (
                                                 <img
                                                     src={item.image_url}
@@ -123,17 +123,17 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-2">
                                                 <div className="min-w-0">
-                                                    <h5 className="text-[11px] sm:text-xs font-black text-slate-900 leading-snug truncate">
+                                                    <h5 className="text-xs font-black text-slate-900 leading-snug truncate">
                                                         {item.name}
                                                     </h5>
-                                                    <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">
+                                                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">
                                                         {item.form} ·{" "}
                                                         {item.unit}
                                                     </p>
                                                     {item.requires_prescription && (
                                                         <div className="flex items-center gap-1 mt-1">
-                                                            <ShieldAlert className="w-2 h-2.5 sm:w-2.5 text-violet-500" />
-                                                            <span className="text-[8px] sm:text-[9px] font-bold text-violet-500 uppercase tracking-wide">
+                                                            <ShieldAlert className="w-2.5 h-2.5 text-violet-500" />
+                                                            <span className="text-[9px] font-bold text-violet-500 uppercase tracking-wide">
                                                                 Butuh Resep
                                                             </span>
                                                         </div>
@@ -143,13 +143,13 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                                     onClick={() =>
                                                         removeFromCart(item.id)
                                                     }
-                                                    className="w-5 sm:w-6 h-5 sm:h-6 rounded-full bg-transparent hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 shrink-0 mt-0.5"
+                                                    className="w-6 h-6 rounded-full bg-transparent hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 shrink-0 mt-0.5"
                                                 >
-                                                    <Trash2 className="w-2.5 sm:w-3 h-2.5 sm:h-3" />
+                                                    <Trash2 className="w-3 h-3" />
                                                 </button>
                                             </div>
 
-                                            <div className="flex items-center justify-between mt-2">
+                                            <div className="flex items-center justify-between mt-2.5">
                                                 <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-sm">
                                                     <button
                                                         onClick={() =>
@@ -158,11 +158,11 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                                                 -1,
                                                             )
                                                         }
-                                                        className="w-5 sm:w-6 h-5 sm:h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-all"
+                                                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-all"
                                                     >
-                                                        <Minus className="w-2 sm:w-2.5 h-2 sm:h-2.5" />
+                                                        <Minus className="w-2.5 h-2.5" />
                                                     </button>
-                                                    <span className="w-6 sm:w-7 text-center text-[11px] sm:text-xs font-black text-slate-900 tabular-nums">
+                                                    <span className="w-7 text-center text-xs font-black text-slate-900 tabular-nums">
                                                         {item.qty}
                                                     </span>
                                                     <button
@@ -172,12 +172,12 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                                                                 1,
                                                             )
                                                         }
-                                                        className="w-5 sm:w-6 h-5 sm:h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-all"
+                                                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition-all"
                                                     >
-                                                        <Plus className="w-2 sm:w-2.5 h-2 sm:h-2.5" />
+                                                        <Plus className="w-2.5 h-2.5" />
                                                     </button>
                                                 </div>
-                                                <span className="text-xs sm:text-sm font-black text-primary tabular-nums">
+                                                <span className="text-sm font-black text-primary tabular-nums">
                                                     {formatRupiah(
                                                         item.price * item.qty,
                                                     )}
@@ -212,19 +212,19 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="w-full flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 bg-white border border-slate-200 rounded-xl sm:rounded-2xl hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm">
-                            <div className="w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
-                                <PayIcon className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+                        <button className="w-full flex items-center gap-3 p-3.5 bg-white border border-slate-200 rounded-2xl hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm">
+                            <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                                <PayIcon className="w-4 h-4" />
                             </div>
                             <div className="flex-1 text-left min-w-0">
-                                <p className="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                                     Metode Bayar
                                 </p>
-                                <p className="text-[11px] sm:text-xs font-bold text-slate-800 truncate">
+                                <p className="text-xs font-bold text-slate-800 truncate">
                                     {paymentMethod.label}
                                 </p>
                             </div>
-                            <ChevronRight className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-slate-300 shrink-0" />
+                            <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -258,11 +258,11 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                 <motion.button
                     disabled={cart.length === 0}
                     whileTap={{ scale: 0.97 }}
-                    className="w-full h-11 sm:h-13 bg-primary hover:bg-primary/90 text-white rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm uppercase tracking-[0.12em] sm:tracking-[0.15em] shadow-xl shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full h-13 bg-primary hover:bg-primary/90 text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
                 >
                     <span>Proses Sekarang</span>
                     {cart.length > 0 && (
-                        <span className="bg-white/20 text-white text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-full tabular-nums">
+                        <span className="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full tabular-nums">
                             {formatRupiah(subtotal)}
                         </span>
                     )}
