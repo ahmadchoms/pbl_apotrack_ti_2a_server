@@ -11,6 +11,7 @@ enum OrderStatus: string
     case DELIVERED        = 'DELIVERED';
     case COMPLETED        = 'COMPLETED';
     case CANCELLED        = 'CANCELLED';
+    case CANCEL_REQUESTED = 'CANCEL_REQUESTED';
 
     public function label(): string
     {
@@ -22,6 +23,7 @@ enum OrderStatus: string
             self::DELIVERED        => 'Terkirim',
             self::COMPLETED        => 'Selesai',
             self::CANCELLED        => 'Dibatalkan',
+            self::CANCEL_REQUESTED => 'Minta Batal',
         };
     }
 }

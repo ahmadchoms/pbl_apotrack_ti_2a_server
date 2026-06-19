@@ -242,7 +242,8 @@ class OrderService
         $validTransitions = [
             OrderStatus::PENDING->value => [
                 OrderStatus::PROCESSING->value,
-                OrderStatus::CANCELLED->value
+                OrderStatus::CANCELLED->value,
+                OrderStatus::CANCEL_REQUESTED->value,
             ],
             OrderStatus::PROCESSING->value => [
                 OrderStatus::READY_FOR_PICKUP->value,
@@ -256,6 +257,10 @@ class OrderService
             OrderStatus::SHIPPED->value => [
                 OrderStatus::DELIVERED->value,
                 OrderStatus::CANCELLED->value // Delivery failed etc
+            ],
+            OrderStatus::CANCEL_REQUESTED->value => [
+            OrderStatus::CANCELLED->value,
+            OrderStatus::PENDING->value,
             ],
             OrderStatus::DELIVERED->value => [
                 OrderStatus::COMPLETED->value

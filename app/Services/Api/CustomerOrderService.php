@@ -85,6 +85,7 @@ class CustomerOrderService
             ->whereIn('order_status', [
                 Order::STATUS_COMPLETED,
                 Order::STATUS_CANCELLED,
+                Order::STATUS_CANCELLATION_REQUESTED,
             ])
             ->latest()
             ->paginate($perPage);

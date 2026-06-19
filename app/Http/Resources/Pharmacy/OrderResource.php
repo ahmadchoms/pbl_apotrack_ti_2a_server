@@ -18,6 +18,7 @@ class OrderResource extends JsonResource
             'payment_status' => $this->payment_status,
             'grand_total' => (float)$this->grand_total,
             'notes' => $this->notes,
+            'cancellation_reason' => $this->cancellation_reason,
             'created_at' => $this->created_at?->format('d M Y H:i'),
             'buyer' => $this->whenLoaded('user', fn() => [
                 'id' => $this->user->id,

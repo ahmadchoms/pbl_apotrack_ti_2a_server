@@ -26,6 +26,7 @@ const STATUSES = [
     { label: "Menunggu", value: "PENDING" },
     { label: "Diproses", value: "PROCESSING" },
     { label: "Dikirim", value: "SHIPPED" },
+    { label: "Pengajuan Batal", value: "CANCEL_REQUESTED" },
     { label: "Selesai", value: "COMPLETED" },
     { label: "Dibatalkan", value: "CANCELLED" },
 ];

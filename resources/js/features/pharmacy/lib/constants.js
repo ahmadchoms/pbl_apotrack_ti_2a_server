@@ -132,6 +132,11 @@ export const STATUS_CONFIG = {
         dot: "bg-teal-500",
         badge: "bg-teal-50 text-teal-700 border-teal-200/80 ring-1 ring-teal-300/30",
     },
+    CANCEL_REQUESTED: {
+        label: "Pengajuan Batal",
+        dot: "bg-slate-500",
+        badge: "bg-slate-50 text-slate-700 border-slate-200/80 ring-1 ring-slate-300/30",
+    },
     COMPLETED: {
         label: "Selesai",
         dot: "bg-emerald-500",

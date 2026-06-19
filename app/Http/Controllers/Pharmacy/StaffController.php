@@ -71,8 +71,11 @@ class StaffController extends Controller
     public function generateInvitation(Request $request)
     {
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
-        $url = $this->staffService->generateInvitationUrl($pharmacyId);
+        $result = $this->staffService->generateInvitationUrl($pharmacyId);
 
-        return response()->json(['url' => $url]);
+        return response()->json([
+            'url' => $result['url'],
+            'pin' => $result['pin'],
+        ]);
     }
 }

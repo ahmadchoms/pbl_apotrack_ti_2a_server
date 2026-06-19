@@ -3,24 +3,50 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\URL;
 use App\Models\Pharmacy;
 use App\Models\PharmacyStaff;
+use App\Services\Pharmacy\PharmacyStaffService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class StaffInvitationController extends Controller
 {
+    public function __construct(
+        protected PharmacyStaffService $staffService
+    ) {}
+
     public function join(Request $request)
     {
         $request->validate([
-            'invitation_url' => 'required|string',
+            'invitation_url' => 'nullable|string',
+            'pin'            => 'nullable|string|min:6|max:10',
         ]);
 
-        // 1. Parse URL yang discan
-        $invitationUrl = $request->input('invitation_url');
+        // Deteksi mode: URL (scan QR) atau PIN (input manual)
+        if ($request->filled('invitation_url')) {
+            $invitationUrl = $request->input('invitation_url');
 
-        // Parse query string dari URL
+        } elseif ($request->filled('pin')) {
+            $pin = strtoupper(trim($request->input('pin')));
+            $invitationUrl = $this->staffService->resolveInvitationPin($pin);
+
+            if (!$invitationUrl) {
+                return response()->json([
+                    'message' => 'Kode undangan tidak valid atau sudah kadaluarsa.',
+                ], 422);
+            }
+
+        } else {
+            return response()->json([
+                'message' => 'Kirim invitation_url atau pin.',
+            ], 422);
+        }
+
+        return $this->processJoin($request, $invitationUrl);
+    }
+
+    private function processJoin(Request $request, string $invitationUrl)
+    {
         $parsedUrl = parse_url($invitationUrl);
         parse_str($parsedUrl['query'] ?? '', $queryParams);
 
@@ -28,26 +54,16 @@ class StaffInvitationController extends Controller
 
         if (!$pharmacyId) {
             return response()->json([
-                'message' => 'QR tidak valid. pharmacy_id tidak ditemukan.',
+                'message' => 'Undangan tidak valid. pharmacy_id tidak ditemukan.',
             ], 422);
         }
 
-        // 2. Validasi signature Laravel
-        if (!URL::hasValidSignature($request->merge(
-            array_merge($queryParams, ['path' => $parsedUrl['path'] ?? ''])
-        ))) {
-            // Validasi manual karena request tidak sama dengan original
-            // Kita validasi dengan cara rebuild request
-        }
-
-        // Cara validasi signed URL yang benar: cek langsung
         if (!$this->isValidSignedUrl($invitationUrl)) {
             return response()->json([
                 'message' => 'Link undangan tidak valid atau sudah kadaluarsa.',
             ], 422);
         }
 
-        // 3. Cek apotek ada
         $pharmacy = Pharmacy::find($pharmacyId);
         if (!$pharmacy) {
             return response()->json([
@@ -57,7 +73,6 @@ class StaffInvitationController extends Controller
 
         $user = $request->user();
 
-        // 4. Cek apakah user sudah jadi staff di apotek ini
         $alreadyStaff = PharmacyStaff::where('pharmacy_id', $pharmacyId)
             ->where('user_id', $user->id)
             ->whereNull('deleted_at')
@@ -69,7 +84,6 @@ class StaffInvitationController extends Controller
             ], 409);
         }
 
-        // 5. Cek apakah user sudah jadi staff di apotek lain
         $isStaffElsewhere = PharmacyStaff::where('user_id', $user->id)
             ->whereNull('deleted_at')
             ->exists();
@@ -80,7 +94,6 @@ class StaffInvitationController extends Controller
             ], 409);
         }
 
-        // 6. Join sebagai staff
         DB::transaction(function () use ($pharmacyId, $user) {
             PharmacyStaff::create([
                 'pharmacy_id' => $pharmacyId,
@@ -88,13 +101,10 @@ class StaffInvitationController extends Controller
                 'role'        => 'STAFF',
                 'is_active'   => true,
             ]);
-
-            // Update role user menjadi STAFF
-            $user->update(['role' => 'STAFF']);
         });
 
         return response()->json([
-            'message' => 'Berhasil bergabung sebagai staff apotek!',
+            'message'  => 'Berhasil bergabung sebagai staff apotek!',
             'pharmacy' => [
                 'id'   => $pharmacy->id,
                 'name' => $pharmacy->name,
@@ -105,25 +115,8 @@ class StaffInvitationController extends Controller
     private function isValidSignedUrl(string $url): bool
     {
         try {
-            $parsed = parse_url($url);
-            parse_str($parsed['query'] ?? '', $params);
-
-            // Cek expires
-            if (isset($params['expires']) && now()->timestamp > (int) $params['expires']) {
-                return false;
-            }
-
-            // Rebuild URL tanpa signature untuk validasi
-            $signature = $params['signature'] ?? '';
-            unset($params['signature']);
-
-            $urlWithoutSignature = $parsed['scheme'] . '://' . $parsed['host']
-                . ($parsed['path'] ?? '')
-                . '?' . http_build_query($params);
-
-            $expectedSignature = hash_hmac('sha256', $urlWithoutSignature, config('app.key'));
-
-            return hash_equals($expectedSignature, $signature);
+            $fakeRequest = Request::create($url);
+            return $fakeRequest->hasValidSignature();
         } catch (\Throwable $e) {
             return false;
         }
