@@ -19,6 +19,13 @@ import { FILTER_TABS } from "@/features/pharmacy/lib/constants";
 import { router, Link } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PageHeader } from "@/features/admin/components/shared/PageHeader";

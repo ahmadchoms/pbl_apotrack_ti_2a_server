@@ -7,6 +7,7 @@ use App\Services\Api\CustomerOrderService;
 use App\Http\Requests\Api\Customer\StoreCustomerOrderRequest;
 use App\Http\Requests\Api\Customer\UploadPrescriptionRequest;
 use App\Http\Requests\Api\Customer\CheckShippingRatesRequest;
+use App\Models\Medicine;
 use App\Models\Pharmacy;
 use App\Models\UserAddress;
 use App\Services\BiteshipService;
@@ -99,7 +100,6 @@ class OrderController extends BaseApiController
         }
     }
 
-
     public function shippingRates(CheckShippingRatesRequest $request)
     {
         try {
@@ -112,27 +112,15 @@ class OrderController extends BaseApiController
                 $items = $request->items;
             }
 
-            try {
-                $rates = $this->biteshipService->checkRates([
-                    'origin_latitude' => (float) $pharmacy->latitude,
-                    'origin_longitude' => (float) $pharmacy->longitude,
-                    'destination_latitude' => (float) $address->latitude,
-                    'destination_longitude' => (float) $address->longitude,
-                    'items' => $items,
-                ]);
-
-                return $this->successResponse($rates, 'Tarif pengiriman berhasil diambil');
-            } catch (\Exception $e) {
-                Log::info('Biteship rates unavailable, using manual fallback: ' . $e->getMessage());
-                $manualRates = $this->calculateManualRates($pharmacy, $address);
-                return $this->successResponse($manualRates, 'Tarif pengiriman berhasil diambil');
-            }
+            // Langsung pake manual rates dulu (skip Biteship biar ga timeout/error)
+            $manualRates = $this->calculateManualRates($pharmacy, $address, $items);
+            return $this->successResponse($manualRates, 'Tarif pengiriman berhasil diambil');
         } catch (\Exception $e) {
             return $this->errorResponse('Gagal mengambil tarif: ' . $e->getMessage(), 500);
         }
     }
 
-    private function calculateManualRates(Pharmacy $pharmacy, UserAddress $address): array
+    private function calculateManualRates(Pharmacy $pharmacy, UserAddress $address, array $items = []): array
     {
         $lat1 = deg2rad((float) $pharmacy->latitude);
         $lon1 = deg2rad((float) $pharmacy->longitude);
@@ -152,36 +140,46 @@ class OrderController extends BaseApiController
             default => '60 - 90',
         };
 
+        $ratePerKm = (int) config('services.shipping.rate_per_km', 2500);
+        $minFee = (int) config('services.shipping.min_fee', 10000);
+        $ratePerGram = (int) config('services.shipping.rate_per_gram', 2);
+
+        $totalWeightGrams = 0;
+        if (!empty($items) && is_array($items)) {
+            foreach ($items as $item) {
+                $medicineId = $item['id'] ?? null;
+                $quantity = (int) ($item['quantity'] ?? 1);
+                if ($medicineId) {
+                    $medicine = Medicine::find($medicineId);
+                    $weight = $medicine ? (int) $medicine->weight_in_grams : 200;
+                } else {
+                    $weight = 200;
+                }
+                $totalWeightGrams += $weight * $quantity;
+            }
+        }
+        $totalWeightKg = $totalWeightGrams / 1000;
+
+        $basePrice = max($minFee, (int) round($distanceKm * $ratePerKm));
+        $weightSurcharge = (int) round($totalWeightGrams * $ratePerGram);
+        $price = $basePrice + $weightSurcharge;
+
         $couriers = [
-            [
-                'company'         => 'GrabExpress',
-                'courier_code'    => 'grab',
-                'courier_service' => 'Instant',
-                'service_type'    => 'instant',
-                'price'           => max(12000, (int) round($distanceKm * 2500)),
-                'etd'             => "$estimatedMinutes menit",
-            ],
             [
                 'company'         => 'GoSend',
                 'courier_code'    => 'gojek',
                 'courier_service' => 'Instant',
                 'service_type'    => 'instant',
-                'price'           => max(10000, (int) round($distanceKm * 2200)),
-                'etd'             => "$estimatedMinutes menit",
-            ],
-            [
-                'company'         => 'Maxim',
-                'courier_code'    => 'maxim',
-                'courier_service' => 'Instant',
-                'service_type'    => 'instant',
-                'price'           => max(9000, (int) round($distanceKm * 2000)),
+                'price'           => $price,
                 'etd'             => "$estimatedMinutes menit",
             ],
         ];
 
         return [
-            'pricing'     => $couriers,
-            'distance_km' => $distanceKm,
+            'pricing'          => $couriers,
+            'distance_km'      => $distanceKm,
+            'total_weight_g'   => $totalWeightGrams,
+            'total_weight_kg'  => round($totalWeightKg, 2),
         ];
     }
 

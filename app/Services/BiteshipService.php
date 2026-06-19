@@ -25,7 +25,7 @@ class BiteshipService
     public function checkRates(array $params): array
     {
         return $this->safeRequest(function () use ($params) {
-            $response = Http::withHeaders([
+            $response = Http::timeout(5)->withHeaders([
                 'Authorization' => $this->apiKey,
                 'Content-Type' => 'application/json',
             ])->post("{$this->baseUrl}/rates/couriers", $params);

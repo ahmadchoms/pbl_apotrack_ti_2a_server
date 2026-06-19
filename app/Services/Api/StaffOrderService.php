@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Enums\OrderStatus;
 use App\Services\BiteshipService;
 use App\Services\Pharmacy\OrderService;
-use App\Jobs\CreateBiteshipOrderJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -107,7 +106,6 @@ class StaffOrderService
                 throw new \Exception('Pesanan ini belum memiliki data kurir. Customer harus memilih kurir saat checkout.', 422);
             }
 
-
             $items = $order->items->map(function ($item) {
                 return [
                     'name'     => $item->medicine_name,
@@ -117,45 +115,28 @@ class StaffOrderService
                 ];
             })->toArray();
 
-            $payload = [
-                'shipper_contact_name'    => $order->pharmacy->name,
-                'shipper_contact_phone'   => $order->pharmacy->phone ?? '081234567890',
-                'shipper_contact_email'   => $order->pharmacy->email ?? 'admin@apotrack.com',
-                'shipper_organization'    => $order->pharmacy->name,
-                'origin_contact_name'     => $order->pharmacy->name,
-                'origin_contact_phone'    => $order->pharmacy->phone ?? '081234567890',
-                'origin_address'          => $order->pharmacy->address,
-                'origin_coordinate'       => [
-                    'latitude'  => (float) $order->pharmacy->latitude,
-                    'longitude' => (float) $order->pharmacy->longitude,
-                ],
-                'destination_contact_name'  => $order->user->username,
-                'destination_contact_phone' => $order->user->phone ?? '081234567890',
-                'destination_contact_email' => $order->user->email,
-                'destination_address'       => $order->address->complete_address,
-                'destination_coordinate'    => [
-                    'latitude'  => (float) $order->address->latitude,
-                    'longitude' => (float) $order->address->longitude,
-                ],
-                'delivery_type' => 'now',
-                'items' => $items,
-                'courier_company' => $data['courier_code'],
-                'courier_type'    => $data['courier_service'],
-            ];
-
-            $courierData = [
-                'courier' => $courierInfo,
-                'shipping_cost'    => $order->shipping_cost,
-            ];
-
             // Update status tracking
-            $tracking->update(['status'          => 'PENDING_BITESHIP']);
+            $tracking->update(['status' => 'ALLOCATING_COURIER']);
 
-            // Ubah status order menjadi sedang mengalokasikan kurir
             $order->update(['order_status' => 'ALLOCATING_COURIER']);
 
-            // Dispatch job ke antrean latar belakang
-            CreateBiteshipOrderJob::dispatch($order->id, $payload, $courierData);
+            // Skip Biteship — langsung buat mock tracking
+            try {
+                $tracking->update([
+                    'biteship_order_id' => 'mock_' . \Illuminate\Support\Str::uuid(),
+                    'courier'           => $courierInfo,
+                    'delivery_fee'      => $order->shipping_cost ?? 0,
+                    'tracking_number'   => 'TRK-' . strtoupper(substr($order->order_number, -8)),
+                    'tracking_link'     => 'https://track.apotrack.test/' . $order->id,
+                    'status'            => 'SHIPPED',
+                ]);
+
+                $order->update(['order_status' => Order::STATUS_SHIPPED]);
+
+                Log::info("Berhasil membuat mock tracking untuk Order ID: {$order->order_number}");
+            } catch (\Exception $e) {
+                Log::warning("Gagal update mock tracking: " . $e->getMessage());
+            }
 
             return $order->load(['tracking', 'address', 'user']);
         });
@@ -183,9 +164,13 @@ class StaffOrderService
 
         $tracking = $order->tracking;
 
-        if (!$tracking || !$tracking->biteship_order_id) {
-            throw new \Exception('Pesanan ini belum memiliki tracking Biteship.', 422);
+        if (!$tracking) {
+            throw new \Exception('Pesanan ini belum memiliki data tracking.', 422);
         }
+
+        // if (!$tracking->biteship_order_id) {
+        //     throw new \Exception('Pesanan ini belum memiliki tracking Biteship.', 422);
+        // }
 
         try {
             $this->biteshipService->simulateTracking($tracking->biteship_order_id, $status);
