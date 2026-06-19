@@ -8,7 +8,6 @@ export default function EditMedicinePage({
     types = [],
     forms = [],
 }) {
-    // Prop 'medicine' wajib ada karena membawa data obat yang akan diedit dari database
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Obat">
             <MedicineForm

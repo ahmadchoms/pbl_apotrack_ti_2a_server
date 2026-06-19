@@ -72,7 +72,6 @@ class Medicine extends Model
         return $this->hasMany(StockMovement::class);
     }
 
-    // Local Scopes
     public function scopeWithTotalActiveStock($query)
     {
         return $query->withSum(['batches as total_active_stock' => function ($sq) {
@@ -106,6 +105,4 @@ class Medicine extends Model
             }
         });
     }
-
-
 }

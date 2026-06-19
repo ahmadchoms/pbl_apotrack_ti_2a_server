@@ -215,10 +215,24 @@ class OrderController extends BaseApiController
     {
         try {
             $validStatuses = [
-                'confirmed', 'allocated', 'pickingUp', 'picked', 'inTransit',
-                'droppingOff', 'returnInTransit', 'onHold', 'delivered',
-                'rejected', 'courierNotFound', 'returned', 'cancelled', 'disposed',
-                'picking_up', 'dropping_off', 'in_transit', 'return_in_transit',
+                'confirmed',
+                'allocated',
+                'pickingUp',
+                'picked',
+                'inTransit',
+                'droppingOff',
+                'returnInTransit',
+                'onHold',
+                'delivered',
+                'rejected',
+                'courierNotFound',
+                'returned',
+                'cancelled',
+                'disposed',
+                'picking_up',
+                'dropping_off',
+                'in_transit',
+                'return_in_transit',
             ];
 
             if (!in_array($status, $validStatuses)) {
@@ -455,13 +469,12 @@ class OrderController extends BaseApiController
         }
     }
 
-    // ── TAMBAHAN BARU ─────────────────────────────────────────────
-
     public function approveCancellation(Request $request, $id)
     {
         try {
             $order = $this->staffOrderService->approveCancellation(
-                $request->user(), $id
+                $request->user(),
+                $id
             );
 
             AuditHelper::log(
@@ -483,7 +496,8 @@ class OrderController extends BaseApiController
     {
         try {
             $order = $this->staffOrderService->rejectCancellation(
-                $request->user(), $id
+                $request->user(),
+                $id
             );
 
             AuditHelper::log(

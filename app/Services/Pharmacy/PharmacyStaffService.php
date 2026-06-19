@@ -85,7 +85,6 @@ class PharmacyStaffService
 
     public function getActivityLogs(string $pharmacyId)
     {
-        // Combine audit logs and stock movements for all staff in this pharmacy
         $staffUserIds = PharmacyStaff::where('pharmacy_id', $pharmacyId)->pluck('user_id');
 
         return \App\Models\AuditLog::with('user')
@@ -106,7 +105,6 @@ class PharmacyStaffService
             ['pharmacy_id' => $pharmacyId]
         );
 
-        // Generate PIN unik — coba maksimal 10x untuk menghindari tabrakan
         $pin = null;
         for ($i = 0; $i < 10; $i++) {
             $candidate = strtoupper(substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 8));
@@ -116,12 +114,10 @@ class PharmacyStaffService
             }
         }
 
-        // Fallback kalau semua tabrakan (hampir mustahil)
         if ($pin === null) {
             $pin = strtoupper(substr(md5(uniqid($pharmacyId, true)), 0, 8));
         }
 
-        // Simpan mapping PIN → URL di cache selama 24 jam
         Cache::put("staff_pin:{$pin}", $url, now()->addHours(24));
 
         return ['url' => $url, 'pin' => $pin];

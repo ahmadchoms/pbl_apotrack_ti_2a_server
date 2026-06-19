@@ -20,35 +20,31 @@ class PharmacyService
             ->where('verification_status', 'VERIFIED')
             ->whereRaw('is_active IS TRUE');
 
-        // Search by name
         if (isset($filters['search'])) {
             $query->where('name', 'ilike', '%' . $filters['search'] . '%');
         }
 
-        // Filter by medicine category
         if (isset($filters['category_id']) && $filters['category_id'] !== '') {
             $query->whereHas('medicines', function ($q) use ($filters) {
                 $q->where('category_id', $filters['category_id'])
-                  ->where('is_active', true);
+                    ->where('is_active', true);
             });
         }
 
-        // Filter by medicine type
         if (isset($filters['type_id']) && $filters['type_id'] !== '') {
             $query->whereHas('medicines', function ($q) use ($filters) {
                 $q->where('type_id', $filters['type_id'])
-                  ->where('is_active', true);
+                    ->where('is_active', true);
             });
         }
 
-        // Distance Calculation & Radius Filter
         if (isset($filters['latitude']) && isset($filters['longitude'])) {
             $lat = $filters['latitude'];
             $lng = $filters['longitude'];
 
             $haversine = "( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) )";
             $query->selectRaw("{$haversine} AS distance", [$lat, $lng, $lat])
-                  ->orderBy('distance');
+                ->orderBy('distance');
 
             if (isset($filters['radius'])) {
                 $radius = (float) $filters['radius'];

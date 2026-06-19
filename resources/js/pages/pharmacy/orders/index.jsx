@@ -235,9 +235,13 @@ export default function PharmacistOrderManagement({
                     </CardContent>
                 </Card>
 
-                {/* Pagination */}
                 <div className="mt-6 flex justify-center">
-                    <Pagination links={paginatedOrders?.meta?.links || paginatedOrders?.links} />
+                    <Pagination
+                        links={
+                            paginatedOrders?.meta?.links ||
+                            paginatedOrders?.links
+                        }
+                    />
                 </div>
             </div>
         </DashboardPharmacyLayout>

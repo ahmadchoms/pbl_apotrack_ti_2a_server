@@ -26,7 +26,6 @@ class AddressService
     {
         return DB::transaction(function () use ($user, $data) {
             if ($data['is_primary'] ?? false) {
-                // Lock existing addresses before updating
                 UserAddress::where('user_id', $user->id)
                     ->lockForUpdate()
                     ->get();
@@ -49,7 +48,6 @@ class AddressService
     {
         return DB::transaction(function () use ($address, $data) {
             if ($data['is_primary'] ?? false) {
-                // Lock existing addresses before updating
                 UserAddress::where('user_id', $address->user_id)
                     ->where('id', '!=', $address->id)
                     ->lockForUpdate()

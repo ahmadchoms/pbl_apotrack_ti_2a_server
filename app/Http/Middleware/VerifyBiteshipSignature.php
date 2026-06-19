@@ -16,9 +16,6 @@ class VerifyBiteshipSignature
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek apakah mode bypass diaktifkan via .env (BITESHIP_WEBHOOK_BYPASS=true) atau rahasia belum diatur.
-        // Ini memastikan instalasi awal webhook di dashboard Biteship berjalan lancar dengan merespons 200 OK.
-        // Setelah instalasi berhasil dan secret didapatkan, atur BITESHIP_WEBHOOK_BYPASS=false di .env.
         $bypass = config('services.biteship.webhook_bypass', true);
         $secret = config('services.biteship.webhook_secret');
 
@@ -37,7 +34,6 @@ class VerifyBiteshipSignature
             ], 401);
         }
 
-        // Calculate HMAC SHA256 signature
         $payload = $request->getContent();
         $expectedSignature = hash_hmac('sha256', $payload, $secret);
 

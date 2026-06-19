@@ -31,11 +31,9 @@ class MedicineService
     public function store(string $pharmacyId, array $data)
     {
         return DB::transaction(function () use ($pharmacyId, $data) {
-            // 1. Get Category
             $category = MedicineCategory::where('name', $data['category'] ?? '')->first();
             if (!$category) throw new \Exception("Kategori '" . ($data['category'] ?? 'NULL') . "' tidak ditemukan.");
-            
-            // 2. Get Type (with smart check)
+
             $type = MedicineType::where('name', $data['type'] ?? '')->first();
             if (!$type) {
                 if (MedicineForm::where('name', $data['type'])->exists()) {
@@ -44,7 +42,6 @@ class MedicineService
                 throw new \Exception("Tipe '" . ($data['type'] ?? 'NULL') . "' tidak ditemukan di database.");
             }
 
-            // 3. Get Form (with smart check)
             $form = MedicineForm::where('name', $data['form'] ?? '')->first();
             if (!$form) {
                 if (MedicineType::where('name', $data['form'])->exists()) {
@@ -53,7 +50,6 @@ class MedicineService
                 throw new \Exception("Sediaan '" . ($data['form'] ?? 'NULL') . "' tidak ditemukan di database.");
             }
 
-            // 4. Get Unit
             $unit = MedicineUnit::where('name', $data['unit'] ?? '')->first();
             if (!$unit) throw new \Exception("Satuan '" . ($data['unit'] ?? 'NULL') . "' tidak ditemukan.");
 
@@ -79,7 +75,7 @@ class MedicineService
                     $file = $data['image'];
                     $localPath = $file->store('temp/medicines', 'local');
                     $medicine->update(['image_url' => url('api/temp-medicine/' . basename($localPath))]);
-                    
+
                     UploadMedicineImageJob::dispatch($medicine->id, $localPath);
                 } catch (\Exception $e) {
                     \Log::warning("Gagal men-dispatch job upload gambar obat: " . $e->getMessage());
@@ -97,14 +93,11 @@ class MedicineService
     public function update(Medicine $medicine, array $data)
     {
         return DB::transaction(function () use ($medicine, $data) {
-            // Lock medicine row to prevent concurrent updates
             $med = Medicine::where('id', $medicine->id)->lockForUpdate()->firstOrFail();
 
-            // 1. Get Category
             $category = MedicineCategory::where('name', $data['category'] ?? '')->first();
             if (!$category) throw new \Exception("Kategori '" . ($data['category'] ?? 'NULL') . "' tidak ditemukan.");
-            
-            // 2. Get Type (with smart check)
+
             $type = MedicineType::where('name', $data['type'] ?? '')->first();
             if (!$type) {
                 if (MedicineForm::where('name', $data['type'])->exists()) {
@@ -113,7 +106,6 @@ class MedicineService
                 throw new \Exception("Tipe '" . ($data['type'] ?? 'NULL') . "' tidak ditemukan di database.");
             }
 
-            // 3. Get Form (with smart check)
             $form = MedicineForm::where('name', $data['form'] ?? '')->first();
             if (!$form) {
                 if (MedicineType::where('name', $data['form'])->exists()) {
@@ -122,7 +114,6 @@ class MedicineService
                 throw new \Exception("Sediaan '" . ($data['form'] ?? 'NULL') . "' tidak ditemukan di database.");
             }
 
-            // 4. Get Unit
             $unit = MedicineUnit::where('name', $data['unit'] ?? '')->first();
             if (!$unit) throw new \Exception("Satuan '" . ($data['unit'] ?? 'NULL') . "' tidak ditemukan.");
 
@@ -149,7 +140,7 @@ class MedicineService
                     $file = $data['image'];
                     $localPath = $file->store('temp/medicines', 'local');
                     $med->update(['image_url' => url('api/temp-medicine/' . basename($localPath))]);
-                    
+
                     UploadMedicineImageJob::dispatch($med->id, $localPath, $oldImageUrl);
                 } catch (\Exception $e) {
                     \Log::warning("Gagal men-dispatch job update gambar obat: " . $e->getMessage());
@@ -166,7 +157,6 @@ class MedicineService
     {
         $batchIds = collect($batches)->pluck('id')->filter()->toArray();
 
-        // Remove batches not in the new list
         $medicine->batches()->whereNotIn('id', $batchIds)->delete();
 
         foreach ($batches as $batchData) {

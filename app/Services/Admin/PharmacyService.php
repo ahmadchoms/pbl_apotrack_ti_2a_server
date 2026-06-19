@@ -111,8 +111,6 @@ class PharmacyService
     public function delete(Pharmacy $pharmacy)
     {
         return DB::transaction(function () use ($pharmacy) {
-            // Soft delete will handle main record, but we might want to cleanup relationships
-            // if they aren't soft deleted.
             $pharmacy->staffs()->delete();
             $pharmacy->operatingHours()->delete();
             return $pharmacy->delete();
@@ -202,7 +200,6 @@ class PharmacyService
     {
         $userIds = collect($staffs)->pluck('user_id')->toArray();
 
-        // Remove staffs not in the new list
         $pharmacy->staffs()->whereNotIn('user_id', $userIds)->delete();
 
         foreach ($staffs as $staff) {

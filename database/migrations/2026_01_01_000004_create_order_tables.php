@@ -106,7 +106,6 @@ return new class extends Migration
             DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_quantity_positive CHECK (quantity > 0)');
         }
 
-        // ✅ delivery_trackings — struktur baru sesuai Biteship
         Schema::create('delivery_trackings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->unique()->constrained('orders')->cascadeOnDelete();
@@ -125,8 +124,6 @@ return new class extends Migration
 
             $table->timestamps();
         });
-
-        // ✅ delivery_tracking_logs DIHAPUS — diganti history JSONB
     }
 
     public function down(): void

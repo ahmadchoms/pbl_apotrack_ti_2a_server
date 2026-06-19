@@ -37,7 +37,6 @@ class MedicineCategoryController extends BaseApiController
             ->get();
 
         if ($popular->isEmpty()) {
-            // Fallback: get first 4 categories
             $popular = MedicineCategory::select('id', 'name')
                 ->limit(4)
                 ->get()

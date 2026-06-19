@@ -59,14 +59,12 @@ class CartService
         DB::transaction(function () use ($user, $data) {
             $medicine = Medicine::findOrFail($data['medicine_id']);
 
-            // Lock batches to get accurate total stock
             $totalStock = $medicine->batches()
                 ->where('expired_date', '>', now())
                 ->where('stock', '>', 0)
                 ->lockForUpdate()
                 ->sum('stock');
 
-            // Get or create cart, then lock it
             $cart = Cart::firstOrCreate(
                 ['user_id' => $user->id],
                 ['pharmacy_id' => $data['pharmacy_id']]

@@ -22,10 +22,8 @@ class StaffInvitationController extends Controller
             'pin'            => 'nullable|string|min:6|max:10',
         ]);
 
-        // Deteksi mode: URL (scan QR) atau PIN (input manual)
         if ($request->filled('invitation_url')) {
             $invitationUrl = $request->input('invitation_url');
-
         } elseif ($request->filled('pin')) {
             $pin = strtoupper(trim($request->input('pin')));
             $invitationUrl = $this->staffService->resolveInvitationPin($pin);
@@ -35,7 +33,6 @@ class StaffInvitationController extends Controller
                     'message' => 'Kode undangan tidak valid atau sudah kadaluarsa.',
                 ], 422);
             }
-
         } else {
             return response()->json([
                 'message' => 'Kirim invitation_url atau pin.',

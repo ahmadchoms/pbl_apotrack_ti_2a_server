@@ -100,10 +100,6 @@ class CreateBiteshipOrderJob implements ShouldQueue
                 $order->update(['order_status' => Order::STATUS_SHIPPED]);
 
                 Log::info("Berhasil membuat mock tracking untuk Order ID: {$order->order_number}");
-
-                // Kode lama — throw ulang exception jika ingin gagal total
-                // Log::error("Gagal membuat order pengiriman Biteship untuk Order ID {$this->orderId}: " . $e->getMessage());
-                // throw $e;
             }
         });
     }

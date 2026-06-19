@@ -38,7 +38,6 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        // Eager load relasi sekaligus
         if ($user && !$user->relationLoaded('pharmacyStaff')) {
             $user->load('pharmacyStaff');
         }
@@ -53,7 +52,6 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            // Flash messages untuk feedback
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),

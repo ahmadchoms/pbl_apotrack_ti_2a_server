@@ -17,10 +17,9 @@ class StockMovementPolicy
 
     public function view(User $user, StockMovement $movement): bool
     {
-        // StockMovement relates to Medicine, which relates to Pharmacy
-        return $user->pharmacyStaff && 
-               $movement->medicine && 
-               $movement->medicine->pharmacy_id === $user->pharmacyStaff->pharmacy_id;
+        return $user->pharmacyStaff &&
+            $movement->medicine &&
+            $movement->medicine->pharmacy_id === $user->pharmacyStaff->pharmacy_id;
     }
 
     public function create(User $user): bool

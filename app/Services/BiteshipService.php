@@ -90,7 +90,6 @@ class BiteshipService
 
             $result = $callback();
 
-            // Tangani jika Biteship mengembalikan error validasi atau error lainnya
             if (isset($result['success']) && $result['success'] === false) {
                 $errorMsg = $result['error'] ?? ($result['message'] ?? 'Unknown error from Biteship');
                 Log::error("Biteship Error [$actionName]: " . json_encode($result));

@@ -42,7 +42,6 @@ export function ProfileCard({ user, pharmacy }) {
     };
 
     const toggleStatus = (val) => {
-        // This should probably call a specific endpoint to toggle pharmacy status
         router.patch(
             route("pharmacy.profile.update"),
             { is_active: val },

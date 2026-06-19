@@ -4,8 +4,6 @@ import { DashboardAdminLayout } from "@/layouts/admin-layout";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-
-// Decomposed Components
 import { PharmacyHero } from "@/features/admin/components/pharmacies/PharmacyHero";
 import { PharmacyStats } from "@/features/admin/components/pharmacies/PharmacyStats";
 import { PharmacyLegality } from "@/features/admin/components/pharmacies/PharmacyLegality";

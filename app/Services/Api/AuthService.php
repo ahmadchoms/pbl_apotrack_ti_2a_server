@@ -31,8 +31,7 @@ class AuthService
             'otp' => (string) $otp,
         ];
 
-        Cache::put('registration_' . $email, $userData, 300); // 5 minutes cache
-        
+
         Log::info("OTP untuk $email adalah: $otp");
 
         Mail::to($email)->send(new OtpVerificationMail($otp));
@@ -59,7 +58,6 @@ class AuthService
         }
 
         return DB::transaction(function () use ($cachedData, $cacheKey) {
-            // Lock/check existing user to prevent duplicate user creation under high concurrency
             if (User::where('email', $cachedData['email'])->lockForUpdate()->exists()) {
                 throw ValidationException::withMessages([
                     'email' => ['Email ini sudah terdaftar.'],
@@ -129,15 +127,14 @@ class AuthService
             $user = User::where('email', $email)->lockForUpdate()->first();
 
             if (!$user) {
-                // Return silently to prevent email enumeration
                 return;
             }
 
             Log::info("Permintaan Lupa Password untuk: " . $user->email);
             $tempPassword = Str::random(8);
-            
+
             $user->update(['password_hash' => Hash::make($tempPassword)]);
-            
+
             Log::info("Password sementara untuk " . $user->email . " adalah: " . $tempPassword);
 
             Mail::to($user->email)->send(new TemporaryPasswordMail($tempPassword));

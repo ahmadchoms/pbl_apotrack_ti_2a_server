@@ -59,10 +59,8 @@ class UploadMedicineImageJob implements ShouldQueue
         }
 
         try {
-            // Gunakan disk supabase_private secara eksplisit agar file disimpan di Supabase storage bucket, bukan di lokal
             $disk = env('FILESYSTEM_DISK', 'supabase_private');
 
-            // Hapus gambar lama jika ada
             if ($this->oldImageUrl) {
                 $urlPath = parse_url($this->oldImageUrl, PHP_URL_PATH);
                 $bucket = env('SUPABASE_BUCKET_PRIVATE', 'apotrack-private');

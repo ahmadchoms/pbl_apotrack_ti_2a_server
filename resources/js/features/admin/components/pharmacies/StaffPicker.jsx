@@ -46,7 +46,6 @@ export function StaffPicker({
         return () => clearTimeout(delayDebounceFn);
     }, [staffSearch]);
 
-    // Filter out already added staff from the search results
     const filteredResults = availableStaff.filter(
         (user) => !staffs.find((s) => s.user_id === user.id),
     );

@@ -1,12 +1,3 @@
-// This feature page re-exports the pharmacy create form.
-// The form is complex (831 lines) and already uses a consistent pattern internally.
-// The key architectural win is that the route page (`pages/admin/pharmacies/create.jsx`)
-// becomes a thin proxy, and all shared components (SectionHeader, FormField, etc.)
-// are imported from the centralized shared directory.
-//
-// Future optimization: decompose the form into PharmacyBasicInfoSection,
-// PharmacyStaffSection, PharmacyHoursSection, and PharmacyDocumentsSection.
-
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";

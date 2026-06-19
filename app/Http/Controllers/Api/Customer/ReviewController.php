@@ -58,7 +58,6 @@ class ReviewController extends BaseApiController
      *                         type="object",
      *                         @OA\Property(property="id", type="string", format="uuid"),
      *                         @OA\Property(property="username", type="string", example="budi_santoso"),
-     *                         @OA\Property(property="avatar_url", type="string", nullable=true, example="https://example.com/avatars/budi.jpg")
      *                     )
      *                 )
      *             ),
@@ -221,17 +220,16 @@ class ReviewController extends BaseApiController
             $user = $request->user();
             $medicineId = $request->medicine_id;
 
-            // Delegasikan pengecekan otorisasi ke ReviewPolicy
             if ($user->cannot('create', [Review::class, (int) $medicineId])) {
                 return $this->errorResponse('Anda belum pernah membeli obat ini dengan status selesai (COMPLETED) atau sudah mengulas seluruh pembelian Anda.', 403);
             }
 
             $completedOrdersWithMedicine = OrderItem::whereHas('order', function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                      ->where('order_status', 'COMPLETED');
+                    ->where('order_status', 'COMPLETED');
             })
-            ->where('medicine_id', $medicineId)
-            ->pluck('order_id');
+                ->where('medicine_id', $medicineId)
+                ->pluck('order_id');
 
             $reviewedOrderIds = Review::whereIn('order_id', $completedOrdersWithMedicine)
                 ->where('medicine_id', $medicineId)
@@ -250,7 +248,6 @@ class ReviewController extends BaseApiController
                 'comment' => $request->comment,
             ]);
 
-            // Update pharmacy rating (denormalized) — only visible reviews
             $pharmacy = $review->pharmacy;
             if ($pharmacy) {
                 $pharmacy->update([
@@ -264,7 +261,6 @@ class ReviewController extends BaseApiController
             }
 
             return $this->successResponse(new ReviewResource($review->load('user')), 'Ulasan berhasil dikirim.', 201);
-            
         } catch (\Exception $e) {
             Log::error('Gagal membuat review: ' . $e->getMessage());
             return $this->errorResponse('Terjadi kesalahan saat memproses ulasan. Silakan coba lagi.', 500);

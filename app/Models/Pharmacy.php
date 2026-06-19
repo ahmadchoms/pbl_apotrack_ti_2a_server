@@ -58,7 +58,6 @@ class Pharmacy extends Model
         return $this->hasOne(PharmacyLegality::class);
     }
 
-    // Local Scopes
     public function scopeFilterStatus($query, $status)
     {
         return $query->when($status && $status !== 'all', function ($q) use ($status) {

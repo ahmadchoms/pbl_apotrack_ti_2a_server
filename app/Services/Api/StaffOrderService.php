@@ -99,7 +99,6 @@ class StaffOrderService
                 );
             }
 
-            // Gunakan kurir yang sudah dipilih customer dari tracking record
             $tracking = $order->tracking;
             $courierInfo = $tracking->courier ?? [];
             if (!$tracking || !($courierInfo['company'] ?? null)) {
@@ -115,12 +114,10 @@ class StaffOrderService
                 ];
             })->toArray();
 
-            // Update status tracking
             $tracking->update(['status' => 'ALLOCATING_COURIER']);
 
             $order->update(['order_status' => 'ALLOCATING_COURIER']);
 
-            // Skip Biteship — langsung buat mock tracking
             try {
                 $tracking->update([
                     'biteship_order_id' => 'mock_' . \Illuminate\Support\Str::uuid(),
@@ -168,9 +165,6 @@ class StaffOrderService
             throw new \Exception('Pesanan ini belum memiliki data tracking.', 422);
         }
 
-        // if (!$tracking->biteship_order_id) {
-        //     throw new \Exception('Pesanan ini belum memiliki tracking Biteship.', 422);
-        // }
 
         try {
             $this->biteshipService->simulateTracking($tracking->biteship_order_id, $status);
@@ -178,7 +172,6 @@ class StaffOrderService
             Log::warning("Biteship simulateTracking gagal, lanjut update lokal: " . $e->getMessage());
         }
 
-        // Normalize camelCase statuses to snake_case for consistency with webhook
         $normalized = match ($status) {
             'pickingUp' => 'picking_up',
             'droppingOff' => 'dropping_off',
@@ -188,7 +181,6 @@ class StaffOrderService
         };
         $status = $normalized;
 
-        // Append history entry (matching webhook history structure)
         $history = $tracking->history ?? [];
         $history[] = [
             'status'       => $status,
@@ -204,7 +196,6 @@ class StaffOrderService
             'history'       => $history,
         ]);
 
-        // Mapping order status (sama seperti webhook)
         $shippedStatuses = [
             'allocated',
             'pickingUp',
@@ -286,7 +277,6 @@ class StaffOrderService
                 );
             }
 
-            // Kembalikan ke PENDING agar customer bisa lanjut
             $order->update([
                 'order_status'        => Order::STATUS_PENDING,
                 'cancellation_reason' => null,

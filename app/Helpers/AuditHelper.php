@@ -21,7 +21,7 @@ class AuditHelper
     {
         try {
             return AuditLog::create([
-                'user_id' => Auth::id(), // Otomatis mengisi user_id dari auth saat ini
+                'user_id' => Auth::id(),
                 'action' => $action,
                 'description' => $description,
                 'status' => $status,
@@ -29,7 +29,6 @@ class AuditHelper
                 'created_at' => now(),
             ]);
         } catch (\Exception $e) {
-            // Log error ke sistem log utama agar kegagalan audit log tidak menghentikan transaksi bisnis
             Log::error("Gagal mencatat Audit Log [{$action}]: " . $e->getMessage(), [
                 'description' => $description,
                 'metadata' => $metadata,

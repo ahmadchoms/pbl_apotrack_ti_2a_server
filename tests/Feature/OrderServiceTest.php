@@ -33,7 +33,6 @@ class OrderServiceTest extends TestCase
         parent::setUp();
         $this->orderService = new OrderService();
 
-        // Setup base data
         $this->pharmacy = Pharmacy::create([
             'name' => 'Test Pharmacy',
             'address' => 'Test Address',
@@ -66,7 +65,6 @@ class OrderServiceTest extends TestCase
     #[Test]
     public function it_can_create_pos_order_successfully_and_reduce_stock()
     {
-        // Add stock batches
         $this->medicine->batches()->create([
             'batch_number' => 'B001',
             'expired_date' => now()->addYear(),
@@ -75,7 +73,7 @@ class OrderServiceTest extends TestCase
 
         $this->medicine->batches()->create([
             'batch_number' => 'B002',
-            'expired_date' => now()->addMonths(6), // FIFO should pick this first if we order by expired_date asc
+            'expired_date' => now()->addMonths(6),
             'stock' => 30,
         ]);
 
@@ -106,9 +104,6 @@ class OrderServiceTest extends TestCase
             'quantity' => 40,
         ]);
 
-        // Check stock reduction (FIFO)
-        // B002 (30) + B001 (50)
-        // Request 40: B002 becomes 0, B001 becomes 40 (50 - 10)
         $this->assertDatabaseHas('medicine_batches', [
             'batch_number' => 'B002',
             'stock' => 0,
@@ -135,7 +130,7 @@ class OrderServiceTest extends TestCase
             'items' => [
                 [
                     'id' => $this->medicine->id,
-                    'quantity' => 15, // More than 10
+                    'quantity' => 15,
                     'price' => 5000,
                 ]
             ]
@@ -146,7 +141,6 @@ class OrderServiceTest extends TestCase
         try {
             $this->orderService->createPOSOrder($this->pharmacy->id, $data);
         } catch (InsufficientStockException $e) {
-            // Verify no order was created (rollback)
             $this->assertEquals(0, Order::count());
             $this->assertEquals(10, MedicineBatch::where('batch_number', 'B001')->first()->stock);
             throw $e;
@@ -188,7 +182,6 @@ class OrderServiceTest extends TestCase
             'grand_total' => 5000,
         ]);
 
-        // PENDING to COMPLETED is invalid (must go through PROCESSING -> etc)
         $this->expectException(InvalidOrderStatusTransitionException::class);
 
         $this->orderService->updateStatus($order->id, OrderStatus::COMPLETED);

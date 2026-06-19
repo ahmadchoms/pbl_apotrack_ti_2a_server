@@ -14,10 +14,7 @@ class AuditController extends BaseApiController
     public function index(Request $request)
     {
         $staff = $request->user()->pharmacyStaff;
-        
-        // Pemilahan Data (Data Filtering):
-        // Jika rolenya adalah APOTEKER (Manajer/Penanggung Jawab Apotek), mereka berhak melihat seluruh aktivitas log dari semua staf di apotek tersebut.
-        // Namun jika rolenya adalah STAFF biasa (seperti Rina Staff), mereka hanya berhak melihat riwayat aktivitas yang mereka lakukan sendiri.
+
         if ($staff && $staff->role === 'APOTEKER') {
             $staffUserIds = \App\Models\PharmacyStaff::where('pharmacy_id', $staff->pharmacy_id)
                 ->pluck('user_id');

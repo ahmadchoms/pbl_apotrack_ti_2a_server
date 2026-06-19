@@ -66,7 +66,6 @@ class AuthService
     public function registerWithPharmacy(array $data)
     {
         return DB::transaction(function () use ($data) {
-            // 1. Create User
             $user = User::create([
                 'username'      => $data['username'],
                 'email'         => $data['email'],
@@ -76,7 +75,6 @@ class AuthService
                 'is_active'     => true,
             ]);
 
-            // 2. Create Pharmacy
             $pharmacy = Pharmacy::create([
                 'name'                => $data['pharmacy_name'],
                 'address'             => $data['pharmacy_address'],
@@ -87,7 +85,6 @@ class AuthService
                 'is_active'          => false,
             ]);
 
-            // 3. Link User to Pharmacy as APOTEKER
             PharmacyStaff::create([
                 'pharmacy_id' => $pharmacy->id,
                 'user_id'     => $user->id,
@@ -95,7 +92,6 @@ class AuthService
                 'is_active'   => true,
             ]);
 
-            // 4. Upload SIA Document
             $siaUrl = null;
             $disk = 'supabase_private';
 
@@ -104,7 +100,6 @@ class AuthService
                 $siaUrl = Storage::disk($disk)->url($path);
             }
 
-            // 5. Create Pharmacy Legality
             PharmacyLegality::create([
                 'pharmacy_id'      => $pharmacy->id,
                 'sia_number'       => $data['sia_number'],

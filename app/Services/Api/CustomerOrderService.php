@@ -56,7 +56,6 @@ class CustomerOrderService
                 ->lockForUpdate()
                 ->findOrFail($id);
 
-            // Simpan file sementara di local disk agar proses HTTP tidak terblokir
             $localPath = $file->store('temp/prescriptions', 'local');
 
             $prescription = Prescription::create([
@@ -68,7 +67,6 @@ class CustomerOrderService
 
             $order->update(['prescription_id' => $prescription->id]);
 
-            // Dispatch job ke antrean latar belakang
             UploadPrescriptionToS3Job::dispatch($prescription->id, $localPath);
 
             return $prescription;

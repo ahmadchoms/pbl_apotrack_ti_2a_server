@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, CalendarDays, Hash } from "lucide-react";
 import { SectionHeader } from "@/components/ui/section-header";
-import { TextInput } from "@/components/shared/TextInput"; // Gunakan komponen yang kita buat sebelumnya
+import { TextInput } from "@/components/shared/TextInput";
 
 export function MedicineBatchManager({
     batches,

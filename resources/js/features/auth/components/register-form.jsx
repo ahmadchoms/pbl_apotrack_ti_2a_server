@@ -27,20 +27,17 @@ import { registerSchema } from "../schemas/register-schema";
 import { IconInput } from "@/components/ui/icon-input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-    MapContainer,
-    TileLayer,
-    Marker,
-    useMapEvents,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
-// Fix leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    iconRetinaUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+    iconUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    shadowUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
 function LocationMarker({ position, setPosition }) {
@@ -50,9 +47,7 @@ function LocationMarker({ position, setPosition }) {
         },
     });
 
-    return position === null ? null : (
-        <Marker position={position} />
-    );
+    return position === null ? null : <Marker position={position} />;
 }
 
 const STEPS = [
@@ -177,7 +172,6 @@ export function RegisterForm() {
                 });
             },
             onError: (err) => {
-                // Map server-side errors back to react-hook-form
                 Object.keys(err).forEach((key) => {
                     setError(key, {
                         type: "server",
@@ -191,7 +185,6 @@ export function RegisterForm() {
                         "Silakan periksa kembali data Anda.",
                 });
 
-                // If there are errors on previous steps, navigate back
                 const firstErrorField = Object.keys(err)[0];
                 const stepWithError = STEPS.find((step) =>
                     step.fields.includes(firstErrorField),
@@ -425,7 +418,10 @@ export function RegisterForm() {
                             </Label>
                             <div className="h-[250px] w-full rounded-xl overflow-hidden border border-slate-200 z-0">
                                 <MapContainer
-                                    center={[formData.pharmacy_latitude, formData.pharmacy_longitude]}
+                                    center={[
+                                        formData.pharmacy_latitude,
+                                        formData.pharmacy_longitude,
+                                    ]}
                                     zoom={13}
                                     style={{ height: "100%", width: "100%" }}
                                 >
@@ -434,17 +430,31 @@ export function RegisterForm() {
                                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     />
                                     <LocationMarker
-                                        position={[formData.pharmacy_latitude, formData.pharmacy_longitude]}
+                                        position={[
+                                            formData.pharmacy_latitude,
+                                            formData.pharmacy_longitude,
+                                        ]}
                                         setPosition={(latlng) => {
-                                            setValue("pharmacy_latitude", latlng.lat);
-                                            setValue("pharmacy_longitude", latlng.lng);
+                                            setValue(
+                                                "pharmacy_latitude",
+                                                latlng.lat,
+                                            );
+                                            setValue(
+                                                "pharmacy_longitude",
+                                                latlng.lng,
+                                            );
                                         }}
                                     />
                                 </MapContainer>
                             </div>
                             <div className="flex gap-4 text-[10px] text-slate-500 font-medium">
-                                <span>Lat: {formData.pharmacy_latitude.toFixed(6)}</span>
-                                <span>Long: {formData.pharmacy_longitude.toFixed(6)}</span>
+                                <span>
+                                    Lat: {formData.pharmacy_latitude.toFixed(6)}
+                                </span>
+                                <span>
+                                    Long:{" "}
+                                    {formData.pharmacy_longitude.toFixed(6)}
+                                </span>
                             </div>
                         </div>
 
@@ -745,8 +755,14 @@ export function RegisterForm() {
                                         </span>
                                     </div>
                                     <div className="text-xs text-slate-500">
-                                        <p className="font-bold text-slate-700 mb-1">Dokumen Fisik SIA</p>
-                                        <p>Pastikan dokumen yang diunggah terbaca dengan jelas untuk mempercepat proses verifikasi.</p>
+                                        <p className="font-bold text-slate-700 mb-1">
+                                            Dokumen Fisik SIA
+                                        </p>
+                                        <p>
+                                            Pastikan dokumen yang diunggah
+                                            terbaca dengan jelas untuk
+                                            mempercepat proses verifikasi.
+                                        </p>
                                     </div>
                                 </div>
                             </CardContent>

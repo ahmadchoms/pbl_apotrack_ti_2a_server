@@ -532,9 +532,7 @@ class AuthController extends BaseApiController
 
         try {
             DB::transaction(function () use ($user) {
-                // Revoke semua token
                 $user->tokens()->delete();
-                // Hapus user (cascade ke data terkait)
                 $user->delete();
             });
 

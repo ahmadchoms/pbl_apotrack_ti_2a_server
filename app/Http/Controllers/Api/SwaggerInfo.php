@@ -44,9 +44,4 @@ use OpenApi\Annotations as OA;
  * @OA\Tag(name="Address", description="Manajemen alamat pengiriman Customer")
  * @OA\Tag(name="Pharmacies", description="Informasi apotek dan katalog obat publik")
  */
-class SwaggerInfo
-{
-    // File ini HANYA berisi anotasi OpenAPI dasar (Info, Server, SecurityScheme, Tags).
-    // Tidak ada logika bisnis di sini.
-    // swagger-php v6 mengharuskan @OA\Info berada di non-abstract class.
-}
+class SwaggerInfo {}

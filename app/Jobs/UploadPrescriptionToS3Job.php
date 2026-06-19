@@ -68,7 +68,7 @@ class UploadPrescriptionToS3Job implements ShouldQueue
 
             $prescription->update([
                 'image_url' => $url,
-                'status' => 'PENDING', // Siap diverifikasi oleh staf apotek
+                'status' => 'PENDING',
             ]);
 
             Log::info("Berhasil mengunggah resep ke S3: {$url}");
@@ -76,7 +76,7 @@ class UploadPrescriptionToS3Job implements ShouldQueue
             $this->cleanLocalFile();
         } catch (\Exception $e) {
             Log::error("Gagal mengunggah resep ke S3 untuk Prescription ID {$this->prescriptionId}: " . $e->getMessage());
-            throw $e; // Akan memicu retry sesuai $tries dan $backoff
+            throw $e;
         }
     }
 

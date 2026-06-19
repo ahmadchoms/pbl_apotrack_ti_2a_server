@@ -112,7 +112,6 @@ class OrderController extends BaseApiController
                 $items = $request->items;
             }
 
-            // Langsung pake manual rates dulu (skip Biteship biar ga timeout/error)
             $manualRates = $this->calculateManualRates($pharmacy, $address, $items);
             return $this->successResponse($manualRates, 'Tarif pengiriman berhasil diambil');
         } catch (\Exception $e) {

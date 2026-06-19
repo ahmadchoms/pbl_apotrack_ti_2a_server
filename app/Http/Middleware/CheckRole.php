@@ -22,8 +22,6 @@ class CheckRole
             return $next($request);
         }
 
-        // --- NORMALISASI ROLES ---
-        // Jika parameter dikirim sebagai 'STAFF|APOTEKER', pecah menjadi array ['STAFF', 'APOTEKER']
         $normalizedRoles = [];
         foreach ($roles as $role) {
             if (str_contains($role, '|')) {
@@ -33,10 +31,9 @@ class CheckRole
             }
         }
 
-        // 1. Cek jika role ini berkaitan dengan Staff (STAFF atau APOTEKER)
-        $isStaffRole = in_array($user->role, ['STAFF', 'APOTEKER']) || 
-                       in_array('STAFF', $normalizedRoles) || 
-                       in_array('APOTEKER', $normalizedRoles);
+        $isStaffRole = in_array($user->role, ['STAFF', 'APOTEKER']) ||
+            in_array('STAFF', $normalizedRoles) ||
+            in_array('APOTEKER', $normalizedRoles);
 
         if ($isStaffRole) {
             $user->loadMissing('pharmacyStaff');
@@ -51,17 +48,14 @@ class CheckRole
                     : abort(403, 'Anda tidak terdaftar sebagai staf apotek aktif. Silakan hubungi admin.');
             }
 
-            // Izinkan jika role utama di tabel users cocok
             if (in_array($user->role, $normalizedRoles)) {
                 return $next($request);
             }
-            
-            // Cek role spesifik milik staf tersebut di tabel staffs
+
             if (in_array($staff->role, $normalizedRoles)) {
                 return $next($request);
             }
         } else {
-            // Untuk non-staff (misal SUPER_ADMIN atau USER)
             if (in_array($user->role, $normalizedRoles)) {
                 return $next($request);
             }

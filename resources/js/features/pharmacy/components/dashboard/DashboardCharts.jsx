@@ -51,7 +51,6 @@ export function DashboardCharts({ charts = {} }) {
     const revenueTrend = charts.revenue_trend || [];
     const topMedicines = charts.top_medicines || [];
 
-    // Modern harmonious color palette for top medicines
     const barColors = [
         "url(#barGrad1)",
         "url(#barGrad2)",

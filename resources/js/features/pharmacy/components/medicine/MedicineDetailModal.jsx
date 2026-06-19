@@ -42,7 +42,7 @@ export function MedicineDetailModal({
     const [medicine, setMedicine] = useState(initialMedicine);
     const [history, setHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isAdjusting, setIsAdjusting] = useState(null); // batchId if adjusting
+    const [isAdjusting, setIsAdjusting] = useState(null);
 
     useEffect(() => {
         if (open && initialMedicine) {

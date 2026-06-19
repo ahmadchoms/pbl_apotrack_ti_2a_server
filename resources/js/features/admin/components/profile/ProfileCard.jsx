@@ -35,7 +35,6 @@ export function ProfileCard({ user }) {
     });
 
     const handleSaveProfile = () => {
-        // Here you would typically call a router.put or similar
         setIsEditProfileOpen(false);
         setTimeout(() => setIsSuccessOpen(true), 150);
     };

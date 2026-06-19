@@ -14,21 +14,27 @@ class MedicineService
     {
         $query = Medicine::query()
             ->select([
-                'id', 'pharmacy_id', 'category_id', 'form_id', 'name', 
-                'generic_name', 'price', 'image_url', 'requires_prescription'
+                'id',
+                'pharmacy_id',
+                'category_id',
+                'form_id',
+                'name',
+                'generic_name',
+                'price',
+                'image_url',
+                'requires_prescription'
             ])
             ->with([
                 'category:id,name',
                 'form:id,name',
                 'pharmacy:id,name'
             ])
-            ->withTotalActiveStock() // Custom scope
+            ->withTotalActiveStock()
             ->whereRaw('is_active IS TRUE');
 
-        // Filters
         $query->when($filters['search'] ?? null, function (Builder $q, $search) {
             $q->where('name', 'ilike', "%{$search}%")
-              ->orWhere('generic_name', 'ilike', "%{$search}%");
+                ->orWhere('generic_name', 'ilike', "%{$search}%");
         });
 
         $query->when($filters['category_id'] ?? null, function (Builder $q, $catId) {
@@ -48,12 +54,12 @@ class MedicineService
     public function getMedicineDetail($id)
     {
         return Medicine::with([
-                'category:id,name',
-                'form:id,name',
-                'type:id,name',
-                'unit:id,name',
-                'pharmacy:id,name,address'
-            ])
+            'category:id,name',
+            'form:id,name',
+            'type:id,name',
+            'unit:id,name',
+            'pharmacy:id,name,address'
+        ])
             ->withTotalActiveStock()
             ->findOrFail($id);
     }

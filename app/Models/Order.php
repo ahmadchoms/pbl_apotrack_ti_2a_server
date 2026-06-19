@@ -86,7 +86,6 @@ class Order extends Model
         return $this->hasMany(Review::class);
     }
 
-    // Local Scopes
     public function scopeForPharmacy($query, $pharmacyId)
     {
         return $query->where('pharmacy_id', $pharmacyId);

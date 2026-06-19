@@ -22,16 +22,15 @@ class PharmacyStaffPolicy
 
     public function update(User $user, PharmacyStaff $staff): bool
     {
-        // Only APOTEKER can update staff status usually, or check pharmacy_id
-        return $user->pharmacyStaff && 
-               $staff->pharmacy_id === $user->pharmacyStaff->pharmacy_id &&
-               $user->pharmacyStaff->role === 'APOTEKER';
+        return $user->pharmacyStaff &&
+            $staff->pharmacy_id === $user->pharmacyStaff->pharmacy_id &&
+            $user->pharmacyStaff->role === 'APOTEKER';
     }
 
     public function toggleStatus(User $user, PharmacyStaff $staff): bool
     {
-        return $user->pharmacyStaff && 
-               $staff->pharmacy_id === $user->pharmacyStaff->pharmacy_id &&
-               $user->pharmacyStaff->role === 'APOTEKER';
+        return $user->pharmacyStaff &&
+            $staff->pharmacy_id === $user->pharmacyStaff->pharmacy_id &&
+            $user->pharmacyStaff->role === 'APOTEKER';
     }
 }

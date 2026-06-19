@@ -23,7 +23,7 @@ class ReportController extends Controller
         $pharmacyId = $request->user()->pharmacyStaff->pharmacy_id;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $type = $request->input('type', 'sales'); // sales or stock
+        $type = $request->input('type', 'sales');
 
         if ($type === 'stock') {
             $reportData = $this->reportService->getStockMovementReport($pharmacyId, $startDate, $endDate);

@@ -9,7 +9,7 @@ class AuditLog extends Model
 {
     use HasUuids;
 
-    public $timestamps = false; // We use created_at only
+    public $timestamps = false;
 
     protected $guarded = [];
 
@@ -23,13 +23,12 @@ class AuditLog extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Local Scopes
     public function scopeSearch($query, $search)
     {
         return $query->when($search, function ($q) use ($search) {
             $q->where(function ($sq) use ($search) {
                 $sq->where('description', 'ilike', "%{$search}%")
-                  ->orWhere('action', 'ilike', "%{$search}%");
+                    ->orWhere('action', 'ilike', "%{$search}%");
             });
         });
     }

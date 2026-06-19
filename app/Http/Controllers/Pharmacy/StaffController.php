@@ -54,7 +54,7 @@ class StaffController extends Controller
 
     public function destroy(PharmacyStaff $staff)
     {
-        $this->authorize('update', $staff); // Usually delete also needs update permission
+        $this->authorize('update', $staff);
         $this->staffService->delete($staff);
 
         return redirect()->back()->with('success', 'Staff berhasil dihapus');

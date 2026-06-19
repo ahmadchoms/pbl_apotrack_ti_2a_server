@@ -64,7 +64,6 @@ class OrderService
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
 
-                // Reduce stock from batches (FIFO simple logic with locking)
                 $this->reduceStock($medicine, $item['quantity']);
             }
 
@@ -106,7 +105,6 @@ class OrderService
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
 
-                // Reduce stock from batches (FIFO with locking)
                 $this->reduceStock($medicine, $item['quantity']);
             }
 
@@ -122,12 +120,11 @@ class OrderService
                 ]);
             }
 
-            // Clear User Cart
             $cart = \App\Models\Cart::where('user_id', $user->id)
                 ->where('pharmacy_id', $data['pharmacy_id'])
                 ->lockForUpdate()
                 ->first();
-            
+
             if ($cart) {
                 $cart->items()->delete();
             }
@@ -135,7 +132,6 @@ class OrderService
             return $order;
         });
 
-        // Dispatch status changed event to notify customer and pharmacy staff (outside transaction to prevent race conditions)
         OrderStatusChangedEvent::dispatch($order, 'NONE', 'PENDING');
 
         return $order;
@@ -143,7 +139,6 @@ class OrderService
 
     protected function reduceStock($medicine, $quantity)
     {
-        // Pessimistic Locking on medicine and batches
         $med = \App\Models\Medicine::where('id', $medicine->id)->lockForUpdate()->first();
 
         $batches = $med->batches()
@@ -186,12 +181,10 @@ class OrderService
             $order = Order::with('user')->where('id', $orderId)->lockForUpdate()->firstOrFail();
             $oldStatus = OrderStatus::from($order->order_status);
 
-            // Validate Transition
             $this->validateStatusTransition($oldStatus, $status);
 
             $order->update(['order_status' => $status->value]);
 
-            // Create log
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
                 'status' => $status->value,
@@ -199,12 +192,10 @@ class OrderService
                 'source' => 'PHARMACY_WEB'
             ]);
 
-            // Jika dibatalkan, kembalikan stok obat ke batch aktif
             if ($status === OrderStatus::CANCELLED && $oldStatus !== OrderStatus::CANCELLED) {
                 $this->restoreStock($order);
             }
 
-            // Dispatch event perubahan status pesanan untuk notifikasi latar belakang
             OrderStatusChangedEvent::dispatch($order, $oldStatus->value, $status->value);
 
             return $order;
@@ -256,16 +247,15 @@ class OrderService
             ],
             OrderStatus::SHIPPED->value => [
                 OrderStatus::DELIVERED->value,
-                OrderStatus::CANCELLED->value // Delivery failed etc
+                OrderStatus::CANCELLED->value
             ],
             OrderStatus::CANCEL_REQUESTED->value => [
-            OrderStatus::CANCELLED->value,
-            OrderStatus::PENDING->value,
+                OrderStatus::CANCELLED->value,
+                OrderStatus::PENDING->value,
             ],
             OrderStatus::DELIVERED->value => [
                 OrderStatus::COMPLETED->value
             ],
-            // COMPLETED and CANCELLED are terminal states
             OrderStatus::COMPLETED->value => [],
             OrderStatus::CANCELLED->value => [],
         ];

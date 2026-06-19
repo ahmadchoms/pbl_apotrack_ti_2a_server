@@ -38,7 +38,6 @@ return new class extends Migration
             $table->index(['user_id', 'is_primary']);
         });
 
-        // Unique index for primary address
         DB::statement('CREATE UNIQUE INDEX idx_user_primary_address ON user_addresses (user_id) WHERE is_primary = true');
     }
 

@@ -88,7 +88,6 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:SUPER_ADMIN', 'active.user'])
     ->group(function () {
 
-        // Dashboard
         Route::get('/', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
 
@@ -155,7 +154,6 @@ Route::prefix('pharmacy')
     ->middleware(['auth', 'role:APOTEKER,STAFF', 'verified.pharmacy', 'active.user'])
     ->group(function () {
 
-        // Dashboard
         Route::get('/', [PharmacyDashboardController::class, 'index'])
             ->name('dashboard');
 

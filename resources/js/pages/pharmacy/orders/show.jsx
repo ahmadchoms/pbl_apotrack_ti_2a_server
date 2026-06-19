@@ -624,7 +624,6 @@ export default function OrderShow({ order: orderWrapper }) {
                 </DialogContent>
             </Dialog>
 
-            {/* Dialog Konfirmasi Setujui Pembatalan */}
             <Dialog
                 open={showApproveCancelDialog}
                 onOpenChange={setShowApproveCancelDialog}
@@ -676,7 +675,6 @@ export default function OrderShow({ order: orderWrapper }) {
                 </DialogContent>
             </Dialog>
 
-            {/* Dialog Konfirmasi Tolak Pembatalan */}
             <Dialog
                 open={showRejectCancelDialog}
                 onOpenChange={setShowRejectCancelDialog}

@@ -45,7 +45,7 @@ class ReportService
     public function exportSalesCsv(string $pharmacyId, ?string $startDate, ?string $endDate): StreamedResponse
     {
         $fileName = 'sales_report_' . now()->format('YmdHis') . '.csv';
-        
+
         $headers = [
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -54,10 +54,9 @@ class ReportService
             "Expires"             => "0"
         ];
 
-        $callback = function() use ($pharmacyId, $startDate, $endDate) {
+        $callback = function () use ($pharmacyId, $startDate, $endDate) {
             $file = fopen('php://output', 'w');
-            
-            // CSV Header
+
             fputcsv($file, ['No. Order', 'Tanggal', 'Pelanggan', 'Metode Pembayaran', 'Subtotal', 'Ongkir', 'Total']);
 
             Order::with('user')
@@ -66,7 +65,7 @@ class ReportService
                 ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
                 ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
                 ->latest()
-                ->chunk(1000, function($orders) use ($file) {
+                ->chunk(1000, function ($orders) use ($file) {
                     foreach ($orders as $order) {
                         fputcsv($file, [
                             $order->order_number,
@@ -89,7 +88,7 @@ class ReportService
     public function exportStockMovementCsv(string $pharmacyId, ?string $startDate, ?string $endDate): StreamedResponse
     {
         $fileName = 'stock_mutation_' . now()->format('YmdHis') . '.csv';
-        
+
         $headers = [
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -98,10 +97,9 @@ class ReportService
             "Expires"             => "0"
         ];
 
-        $callback = function() use ($pharmacyId, $startDate, $endDate) {
+        $callback = function () use ($pharmacyId, $startDate, $endDate) {
             $file = fopen('php://output', 'w');
-            
-            // CSV Header
+
             fputcsv($file, ['Tanggal', 'Obat', 'Batch', 'Tipe', 'Jumlah', 'Catatan']);
 
             StockMovement::with(['medicine', 'batch'])
@@ -111,7 +109,7 @@ class ReportService
                 ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
                 ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
                 ->latest('created_at')
-                ->chunk(1000, function($movements) use ($file) {
+                ->chunk(1000, function ($movements) use ($file) {
                     foreach ($movements as $movement) {
                         fputcsv($file, [
                             $movement->created_at,
