@@ -38,6 +38,9 @@ export default function OrderShow({ order: orderWrapper }) {
     const order = orderWrapper.data;
     const [isZoomed, setIsZoomed] = useState(false);
     const [showRejectDialog, setShowRejectDialog] = useState(false);
+    const [showApproveCancelDialog, setShowApproveCancelDialog] =
+        useState(false);
+    const [showRejectCancelDialog, setShowRejectCancelDialog] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
 
     const statusCfg =
@@ -497,6 +500,52 @@ export default function OrderShow({ order: orderWrapper }) {
                                     </Button>
                                 )}
 
+                                {order.order_status === "CANCEL_REQUESTED" && (
+                                    <div className="flex-1 flex flex-col gap-4">
+                                        {order.cancellation_reason && (
+                                            <div className="flex items-start gap-3 p-5 bg-rose-50 rounded-2xl border border-rose-100">
+                                                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                                                <div>
+                                                    <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1">
+                                                        Alasan Pembatalan dari
+                                                        Customer
+                                                    </p>
+                                                    <p className="text-sm text-rose-700 font-medium leading-relaxed">
+                                                        {
+                                                            order.cancellation_reason
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="flex gap-3">
+                                            <Button
+                                                className="h-14 px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-rose-500/30 flex-1"
+                                                onClick={() =>
+                                                    setShowApproveCancelDialog(
+                                                        true,
+                                                    )
+                                                }
+                                            >
+                                                <XCircle className="w-5 h-5 mr-2" />
+                                                Setujui Pembatalan
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50 font-black text-[11px] uppercase tracking-[0.2em] flex-1"
+                                                onClick={() =>
+                                                    setShowRejectCancelDialog(
+                                                        true,
+                                                    )
+                                                }
+                                            >
+                                                <CheckCircle2 className="w-5 h-5 mr-2" />
+                                                Tolak, Lanjutkan Pesanan
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {order.order_status === "CANCELLED" && (
                                     <div className="flex-1 flex items-center gap-3 p-6 bg-rose-50 rounded-2xl border border-rose-100">
                                         <XCircle className="w-8 h-8 text-rose-500 shrink-0" />
@@ -570,6 +619,110 @@ export default function OrderShow({ order: orderWrapper }) {
                             onClick={handleReject}
                         >
                             Tolak Pesanan
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Dialog Konfirmasi Setujui Pembatalan */}
+            <Dialog
+                open={showApproveCancelDialog}
+                onOpenChange={setShowApproveCancelDialog}
+            >
+                <DialogContent className="max-w-md rounded-[2.5rem] p-8 border-slate-100 shadow-2xl">
+                    <DialogHeader>
+                        <div className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 mb-4 shadow-inner">
+                            <XCircle className="w-8 h-8" />
+                        </div>
+                        <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">
+                            Setujui Pembatalan?
+                        </DialogTitle>
+                        <p className="text-sm text-slate-500 font-medium mt-2 leading-relaxed">
+                            Pesanan akan dibatalkan dan tidak dapat diproses
+                            lebih lanjut.
+                        </p>
+                    </DialogHeader>
+                    <DialogFooter className="gap-3 pt-4">
+                        <Button
+                            variant="ghost"
+                            className="h-12 rounded-xl font-bold text-slate-400"
+                            onClick={() => setShowApproveCancelDialog(false)}
+                        >
+                            Kembali
+                        </Button>
+                        <Button
+                            className="h-12 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-lg shadow-rose-500/20"
+                            onClick={() => {
+                                router.post(
+                                    route(
+                                        "pharmacy.orders.approve-cancellation",
+                                        order.id,
+                                    ),
+                                    {},
+                                    {
+                                        onSuccess: () => {
+                                            toast.success(
+                                                "Pembatalan disetujui",
+                                            );
+                                            setShowApproveCancelDialog(false);
+                                        },
+                                    },
+                                );
+                            }}
+                        >
+                            Ya, Batalkan Pesanan
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Dialog Konfirmasi Tolak Pembatalan */}
+            <Dialog
+                open={showRejectCancelDialog}
+                onOpenChange={setShowRejectCancelDialog}
+            >
+                <DialogContent className="max-w-md rounded-[2.5rem] p-8 border-slate-100 shadow-2xl">
+                    <DialogHeader>
+                        <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4 shadow-inner">
+                            <CheckCircle2 className="w-8 h-8" />
+                        </div>
+                        <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">
+                            Tolak Pengajuan Batal?
+                        </DialogTitle>
+                        <p className="text-sm text-slate-500 font-medium mt-2 leading-relaxed">
+                            Pesanan akan dikembalikan ke status menunggu dan
+                            dilanjutkan seperti biasa.
+                        </p>
+                    </DialogHeader>
+                    <DialogFooter className="gap-3 pt-4">
+                        <Button
+                            variant="ghost"
+                            className="h-12 rounded-xl font-bold text-slate-400"
+                            onClick={() => setShowRejectCancelDialog(false)}
+                        >
+                            Kembali
+                        </Button>
+                        <Button
+                            className="h-12 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-lg shadow-emerald-500/20"
+                            onClick={() => {
+                                router.post(
+                                    route(
+                                        "pharmacy.orders.reject-cancellation",
+                                        order.id,
+                                    ),
+                                    {},
+                                    {
+                                        onSuccess: () => {
+                                            toast.success(
+                                                "Pengajuan batal ditolak",
+                                            );
+                                            setShowRejectCancelDialog(false);
+                                        },
+                                    },
+                                );
+                            }}
+                        >
+                            Ya, Lanjutkan Pesanan
                         </Button>
                     </DialogFooter>
                 </DialogContent>

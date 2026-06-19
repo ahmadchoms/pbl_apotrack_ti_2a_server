@@ -157,4 +157,24 @@ class OrderController extends Controller
 
         return redirect()->back()->with('success', "Resep berhasil divalidasi");
     }
+
+    public function approveCancellation(Request $request, string $id)
+    {
+        $order = Order::findOrFail($id);
+        $this->authorize('update', $order);
+
+        $this->orderService->updateStatus($id, OrderStatus::CANCELLED, 'Pembatalan disetujui oleh apotek');
+
+        return redirect()->back()->with('success', 'Pembatalan pesanan disetujui');
+    }
+
+    public function rejectCancellation(Request $request, string $id)
+    {
+        $order = Order::findOrFail($id);
+        $this->authorize('update', $order);
+
+        $this->orderService->updateStatus($id, OrderStatus::PENDING, 'Pengajuan batal ditolak, pesanan dilanjutkan');
+
+        return redirect()->back()->with('success', 'Pengajuan batal ditolak');
+    }
 }

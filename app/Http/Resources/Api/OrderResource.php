@@ -46,6 +46,7 @@ class OrderResource extends JsonResource
             'subtotal_amount' => (float) $this->subtotal_amount,
             'shipping_cost' => (float) $this->shipping_cost,
             'notes' => $this->notes,
+            'cancellation_reason' => $this->cancellation_reason,
             'created_at' => $this->created_at?->translatedFormat('d M Y H:i'),
             'buyer' => $this->whenLoaded('user', fn() => [
                 'id' => $this->user->id,

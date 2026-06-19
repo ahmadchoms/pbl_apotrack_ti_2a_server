@@ -204,6 +204,8 @@ Route::prefix('pharmacy')
                 Route::get('/{id}', 'show')->name('show');
                 Route::patch('/{id}/status', 'updateStatus')->name('status.update');
                 Route::patch('/{id}/reject', 'reject')->name('reject');
+                Route::post('/{id}/approve-cancellation', 'approveCancellation')->name('approve-cancellation');
+                Route::post('/{id}/reject-cancellation', 'rejectCancellation')->name('reject-cancellation');
                 Route::patch('/prescriptions/{id}/validate', 'validatePrescription')->name('prescription.validate');
             });
 

@@ -4,9 +4,9 @@ namespace App\Services\Pharmacy;
 
 use App\Models\PharmacyStaff;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
 use Illuminate\Support\Facades\URL;
 
 class PharmacyStaffService
@@ -74,11 +74,11 @@ class PharmacyStaffService
     public function toggleStatus(PharmacyStaff $staff)
     {
         $newStatus = !$staff->is_active;
-        
+
         return DB::transaction(function () use ($staff, $newStatus) {
             $staff->update(['is_active' => $newStatus]);
             $staff->user->update(['is_active' => $newStatus]);
-            
+
             return $staff;
         });
     }
@@ -94,12 +94,46 @@ class PharmacyStaffService
             ->paginate(15);
     }
 
-    public function generateInvitationUrl(string $pharmacyId)
+    /**
+     * Generate signed URL + PIN 8 digit yang disimpan di cache selama 24 jam.
+     * Mengembalikan array ['url' => ..., 'pin' => ...].
+     */
+    public function generateInvitationUrl(string $pharmacyId): array
     {
-        return URL::temporarySignedRoute(
+        $url = URL::temporarySignedRoute(
             'auth.register.staff',
             now()->addHours(24),
             ['pharmacy_id' => $pharmacyId]
         );
+
+        // Generate PIN unik — coba maksimal 10x untuk menghindari tabrakan
+        $pin = null;
+        for ($i = 0; $i < 10; $i++) {
+            $candidate = strtoupper(substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 8));
+            if (!Cache::has("staff_pin:{$candidate}")) {
+                $pin = $candidate;
+                break;
+            }
+        }
+
+        // Fallback kalau semua tabrakan (hampir mustahil)
+        if ($pin === null) {
+            $pin = strtoupper(substr(md5(uniqid($pharmacyId, true)), 0, 8));
+        }
+
+        // Simpan mapping PIN → URL di cache selama 24 jam
+        Cache::put("staff_pin:{$pin}", $url, now()->addHours(24));
+
+        return ['url' => $url, 'pin' => $pin];
+    }
+
+    /**
+     * Lookup URL dari PIN yang diinput manual.
+     * Return URL string atau null jika PIN tidak ditemukan / expired.
+     */
+    public function resolveInvitationPin(string $pin): ?string
+    {
+        $pin = strtoupper(trim($pin));
+        return Cache::get("staff_pin:{$pin}");
     }
 }

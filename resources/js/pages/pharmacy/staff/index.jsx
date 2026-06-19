@@ -48,6 +48,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
     const [status, setStatus] = useState(filters.status || "all");
     const [isInvitationModalOpen, setIsInvitationModalOpen] = useState(false);
     const [invitationUrl, setInvitationUrl] = useState("");
+    const [invitationPin, setInvitationPin] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
 
     const [formDialog, setFormDialog] = useState({ open: false, data: null });
@@ -104,6 +105,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                 route("pharmacy.staff.invitation"),
             );
             setInvitationUrl(response.data.url);
+            setInvitationPin(response.data.pin);
             setIsInvitationModalOpen(true);
         } catch (error) {
             toast.error("Gagal membuat link undangan");
@@ -325,8 +327,8 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                             Link Undangan
                         </DialogTitle>
                         <DialogDescription className="text-sm font-bold text-slate-400">
-                            Bagikan QR Code atau link ini kepada calon staff
-                            baru Anda.
+                            Bagikan QR Code atau Pin ini kepada calon staff baru
+                            Anda.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -337,26 +339,33 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                             </div>
 
                             <div className="w-full space-y-4">
-                                <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                                    <code className="flex-1 text-xs text-slate-600 font-bold truncate">
-                                        {invitationUrl}
-                                    </code>
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(
-                                                invitationUrl,
-                                            );
-                                            toast.success(
-                                                "Link berhasil disalin",
-                                            );
-                                        }}
-                                        className="h-8 w-8 p-0 rounded-xl hover:bg-white text-primary shrink-0"
-                                    >
-                                        <Copy className="w-4 h-4" />
-                                    </Button>
-                                </div>
+                                {invitationPin && (
+                                    <div className="w-full">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mb-3">
+                                            Kode Undangan Manual
+                                        </p>
+                                        <div className="flex items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <span className="flex-1 text-center text-2xl font-black text-slate-800 tracking-[0.3em]">
+                                                {invitationPin}
+                                            </span>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        invitationPin,
+                                                    );
+                                                    toast.success(
+                                                        "Kode berhasil disalin",
+                                                    );
+                                                }}
+                                                className="h-8 w-8 p-0 rounded-xl hover:bg-white text-primary shrink-0"
+                                            >
+                                                <Copy className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
