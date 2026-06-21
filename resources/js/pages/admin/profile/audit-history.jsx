@@ -7,13 +7,14 @@ import { DashboardAdminLayout } from "@/layouts/admin-layout";
 import { AuditFilters } from "@/features/admin/components/audit/AuditFilters";
 import { AuditLogItem } from "@/features/admin/components/audit/AuditLogItem";
 import { AdminPagination } from "@/features/admin/components/shared/AdminPagination";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 import { useAuditHistory } from "@/features/admin/hooks/useAuditHistory";
 import {
     containerVariants,
     itemVariants,
 } from "@/features/admin/lib/constants";
 
-export default function AdminAuditHistory(props) {
+export default function AdminAuditHistory({ logs, filters, actionTypes: serverActionTypes }) {
     const {
         search,
         setSearch,
@@ -30,43 +31,38 @@ export default function AdminAuditHistory(props) {
         logList,
         pagination,
         actionTypes,
-    } = useAuditHistory(props);
+    } = useAuditHistory({ logs, filters, actionTypes: serverActionTypes });
+    console.log(actionTypes);
 
     return (
         <DashboardAdminLayout activeMenu="profile">
             <div className="space-y-8 pb-20">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href={route("admin.profile.index")}
-                            className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
+                <div className="flex items-start gap-4">
+                    <Link
+                        href={route("admin.profile.index")}
+                        className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary transition-colors shrink-0 mt-1"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </Link>
+                    <div className="flex-1">
+                        <PageHeader
+                            title="Riwayat Aktivitas"
+                            description="Tinjau dan lacak seluruh catatan aktivitas log keamanan akun Anda."
                         >
-                            <ArrowLeft className="w-5 h-5" />
-                        </Link>
-                        <div>
-                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-1 flex items-center gap-2">
-                                <span className="w-8 h-px bg-primary/30" />
-                                Profil Keamanan
-                            </p>
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                                Riwayat Aktivitas
-                            </h2>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            onClick={resetFilters}
-                            className="h-12 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest border-slate-200 text-slate-400 hover:bg-slate-50"
-                        >
-                            Reset
-                        </Button>
-                        <Button
-                            onClick={handleFilter}
-                            className="h-12 px-8 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
-                        >
-                            Terapkan Filter
-                        </Button>
+                            <Button
+                                variant="outline"
+                                onClick={resetFilters}
+                                className="h-12 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest border-slate-200 text-slate-400 hover:bg-slate-50"
+                            >
+                                Reset
+                            </Button>
+                            <Button
+                                onClick={handleFilter}
+                                className="h-12 px-8 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                            >
+                                Terapkan Filter
+                            </Button>
+                        </PageHeader>
                     </div>
                 </div>
                 <AuditFilters

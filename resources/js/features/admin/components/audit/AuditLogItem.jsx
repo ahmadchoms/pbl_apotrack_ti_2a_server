@@ -50,7 +50,7 @@ export function AuditLogItem({ log }) {
                         </div>
                         <div className="text-right">
                             <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">
-                                Timestamp
+                                Waktu
                             </p>
                             <p className="text-[11px] font-black text-slate-800">
                                 {formatDate(log.created_at)}
@@ -58,9 +58,6 @@ export function AuditLogItem({ log }) {
                             <p className="text-[10px] font-bold text-slate-400">
                                 {formatTime(log.created_at)} WIB
                             </p>
-                        </div>
-                        <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:text-primary group-hover:bg-blue-50 transition-all cursor-pointer">
-                            <MoreHorizontal className="w-5 h-5" />
                         </div>
                     </div>
                 </div>

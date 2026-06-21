@@ -127,4 +127,82 @@ class ReportService
 
         return Response::stream($callback, 200, $headers);
     }
+
+    public function getSalesSummary(string $pharmacyId, ?string $startDate, ?string $endDate)
+    {
+        $query = Order::where('pharmacy_id', $pharmacyId)
+            ->where('order_status', 'COMPLETED');
+
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $totalRevenue = $query->sum('grand_total');
+        $totalTransactions = $query->count();
+        
+        $totalItemsSold = \App\Models\OrderItem::whereHas('order', function ($q) use ($pharmacyId, $startDate, $endDate) {
+            $q->where('pharmacy_id', $pharmacyId)
+              ->where('order_status', 'COMPLETED')
+              ->when($startDate, fn($sq) => $sq->whereDate('created_at', '>=', $startDate))
+              ->when($endDate, fn($sq) => $sq->whereDate('created_at', '<=', $endDate));
+        })->sum('quantity');
+
+        $prescriptionTransactions = $query->whereNotNull('prescription_id')->count();
+
+        return [
+            'total_revenue' => (float) $totalRevenue,
+            'total_transactions' => $totalTransactions,
+            'total_items_sold' => (int) $totalItemsSold,
+            'prescription_transactions' => $prescriptionTransactions,
+        ];
+    }
+
+    public function getStockSummary(string $pharmacyId, ?string $startDate, ?string $endDate)
+    {
+        $queryIn = StockMovement::where('type', 'IN')
+            ->whereHas('medicine', function ($q) use ($pharmacyId) {
+                $q->where('pharmacy_id', $pharmacyId);
+            });
+        
+        $queryOut = StockMovement::where('type', 'OUT')
+            ->whereHas('medicine', function ($q) use ($pharmacyId) {
+                $q->where('pharmacy_id', $pharmacyId);
+            });
+
+        if ($startDate) {
+            $queryIn->whereDate('created_at', '>=', $startDate);
+            $queryOut->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $queryIn->whereDate('created_at', '<=', $endDate);
+            $queryOut->whereDate('created_at', '<=', $endDate);
+        }
+
+        $totalIn = $queryIn->sum('quantity');
+        $totalOut = $queryOut->sum('quantity');
+
+        $lowStockCount = \App\Models\Medicine::where('pharmacy_id', $pharmacyId)
+            ->where('is_active', true)
+            ->whereHas('batches', function ($q) {
+                $q->where('stock', '<=', 10);
+            })
+            ->count();
+
+        $expiringCount = \App\Models\MedicineBatch::whereHas('medicine', function ($q) use ($pharmacyId) {
+                $q->where('pharmacy_id', $pharmacyId);
+            })
+            ->where('stock', '>', 0)
+            ->whereBetween('expired_date', [now(), now()->addDays(90)])
+            ->count();
+
+        return [
+            'total_in' => (int) $totalIn,
+            'total_out' => (int) $totalOut,
+            'low_stock_count' => $lowStockCount,
+            'expiring_count' => $expiringCount,
+        ];
+    }
 }

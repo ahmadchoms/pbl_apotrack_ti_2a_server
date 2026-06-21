@@ -4,6 +4,7 @@ import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { UserTableRow } from "@/features/admin/components/users/UserTableRow";
 import { SuspendUserDialog } from "@/features/admin/components/users/SuspendUserDialog";
+import { ResetPasswordDialog } from "@/features/admin/components/users/ResetPasswordDialog";
 import { AdminPagination } from "@/features/admin/components/shared/AdminPagination";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -21,6 +22,7 @@ import { router } from "@inertiajs/react";
 
 export default function AdminUserList({ users, filters }) {
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [resetTarget, setResetTarget] = useState(null);
 
     const handleFilter = (newFilters) => {
         router.get(
@@ -45,13 +47,15 @@ export default function AdminUserList({ users, filters }) {
         }
     };
 
-    const resetPassword = (user) => {
-        if (
-            confirm(
-                `Apakah Anda yakin ingin mereset password user ${user.username} menjadi default (Apotrack2026!)?`,
-            )
-        ) {
-            router.patch(`/admin/users/${user.id}/reset-password`);
+    const confirmResetPassword = () => {
+        if (resetTarget) {
+            router.patch(
+                `/admin/users/${resetTarget.id}/reset-password`,
+                {},
+                {
+                    onSuccess: () => setResetTarget(null),
+                },
+            );
         }
     };
 
@@ -149,7 +153,7 @@ export default function AdminUserList({ users, filters }) {
                                             key={user.id}
                                             user={user}
                                             onSuspend={setDeleteTarget}
-                                            onResetPassword={resetPassword}
+                                            onResetPassword={setResetTarget}
                                         />
                                     ))
                                 )}
@@ -167,6 +171,12 @@ export default function AdminUserList({ users, filters }) {
                 user={deleteTarget}
                 onClose={() => setDeleteTarget(null)}
                 onConfirm={confirmDelete}
+            />
+
+            <ResetPasswordDialog
+                user={resetTarget}
+                onClose={() => setResetTarget(null)}
+                onConfirm={confirmResetPassword}
             />
         </DashboardAdminLayout>
     );

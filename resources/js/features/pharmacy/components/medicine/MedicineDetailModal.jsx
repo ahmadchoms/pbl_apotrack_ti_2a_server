@@ -342,9 +342,16 @@ export function MedicineDetailModal({
                                             <div className="col-span-2 flex justify-end mt-2">
                                                 <Button
                                                     disabled={processingBatch}
-                                                    className="h-12 px-8 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-200"
+                                                    className="h-11 px-5 rounded-xl uppercase bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs tracking-wide transition-all border-0 shadow-sm gap-2"
                                                 >
-                                                    Tambah Batch
+                                                    {processingBatch ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            Memproses...
+                                                        </>
+                                                    ) : (
+                                                        "Tambah Batch"
+                                                    )}
                                                 </Button>
                                             </div>
                                         </form>
@@ -525,18 +532,17 @@ export function MedicineDetailModal({
                                                     <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-100 last:hidden" />
                                                     <div
                                                         className={`absolute left-0 top-1 w-8 h-8 rounded-xl flex items-center justify-center border-2 border-white shadow-md z-10 
-                                                    ${
-                                                        log.type === "IN"
-                                                            ? "bg-emerald-50 text-emerald-600"
-                                                            : log.type === "OUT"
-                                                              ? "bg-rose-50 text-rose-600"
-                                                              : "bg-blue-50 text-primary"
-                                                    }`}
+                                                    ${log.type === "IN"
+                                                                ? "bg-emerald-50 text-emerald-600"
+                                                                : log.type === "OUT"
+                                                                    ? "bg-rose-50 text-rose-600"
+                                                                    : "bg-blue-50 text-primary"
+                                                            }`}
                                                     >
                                                         {log.type === "IN" ? (
                                                             <TrendingUp className="w-4 h-4" />
                                                         ) : log.type ===
-                                                          "OUT" ? (
+                                                            "OUT" ? (
                                                             <TrendingDown className="w-4 h-4" />
                                                         ) : (
                                                             <History className="w-4 h-4" />
@@ -550,13 +556,13 @@ export function MedicineDetailModal({
                                                                     <span
                                                                         className={
                                                                             log.type ===
-                                                                            "IN"
+                                                                                "IN"
                                                                                 ? "text-emerald-600"
                                                                                 : "text-rose-600"
                                                                         }
                                                                     >
                                                                         {log.type ===
-                                                                        "IN"
+                                                                            "IN"
                                                                             ? "+"
                                                                             : "-"}
                                                                         {

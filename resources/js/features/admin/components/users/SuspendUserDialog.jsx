@@ -34,13 +34,17 @@ export function SuspendUserDialog({ user, onClose, onConfirm }) {
                             : `Apakah Anda yakin ingin mengaktifkan kembali akun ${user?.username}? Pengguna akan dapat mengakses sistem kembali.`}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="flex flex-row items-center justify-center gap-4 mt-10">
-                    <AlertDialogCancel className="h-14 flex-1 rounded-2xl border-2 border-slate-100 bg-white text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all">
+                <AlertDialogFooter className="flex sm:flex-row items-center gap-3 mt-8">
+                    <AlertDialogCancel className="h-11 flex-1 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 font-medium text-xs tracking-wide transition-all m-0 sm:mt-0">
                         Batalkan
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={onConfirm}
-                        className={`h-14 flex-1 rounded-2xl ${isSuspending ? "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20" : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"} text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-xl`}
+                        className={`h-11 flex-1 rounded-xl text-white font-extrabold text-xs tracking-wide transition-all border-0 shadow-sm ${
+                            isSuspending
+                                ? "bg-rose-600 hover:bg-rose-700"
+                                : "bg-emerald-600 hover:bg-emerald-700"
+                        }`}
                     >
                         {isSuspending ? "Ya, Tangguhkan" : "Ya, Aktifkan"}
                     </AlertDialogAction>

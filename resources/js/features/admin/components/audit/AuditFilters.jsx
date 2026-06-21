@@ -62,11 +62,11 @@ export function AuditFilters({
                                 </SelectItem>
                                 {actionTypes.map((type) => (
                                     <SelectItem
-                                        key={type}
-                                        value={type}
+                                        key={type.value}
+                                        value={type.value}
                                         className="text-xs font-bold"
                                     >
-                                        {type}
+                                        {type.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

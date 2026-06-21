@@ -1,12 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-    History,
-    ShieldAlert,
-    Cpu,
-    CheckCircle,
-    RefreshCw,
-} from "lucide-react";
+import { History, RefreshCw } from "lucide-react";
 import { Link, router } from "@inertiajs/react";
 import { DashboardAdminLayout } from "@/layouts/admin-layout";
 import { StatsGrid } from "@/features/admin/components/dashboard/StatsGrid";
@@ -35,8 +29,6 @@ export default function AdminDashboard({
             onFinish: () => setIsRefreshing(false),
         });
     };
-
-    console.log("Audit Logs:", auditLogs);
 
     return (
         <DashboardAdminLayout activeMenu="dashboard">

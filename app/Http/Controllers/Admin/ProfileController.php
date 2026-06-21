@@ -27,8 +27,17 @@ class ProfileController extends Controller
 
     public function auditHistory(Request $request)
     {
-        $dateFrom = $request->date_from ?? now()->subDays(7)->format('Y-m-d');
-        $dateTo = $request->date_to ?? now()->format('Y-m-d');
+        $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'status' => 'nullable|in:all,SUCCESS,FAILED',
+            'action_type' => 'nullable|string',
+            'date_from' => 'nullable|date_format:Y-m-d',
+            'date_to' => 'nullable|date_format:Y-m-d',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $dateFrom = $validated['date_from'] ?? null;
+        $dateTo = $validated['date_to'] ?? null;
 
         $filters = array_merge($request->only(['search', 'status', 'action_type']), [
             'date_from' => $dateFrom,

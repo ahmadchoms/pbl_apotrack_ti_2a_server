@@ -69,7 +69,7 @@ export default function PharmacyDetail({ pharmacy }) {
 
     const getStatusBadge = (status) => {
         switch (status) {
-            case "ACTIVE":
+            case "VERIFIED":
                 return (
                     <Badge className="bg-emerald-500 hover:bg-emerald-600 border-none px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20">
                         Aktif

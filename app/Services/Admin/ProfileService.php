@@ -39,7 +39,23 @@ class ProfileService
 
     public function getActionTypes()
     {
-        return $this->accountService->getActionTypes(auth()->user());
+        $rawTypes = $this->accountService->getActionTypes(auth()->user());
+
+        $map = [
+            'PHARMACY_VERIFIED' => 'Verifikasi Apotek',
+            'PHARMACY_REJECTED' => 'Penolakan Apotek',
+            'UPDATE_PROFILE'    => 'Pembaruan Profil',
+            'CHANGE_PASSWORD'   => 'Perubahan Password',
+            'DELETE_ACCOUNT'    => 'Penghapusan Akun',
+            'LOGIN'             => 'Login Akun',
+        ];
+
+        return collect($rawTypes)->map(function ($type) use ($map) {
+            return [
+                'value' => $type,
+                'label' => $map[$type] ?? ucwords(strtolower(str_replace('_', ' ', $type)))
+            ];
+        })->values()->all();
     }
 
     public function updateProfile(array $data)

@@ -13,6 +13,10 @@ class StockMovement extends Model
 
     public $timestamps = false;
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     public function medicine()
     {
         return $this->belongsTo(Medicine::class);
