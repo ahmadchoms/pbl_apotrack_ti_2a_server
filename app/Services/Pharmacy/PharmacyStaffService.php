@@ -64,11 +64,7 @@ class PharmacyStaffService
 
     public function delete(PharmacyStaff $staff)
     {
-        return DB::transaction(function () use ($staff) {
-            $user = $staff->user;
-            $staff->delete();
-            return $user->delete();
-        });
+        $staff->delete();
     }
 
     public function toggleStatus(PharmacyStaff $staff)
