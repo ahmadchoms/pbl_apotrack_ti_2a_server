@@ -8,22 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
-    protected function computeCanReview(): bool
-    {
-        if (!$this->relationLoaded('items') || !$this->relationLoaded('reviews')) {
-            return true;
-        }
-
-        $reviewedMedicineIds = $this->reviews
-            ->pluck('medicine_id')
-            ->filter()
-            ->toArray();
-
-        return $this->items->contains(function ($item) use ($reviewedMedicineIds) {
-            return !in_array($item->medicine_id, $reviewedMedicineIds);
-        });
-    }
-
     public function toArray(Request $request): array
     {
         Carbon::setLocale('id');
@@ -61,7 +45,8 @@ class OrderResource extends JsonResource
             'tracking' => new DeliveryTrackingResource($this->whenLoaded('tracking')),
             'address' => new AddressResource($this->whenLoaded('address')),
             'status_logs' => $this->whenLoaded('statusLogs'),
-            'can_review' => $this->computeCanReview(),
+            'is_reviewed' => (bool) $this->is_reviewed,
+            'can_review' => !$this->is_reviewed && $this->order_status === 'COMPLETED',
         ];
     }
 }

@@ -188,7 +188,7 @@ class OrderService
             \App\Models\OrderStatusLog::create([
                 'order_id' => $order->id,
                 'status' => $status->value,
-                'description' => $note ?? "Status changed from {$oldStatus->value} to {$status->value}",
+                'description' => $note ?? "Ada kabar baru! Statusnya udah berubah dari {$oldStatus->value} ke {$status->value}.",
                 'source' => 'PHARMACY_WEB'
             ]);
 

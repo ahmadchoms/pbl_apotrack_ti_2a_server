@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
+    public function deviceTokens()
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
     public function scopeFilterRole($query, $role)
     {
         return $query->when($role && $role !== 'all', function ($q) use ($role) {

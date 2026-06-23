@@ -87,17 +87,17 @@ class ReviewController extends BaseApiController
      *     )
      * )
      */
-    public function index($medicineId)
+    public function index($pharmacyId)
     {
-        $medicine = Medicine::findOrFail($medicineId);
+        $pharmacy = Pharmacy::findOrFail($pharmacyId);
 
         $reviews = Review::with(['user:id,username,avatar_url'])
-            ->where('medicine_id', $medicine->id)
+            ->where('pharmacy_id', $pharmacy->id)
             ->where('is_visible', true)
             ->latest()
             ->paginate(10);
 
-        $averageRating = Review::where('medicine_id', $medicine->id)
+        $averageRating = Review::where('pharmacy_id', $pharmacy->id)
             ->where('is_visible', true)
             ->avg('rating');
 
@@ -218,34 +218,30 @@ class ReviewController extends BaseApiController
     {
         try {
             $user = $request->user();
-            $medicineId = $request->medicine_id;
+            $orderId = $request->order_id;
 
-            if ($user->cannot('create', [Review::class, (int) $medicineId])) {
-                return $this->errorResponse('Anda belum pernah membeli obat ini dengan status selesai (COMPLETED) atau sudah mengulas seluruh pembelian Anda.', 403);
+            if ($user->cannot('create', [Review::class, $orderId])) {
+                return $this->errorResponse('Anda tidak memiliki akses untuk memberikan ulasan pada pesanan ini atau pesanan ini sudah diulas.', 403);
             }
 
-            $completedOrdersWithMedicine = OrderItem::whereHas('order', function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->where('order_status', 'COMPLETED');
-            })
-                ->where('medicine_id', $medicineId)
-                ->pluck('order_id');
-
-            $reviewedOrderIds = Review::whereIn('order_id', $completedOrdersWithMedicine)
-                ->where('medicine_id', $medicineId)
-                ->pluck('order_id');
-
-            $availableOrderId = $completedOrdersWithMedicine->diff($reviewedOrderIds)->first();
-
-            $order = Order::find($availableOrderId);
+            $order = Order::findOrFail($orderId);
 
             $review = Review::create([
                 'user_id' => $user->id,
                 'pharmacy_id' => $order->pharmacy_id,
                 'order_id' => $order->id,
-                'medicine_id' => $medicineId,
                 'rating' => $request->rating,
                 'comment' => $request->comment,
+            ]);
+
+            $order->update([
+                'is_reviewed' => true,
+            ]);
+
+            $order->statusLogs()->create([
+                'status' => 'COMPLETED',
+                'description' => 'Customer telah memberikan ulasan.',
+                'source' => 'CUSTOMER',
             ]);
 
             $pharmacy = $review->pharmacy;

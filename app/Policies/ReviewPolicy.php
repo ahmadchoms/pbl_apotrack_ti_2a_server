@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Review;
-use App\Models\OrderItem;
+use App\Models\Order;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ReviewPolicy
@@ -12,29 +12,26 @@ class ReviewPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can create a review for the medicine.
+     * Determine whether the user can create a review for the order.
      */
-    public function create(User $user, string $medicineId): bool
+    public function create(User $user, string $orderId): bool
     {
         if ($user->role !== 'USER') {
             return false;
         }
 
-        $completedOrdersWithMedicine = OrderItem::whereHas('order', function ($query) use ($user) {
-            $query->where('user_id', $user->id)
-                  ->where('order_status', 'COMPLETED');
-        })
-        ->where('medicine_id', $medicineId)
-        ->pluck('order_id');
+        $order = Order::where('id', $orderId)
+            ->where('user_id', $user->id)
+            ->where('order_status', 'COMPLETED')
+            ->first();
 
-        if ($completedOrdersWithMedicine->isEmpty()) {
+        if (!$order) {
             return false;
         }
 
-        $reviewedOrderIds = Review::whereIn('order_id', $completedOrdersWithMedicine)
-            ->where('medicine_id', $medicineId)
-            ->pluck('order_id');
+        // Pastikan pesanan ini belum pernah diulas
+        $exists = Review::where('order_id', $orderId)->exists();
 
-        return $completedOrdersWithMedicine->diff($reviewedOrderIds)->isNotEmpty();
+        return !$exists;
     }
 }

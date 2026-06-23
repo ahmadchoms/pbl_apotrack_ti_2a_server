@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\MedicineCategoryController;
 use App\Http\Controllers\Api\Customer\CartController;
 use App\Http\Controllers\Api\Customer\ReviewController;
+use App\Http\Controllers\Api\Customer\DeviceTokenController;
 use App\Http\Controllers\Api\Staff\OrderController as StaffOrderController;
 use App\Http\Controllers\Api\Staff\MedicineController as StaffMedicineController;
 use App\Http\Controllers\Api\Staff\AuditController as StaffAuditController;
@@ -23,7 +24,7 @@ use App\Http\Controllers\Api\BiteshipWebhookController;
 
 // --- PUBLIC ROUTES (Rate Limited) ---
 Route::post('/webhooks/biteship', [BiteshipWebhookController::class, 'handle'])->middleware('biteship.webhook');
-Route::get('/medicines/{medicineId}/reviews', [ReviewController::class, 'index']); // Public API Review
+Route::get('/pharmacies/{pharmacyId}/reviews', [ReviewController::class, 'index']); // Public API Review
 
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
@@ -43,6 +44,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
     Route::put('/password', [AuthController::class, 'changePassword']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::delete('/account', [AuthController::class, 'deleteAccount']);
+    Route::post('/devices/token', [DeviceTokenController::class, 'store']);
 
     // Catalog & Exploration (Moved to Protected for Security)
     Route::get('/pharmacies', [PharmacyController::class, 'index']);
