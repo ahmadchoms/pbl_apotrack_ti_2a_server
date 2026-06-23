@@ -18,6 +18,10 @@ class Notification extends Model
         static::creating(function ($model) {
             $model->created_at = $model->created_at ?? now();
         });
+
+        static::created(function ($model) {
+            \App\Jobs\SendFcmNotificationJob::dispatch($model)->afterCommit();
+        });
     }
 
     protected $fillable = [

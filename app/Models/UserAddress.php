@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class UserAddress extends Model
 {
+    use HasUuids;
+
     protected $guarded = [];
 
     protected $appends = ['complete_address'];
