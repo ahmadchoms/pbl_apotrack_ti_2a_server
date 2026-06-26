@@ -55,7 +55,7 @@ class OrderController extends BaseApiController
      *                     @OA\Property(property="order_status", type="string", example="PENDING"),
      *                     @OA\Property(property="payment_status", type="string", example="UNPAID"),
      *                     @OA\Property(property="grand_total", type="integer", example=15000),
-     *                     @OA\Property(property="service_type", type="string", example="DELIVERY")
+     *                     @OA\Property(property="service_type", type="string", example="PICKUP")
      *                 )
      *             ),
      *             @OA\Property(
@@ -139,7 +139,7 @@ class OrderController extends BaseApiController
      * @OA\Post(
      *     path="/api/orders",
      *     summary="Buat pesanan baru (Checkout)",
-     *     description="Membuat pesanan baru dari item keranjang. Membutuhkan alamat dan kurir jika memilih layanan DELIVERY.",
+     *     description="Membuat pesanan baru dari item keranjang.",
      *     operationId="createCustomerOrder",
      *     tags={"Orders (Customer)"},
      *     security={{"sanctum": {}}},
@@ -160,7 +160,7 @@ class OrderController extends BaseApiController
      *                 )
      *             ),
      *             @OA\Property(property="subtotal_amount", type="integer", example=10000),
-     *             @OA\Property(property="service_type", type="string", enum={"PICK_UP", "DELIVERY"}, example="DELIVERY"),
+     *             @OA\Property(property="service_type", type="string", enum={"PICK_UP", "DELIVERY"}, example="PICK_UP"),
      *             @OA\Property(property="payment_method", type="string", enum={"CASH", "TRANSFER", "E-WALLET"}, example="TRANSFER"),
      *             @OA\Property(property="address_id", type="string", format="uuid", nullable=true, example="01932c91-5f00-7341-91a3-b9e7f02c8d1a"),
      *             @OA\Property(property="courier_code", type="string", nullable=true, example="jne"),
@@ -195,10 +195,10 @@ class OrderController extends BaseApiController
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Validasi gagal (misal: alamat tidak diisi saat DELIVERY)",
+     *         description="Validasi gagal",
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="The address id field is required when service type is DELIVERY.")
+     *             @OA\Property(property="message", type="string", example="Validasi gagal.")
      *         )
      *     )
      * )
@@ -259,62 +259,6 @@ class OrderController extends BaseApiController
         $order = $this->orderService->showOrder($request->user(), $id);
 
         return $this->successResponse(new OrderResource($order), 'Detail pesanan berhasil diambil');
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/api/orders/{id}/tracking",
-     *     summary="Pelacakan pengiriman kurir (Biteship)",
-     *     description="Mengambil riwayat pelacakan kurir secara real-time dari Biteship untuk pesanan dengan layanan DELIVERY.",
-     *     operationId="getOrderTracking",
-     *     tags={"Orders (Customer)"},
-     *     security={{"sanctum": {}}},
-     *
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID pesanan (UUID)",
-     *         @OA\Schema(type="string", format="uuid", example="019e2ac0-684e-7139-8cb9-c150e027c872")
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Data pelacakan berhasil diambil",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string", example="Data pelacakan kurir berhasil diambil"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Tidak terautentikasi",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Pelacakan tidak ditemukan",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="Informasi pengiriman tidak ditemukan untuk pesanan ini.")
-     *         )
-     *     )
-     * )
-     */
-    public function tracking(Request $request, $id)
-    {
-        try {
-            $tracking = $this->orderService->getTracking($request->user(), $id);
-
-            return $this->successResponse($tracking, 'Data pelacakan kurir berhasil diambil');
-        } catch (\Exception $e) {
-            $code = $e->getCode() >= 400 && $e->getCode() <= 500 ? $e->getCode() : 404;
-            return $this->errorResponse($e->getMessage(), $code);
-        }
     }
 
     /**
@@ -436,7 +380,7 @@ class OrderController extends BaseApiController
         }
     }
 
-        public function requestCancellation(Request $request, $id)
+    public function requestCancellation(Request $request, $id)
     {
         $request->validate([
             'reason' => 'required|string|max:255',

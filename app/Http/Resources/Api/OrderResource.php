@@ -28,7 +28,6 @@ class OrderResource extends JsonResource
             'payment_status' => $this->payment_status,
             'grand_total' => (float) $this->grand_total,
             'subtotal_amount' => (float) $this->subtotal_amount,
-            'shipping_cost' => (float) $this->shipping_cost,
             'notes' => $this->notes,
             'cancellation_reason' => $this->cancellation_reason,
             'created_at' => $this->created_at?->translatedFormat('d M Y H:i'),
@@ -42,7 +41,7 @@ class OrderResource extends JsonResource
             'prescription' => $this->whenLoaded('prescription'),
             'requires_prescription' => $this->relationLoaded('items') ? $this->items->contains('requires_prescription', true) : false,
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
-            'tracking' => new DeliveryTrackingResource($this->whenLoaded('tracking')),
+
             'address' => new AddressResource($this->whenLoaded('address')),
             'status_logs' => $this->whenLoaded('statusLogs'),
             'is_reviewed' => (bool) $this->is_reviewed,

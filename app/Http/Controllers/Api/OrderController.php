@@ -6,13 +6,10 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Services\Api\CustomerOrderService;
 use App\Http\Requests\Api\Customer\StoreCustomerOrderRequest;
 use App\Http\Requests\Api\Customer\UploadPrescriptionRequest;
-use App\Http\Requests\Api\Customer\CheckShippingRatesRequest;
 use App\Models\Medicine;
 use App\Models\Pharmacy;
 use App\Models\UserAddress;
-use App\Services\BiteshipService;
 use App\Http\Resources\Api\OrderResource;
-use App\Http\Resources\Api\DeliveryTrackingResource;
 use Illuminate\Http\Request;
 use App\Exceptions\InsufficientStockException;
 use Illuminate\Support\Facades\Log;
@@ -20,8 +17,7 @@ use Illuminate\Support\Facades\Log;
 class OrderController extends BaseApiController
 {
     public function __construct(
-        protected CustomerOrderService $customerOrderService,
-        protected BiteshipService $biteshipService
+        protected CustomerOrderService $customerOrderService
     ) {}
 
     public function index(Request $request)
@@ -36,7 +32,7 @@ class OrderController extends BaseApiController
         try {
             $order = $this->customerOrderService->storeOrder($request->user(), $request->validated());
 
-            return $this->successResponse(new OrderResource($order->load(['items.medicine', 'tracking'])), 'Pesanan berhasil dibuat', 201);
+            return $this->successResponse(new OrderResource($order->load(['items.medicine'])), 'Pesanan berhasil dibuat', 201);
         } catch (InsufficientStockException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         } catch (\Exception $e) {
@@ -78,17 +74,6 @@ class OrderController extends BaseApiController
         return $this->successResponse(OrderResource::collection($orders), 'Riwayat pesanan berhasil diambil');
     }
 
-    public function tracking($id, Request $request)
-    {
-        try {
-            $tracking = $this->customerOrderService->getTracking($request->user(), $id);
-
-            return $this->successResponse(new DeliveryTrackingResource($tracking), 'Data pelacakan pengiriman berhasil diambil');
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), 404);
-        }
-    }
-
     public function simulatePayment($id, Request $request)
     {
         try {
@@ -98,88 +83,6 @@ class OrderController extends BaseApiController
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
-    }
-
-    public function shippingRates(CheckShippingRatesRequest $request)
-    {
-        try {
-            $pharmacy = Pharmacy::findOrFail($request->pharmacy_id);
-            $address = UserAddress::where('user_id', $request->user()->id)
-                ->findOrFail($request->address_id);
-
-            $items = [];
-            if ($request->has('items') && is_array($request->items)) {
-                $items = $request->items;
-            }
-
-            $manualRates = $this->calculateManualRates($pharmacy, $address, $items);
-            return $this->successResponse($manualRates, 'Tarif pengiriman berhasil diambil');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Gagal mengambil tarif: ' . $e->getMessage(), 500);
-        }
-    }
-
-    private function calculateManualRates(Pharmacy $pharmacy, UserAddress $address, array $items = []): array
-    {
-        $lat1 = deg2rad((float) $pharmacy->latitude);
-        $lon1 = deg2rad((float) $pharmacy->longitude);
-        $lat2 = deg2rad((float) $address->latitude);
-        $lon2 = deg2rad((float) $address->longitude);
-
-        $dlat = $lat2 - $lat1;
-        $dlon = $lon2 - $lon1;
-        $a = sin($dlat / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dlon / 2) ** 2;
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        $distanceKm = round(6371 * $c, 1);
-
-        $estimatedMinutes = match (true) {
-            $distanceKm <= 3 => '15 - 25',
-            $distanceKm <= 7 => '25 - 40',
-            $distanceKm <= 15 => '40 - 60',
-            default => '60 - 90',
-        };
-
-        $ratePerKm = (int) config('services.shipping.rate_per_km', 2500);
-        $minFee = (int) config('services.shipping.min_fee', 10000);
-        $ratePerGram = (int) config('services.shipping.rate_per_gram', 2);
-
-        $totalWeightGrams = 0;
-        if (!empty($items) && is_array($items)) {
-            foreach ($items as $item) {
-                $medicineId = $item['id'] ?? null;
-                $quantity = (int) ($item['quantity'] ?? 1);
-                if ($medicineId) {
-                    $medicine = Medicine::find($medicineId);
-                    $weight = $medicine ? (int) $medicine->weight_in_grams : 200;
-                } else {
-                    $weight = 200;
-                }
-                $totalWeightGrams += $weight * $quantity;
-            }
-        }
-        $totalWeightKg = $totalWeightGrams / 1000;
-
-        $basePrice = max($minFee, (int) round($distanceKm * $ratePerKm));
-        $weightSurcharge = (int) round($totalWeightGrams * $ratePerGram);
-        $price = $basePrice + $weightSurcharge;
-
-        $couriers = [
-            [
-                'company'         => 'GoSend',
-                'courier_code'    => 'gojek',
-                'courier_service' => 'Instant',
-                'service_type'    => 'instant',
-                'price'           => $price,
-                'etd'             => "$estimatedMinutes menit",
-            ],
-        ];
-
-        return [
-            'pricing'          => $couriers,
-            'distance_km'      => $distanceKm,
-            'total_weight_g'   => $totalWeightGrams,
-            'total_weight_kg'  => round($totalWeightKg, 2),
-        ];
     }
 
     public function requestCancellation(Request $request, $id)

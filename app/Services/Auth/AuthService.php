@@ -31,6 +31,13 @@ class AuthService
             ]);
         }
 
+        $user->loadMissing('pharmacyStaff');
+        if ($user->pharmacyStaff && $user->pharmacyStaff->role === 'STAFF') {
+            throw ValidationException::withMessages([
+                'email' => ['Akses ditolak. Staff hanya diperbolehkan login melalui aplikasi mobile.'],
+            ]);
+        }
+
         $remember = filter_var($credentials['remember'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         Auth::login($user, $remember);

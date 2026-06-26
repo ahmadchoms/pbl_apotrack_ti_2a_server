@@ -4,16 +4,12 @@ import {
     Users,
     QrCode,
     Copy,
-    Search,
     Calendar,
     Activity,
-    ToggleLeft,
-    ToggleRight,
-    Plus,
     Trash2,
     UserPlus,
 } from "lucide-react";
-import { router, Link } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -32,7 +28,6 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter,
 } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
@@ -117,7 +112,7 @@ export default function StaffPage({ staff, activityLogs, filters }) {
     return (
         <DashboardPharmacyLayout activeMenu="Tim Apotek">
             <div className="pb-20 px-4 max-w-7xl mx-auto">
-                <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="mb-5 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <PageHeader
                         title="Manajemen Pegawai Apotek"
                         description="Kelola tim apotek Anda, pantau aktivitas, dan undang anggota tim baru ke dalam sistem."
@@ -136,185 +131,102 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                     </div>
                 </div>
 
-                <Tabs defaultValue="list" className="space-y-8">
-                    <TabsList className="bg-slate-100/50 p-1.5 rounded-2xl">
-                        <TabsTrigger
-                            value="list"
-                            className="rounded-xl px-8 py-2.5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-                        >
-                            Daftar Pegawai
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="activity"
-                            className="rounded-xl px-8 py-2.5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-                        >
-                            Aktivitas Terbaru
-                        </TabsTrigger>
-                    </TabsList>
+                <div className="space-y-6">
+                    <FilterBar
+                        configs={[
+                            {
+                                type: "search",
+                                key: "search",
+                                placeholder: "Cari nama staff, email...",
+                            },
+                            {
+                                type: "select",
+                                key: "status",
+                                label: "Status",
+                                options: [
+                                    { value: "active", label: "Aktif" },
+                                    { value: "inactive", label: "Non-Aktif" },
+                                ],
+                            },
+                        ]}
+                        currentFilters={filters}
+                        onFilterChange={handleFilter}
+                        onReset={handleReset}
+                        actions={
+                            <Button
+                                onClick={() =>
+                                    setFormDialog({
+                                        open: true,
+                                        data: null,
+                                    })
+                                }
+                                className="h-10 px-5 rounded-xl bg-primary text-white font-semibold text-xs tracking-wide hover:bg-[#002855] transition-all gap-2 shadow-sm shadow-blue-900/10 active:scale-98"
+                            >
+                                <UserPlus className="w-4 h-4" />
+                                <span>Tambah Staff</span>
+                            </Button>
+                        }
+                    />
 
-                    <TabsContent value="list" className="space-y-6">
-                        <FilterBar
-                            configs={[
-                                {
-                                    type: "search",
-                                    key: "search",
-                                    placeholder: "Cari nama staff, email...",
-                                },
-                                {
-                                    type: "select",
-                                    key: "status",
-                                    label: "Status",
-                                    options: [
-                                        { value: "active", label: "Aktif" },
-                                        {
-                                            value: "inactive",
-                                            label: "Non-Aktif",
-                                        },
-                                    ],
-                                },
-                            ]}
-                            currentFilters={filters}
-                            onFilterChange={handleFilter}
-                            onReset={handleReset}
-                            actions={
-                                <Button
-                                    onClick={() =>
-                                        setFormDialog({
-                                            open: true,
-                                            data: null,
-                                        })
-                                    }
-                                    className="h-11 px-6 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-widest hover:bg-[#002855] transition-all gap-2 shadow-lg shadow-blue-900/10"
-                                >
-                                    <UserPlus className="w-4 h-4" /> Tambah
-                                    Staff
-                                </Button>
-                            }
-                        />
-
-                        <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
-                            <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader className="bg-slate-50/50">
-                                        <TableRow className="hover:bg-transparent border-slate-100/50">
-                                            <TableHead className="py-6 pl-10 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                                Informasi Pegawai
-                                            </TableHead>
-                                            <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                                Kontak
-                                            </TableHead>
-                                            <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                                Status
-                                            </TableHead>
-                                            <TableHead className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                                Aksi
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {staff.data.length === 0 ? (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={4}
-                                                    className="h-96 text-center"
-                                                >
-                                                    <div className="flex flex-col items-center justify-center text-slate-300">
-                                                        <Users className="w-16 h-16 mb-4 opacity-10" />
-                                                        <p className="text-sm font-black uppercase tracking-widest">
-                                                            Data pegawai tidak
-                                                            ditemukan
-                                                        </p>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                            staff.data.map((item) => (
-                                                <StaffTableRow
-                                                    key={item.id}
-                                                    staff={item}
-                                                    onEdit={(s) =>
-                                                        setFormDialog({
-                                                            open: true,
-                                                            data: s,
-                                                        })
-                                                    }
-                                                    onDelete={(s) =>
-                                                        setDeleteDialog({
-                                                            open: true,
-                                                            data: s,
-                                                        })
-                                                    }
-                                                />
-                                            ))
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-
-                        {staff.meta?.links && (
-                            <div className="pt-4">
-                                <Pagination links={staff.meta.links} />
-                            </div>
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="activity">
-                        <Card className="pt-0 rounded-[2.5rem] border-0 shadow-2xl shadow-slate-200/40 overflow-hidden bg-white">
-                            <CardHeader className="p-10 border-b border-slate-50 bg-slate-50/30">
-                                <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                                    <Activity className="w-6 h-6 text-primary" />
-                                    Log Aktivitas Tim
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0">
-                                <div className="divide-y divide-slate-50">
-                                    {activityLogs.data?.map((log) => (
-                                        <div
-                                            key={log.id}
-                                            className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-all"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
-                                                    <Calendar className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-bold text-slate-800">
-                                                        {log.description}
-                                                    </p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">
-                                                        {new Date(
-                                                            log.created_at,
-                                                        ).toLocaleString(
-                                                            "id-ID",
-                                                            {
-                                                                dateStyle:
-                                                                    "medium",
-                                                                timeStyle:
-                                                                    "short",
-                                                            },
-                                                        )}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <Badge
-                                                variant="outline"
-                                                className="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-slate-200 text-slate-500"
+                    <Card className="pt-0 rounded-2xl border border-slate-100 shadow-sm overflow-hidden bg-white">
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader className="bg-slate-50/70">
+                                    <TableRow className="hover:bg-transparent border-slate-100">
+                                        <TableHead className="py-4 pl-8 text-xs font-semibold text-slate-500 tracking-wide">
+                                            Informasi Pegawai
+                                        </TableHead>
+                                        <TableHead className="text-xs font-semibold text-slate-500 tracking-wide">
+                                            Kontak
+                                        </TableHead>
+                                        <TableHead className="text-xs font-semibold text-slate-500 tracking-wide">
+                                            Status
+                                        </TableHead>
+                                        <TableHead className="text-xs pl-8 font-semibold text-slate-500 tracking-wide">
+                                            Aksi
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {staff.data.length === 0 ? (
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableCell
+                                                colSpan={4}
+                                                className="h-72 text-center"
                                             >
-                                                {log.user.username}
-                                            </Badge>
-                                        </div>
-                                    ))}
-                                    {!activityLogs.data?.length && (
-                                        <div className="py-20 text-center text-slate-300 font-bold uppercase tracking-widest text-xs">
-                                            Belum ada aktivitas tercatat
-                                        </div>
+                                                <div className="flex flex-col items-center justify-center text-slate-300">
+                                                    <Users className="w-12 h-12 mb-3 text-slate-200" />
+                                                    <p className="text-xs font-medium text-slate-400 tracking-wide">
+                                                        Data pegawai tidak ditemukan
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        staff.data.map((item) => (
+                                            <StaffTableRow
+                                                key={item.id}
+                                                staff={item}
+                                                onDelete={(s) =>
+                                                    setDeleteDialog({
+                                                        open: true,
+                                                        data: s,
+                                                    })
+                                                }
+                                            />
+                                        ))
                                     )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+
+                    {staff.meta?.links && (
+                        <div className="pt-2">
+                            <Pagination links={staff.meta.links} />
+                        </div>
+                    )}
+                </div>
             </div>
 
             <Dialog
@@ -385,35 +297,30 @@ export default function StaffPage({ staff, activityLogs, filters }) {
                     !val && setDeleteDialog({ open: false, data: null })
                 }
             >
-                <DialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-10 max-w-md">
+                <DialogContent className="rounded-3xl border border-slate-100 shadow-xl p-8 max-w-sm bg-white animate-in fade-in-50 zoom-in-95 duration-200">
                     <div className="flex flex-col items-center text-center">
-                        <div className="w-20 h-20 bg-rose-50 rounded-[2rem] flex items-center justify-center text-rose-600 mb-6">
-                            <Trash2 className="w-10 h-10" />
+                        <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 hover:rotate-12">
+                            <Trash2 className="w-6 h-6" />
                         </div>
-                        <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-2">
-                            Hapus Staff?
+
+                        <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-2">
+                            Hapus Akun Staff
                         </h3>
-                        <p className="text-sm font-bold text-slate-400 mb-8 leading-relaxed">
-                            Akun staff{" "}
-                            <span className="text-slate-900 font-black">
-                                {deleteDialog.data?.user?.username}
-                            </span>{" "}
-                            akan dihapus secara permanen. Tindakan ini tidak
-                            dapat dibatalkan.
+                        <p className="text-sm font-medium text-slate-500 mb-6 leading-relaxed px-2">
+                            Akun staff <span className="text-slate-900 font-semibold">{deleteDialog.data?.user?.username}</span> akan dihapus secara permanen dari sistem. Tindakan ini tidak dapat dibatalkan.
                         </p>
-                        <div className="flex items-center gap-4 w-full">
+
+                        <div className="flex items-center gap-3 w-full">
                             <Button
-                                variant="outline"
-                                onClick={() =>
-                                    setDeleteDialog({ open: false, data: null })
-                                }
-                                className="h-14 flex-1 rounded-2xl border-2 border-slate-100 bg-white text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all"
+                                variant="ghost"
+                                onClick={() => setDeleteDialog({ open: false, data: null })}
+                                className="h-11 flex-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 font-semibold text-xs tracking-wide transition-all"
                             >
                                 Batal
                             </Button>
                             <Button
                                 onClick={handleDelete}
-                                className="h-14 flex-1 rounded-2xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20"
+                                className="h-11 flex-1 rounded-xl bg-rose-600 text-white hover:bg-rose-700 font-semibold text-xs tracking-wide shadow-sm shadow-rose-600/10 active:scale-98 transition-all"
                             >
                                 Ya, Hapus
                             </Button>

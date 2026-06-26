@@ -21,6 +21,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatRupiah } from "@/lib/utils";
+import { router } from "@inertiajs/react";
+import { toast } from "sonner";
 
 const PAYMENT_METHODS = [
     { id: "CASH", label: "Tunai / Cash", icon: Banknote },
@@ -29,8 +31,42 @@ const PAYMENT_METHODS = [
 
 export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
     const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0]);
+    const [processing, setProcessing] = useState(false);
 
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
+
+    const handleProcessOrder = () => {
+        if (cart.length === 0) return;
+
+        setProcessing(true);
+        router.post(
+            route("pharmacy.orders.store"),
+            {
+                items: cart.map((item) => ({
+                    id: item.id,
+                    quantity: item.qty,
+                    price: item.price,
+                })),
+                total: subtotal,
+                payment_method: paymentMethod.id,
+            },
+            {
+                onSuccess: () => {
+                    toast.success("Pesanan POS berhasil dibuat!");
+                    onReset();
+                    setProcessing(false);
+                },
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0] || "Gagal membuat pesanan";
+                    toast.error(firstError);
+                    setProcessing(false);
+                },
+                onFinish: () => {
+                    setProcessing(false);
+                }
+            }
+        );
+    };
 
     const PayIcon = paymentMethod.icon;
 
@@ -256,12 +292,17 @@ export function OrderCart({ cart, updateQty, removeFromCart, onReset }) {
                 </DropdownMenu>
 
                 <motion.button
-                    disabled={cart.length === 0}
+                    disabled={cart.length === 0 || processing}
                     whileTap={{ scale: 0.97 }}
+                    onClick={handleProcessOrder}
                     className="w-full h-13 bg-primary hover:bg-primary/90 text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
                 >
-                    <span>Proses Sekarang</span>
-                    {cart.length > 0 && (
+                    {processing ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <span>Proses Sekarang</span>
+                    )}
+                    {cart.length > 0 && !processing && (
                         <span className="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full tabular-nums">
                             {formatRupiah(subtotal)}
                         </span>

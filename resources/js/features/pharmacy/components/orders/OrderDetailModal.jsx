@@ -38,7 +38,6 @@ export function OrderDetailModal({ order, open, onClose }) {
 
     const statusCfg =
         STATUS_CONFIG[order.order_status] || STATUS_CONFIG.PENDING;
-    const isDelivery = order.service_type === "DELIVERY";
     const needsPrescription = order.requires_prescription;
 
     const handleUpdateStatus = (status, note = null) => {
@@ -132,16 +131,10 @@ export function OrderDetailModal({ order, open, onClose }) {
                                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                                            {isDelivery ? (
-                                                <Truck className="w-5 h-5 text-indigo-500" />
-                                            ) : (
-                                                <Package className="w-5 h-5 text-amber-500" />
-                                            )}
+                                            <Package className="w-5 h-5 text-amber-500" />
                                         </div>
                                         <p className="text-xs font-bold text-slate-700">
-                                            {isDelivery
-                                                ? "Kurir (Delivery)"
-                                                : "Ambil Sendiri (Pickup)"}
+                                            Ambil Sendiri (Pickup)
                                         </p>
                                     </div>
                                 </div>
@@ -296,16 +289,10 @@ export function OrderDetailModal({ order, open, onClose }) {
                                 <Button
                                     className="w-full h-12 rounded-xl bg-primary hover:bg-primary/80 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-900/20"
                                     onClick={() =>
-                                        handleUpdateStatus(
-                                            isDelivery
-                                                ? "SHIPPED"
-                                                : "READY_FOR_PICKUP",
-                                        )
+                                        handleUpdateStatus("READY_FOR_PICKUP")
                                     }
                                 >
-                                    {isDelivery
-                                        ? "Kirim Pesanan"
-                                        : "Tandai Siap Diambil"}{" "}
+                                    Tandai Siap Diambil
                                     <ArrowRight className="ml-2 w-4 h-4" />
                                 </Button>
                             )}

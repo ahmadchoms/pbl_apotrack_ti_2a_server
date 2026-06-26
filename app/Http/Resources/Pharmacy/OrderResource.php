@@ -29,7 +29,6 @@ class OrderResource extends JsonResource
             'prescription' => $this->whenLoaded('prescription'),
             'requires_prescription' => $this->relationLoaded('items') ? $this->items->contains('requires_prescription', true) : false,
             'items' => $this->whenLoaded('items'),
-            'tracking' => $this->whenLoaded('tracking'),
             'address' => $this->whenLoaded('address'),
         ];
     }

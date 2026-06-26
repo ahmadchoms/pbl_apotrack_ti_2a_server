@@ -47,7 +47,11 @@ class SendFcmNotificationJob implements ShouldQueue
         Log::info("Mengirim push notification ke Supabase Edge Function untuk Notification ID: {$this->notification->id}");
 
         try {
-            $response = Http::timeout(10)->post($endpoint, [
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'X-Apotrack-Secret' => env('APOTRACK_INTERNAL_SECRET')
+                ])
+                ->post($endpoint, [
                 'record' => [
                     'id' => $this->notification->id,
                     'user_id' => $this->notification->user_id,

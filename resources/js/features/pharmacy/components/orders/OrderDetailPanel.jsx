@@ -30,7 +30,6 @@ function SectionLabel({ children }) {
 export function OrderDetailPanel({ order }) {
     const statusCfg =
         STATUS_CONFIG[order.order_status] ?? STATUS_CONFIG.PENDING;
-    const isDelivery = order.service_type === "DELIVERY";
     const isPending = order.order_status === "PENDING";
     const isProcessing = order.order_status === "PROCESSING";
     const isReady = order.order_status === "READY_FOR_PICKUP";
@@ -103,7 +102,7 @@ export function OrderDetailPanel({ order }) {
                             },
                             {
                                 label: "Layanan",
-                                value: isDelivery ? "Delivery" : "Pickup",
+                                value: "Pickup",
                             },
                             {
                                 label: "Metode Bayar",
@@ -289,9 +288,7 @@ export function OrderDetailPanel({ order }) {
                     {isReady && (
                         <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold text-sm shadow-md shadow-primary/20">
                             <CheckCircle2 className="mr-2 h-4 w-4" />
-                            {order.service_type === "DELIVERY"
-                                ? "Tandai Sudah Dikirim"
-                                : "Tandai Sudah Diambil"}
+                            Tandai Sudah Diambil
                         </Button>
                     )}
                     {isShipped && (

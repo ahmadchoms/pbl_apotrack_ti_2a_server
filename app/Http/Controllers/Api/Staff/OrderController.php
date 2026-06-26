@@ -19,129 +19,6 @@ class OrderController extends BaseApiController
         protected StaffOrderService $staffOrderService
     ) {}
 
-    /**
-     * @OA\Post(
-     *     path="/api/staff/orders/{id}/ship",
-     *     summary="Minta penjemputan paket kurir (Biteship)",
-     *     description="Membuat pesanan pengiriman (pickup request) ke Biteship untuk pesanan dengan layanan DELIVERY yang sudah siap dikirim.",
-     *     operationId="staffShipOrder",
-     *     tags={"Orders (Staff)"},
-     *     security={{"sanctum": {}}},
-     *
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID pesanan (UUID)",
-     *         @OA\Schema(type="string", format="uuid", example="019e2ac0-684e-7139-8cb9-c150e027c872")
-     *     ),
-     *
-     *     @OA\RequestBody(
-     *         required=true,
-     *         description="Data kurir pengiriman",
-     *         @OA\JsonContent(
-     *             required={"courier_code", "courier_service"},
-     *             @OA\Property(property="courier_code", type="string", example="jne"),
-     *             @OA\Property(property="courier_service", type="string", example="reg")
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Permintaan pickup berhasil dikirim ke Biteship",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string", example="Permintaan pengiriman berhasil dikirim ke Biteship"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Tidak terautentikasi",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Gagal memproses pengiriman (misal: Biteship API error atau pesanan belum lunas)",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="Gagal memproses pengiriman: Kurir tidak tersedia.")
-     *         )
-     *     )
-     * )
-     */
-    public function shipOrder(ShipOrderRequest $request, $id)
-    {
-        try {
-            $order = $this->staffOrderService->shipOrder($request->user(), $id, $request->validated());
-
-            AuditHelper::log(
-                'SHIP_ORDER',
-                "Mengatur pengiriman pesanan {$order->order_number} melalui Biteship.",
-                ['order_id' => $order->id, 'courier' => $request->courier_code]
-            );
-
-            return $this->successResponse(new OrderResource($order), 'Permintaan pengiriman berhasil dikirim ke Biteship');
-        } catch (\Throwable $e) {
-            $code = $e->getCode() >= 400 && $e->getCode() <= 500 ? $e->getCode() : 422;
-            return $this->errorResponse('Gagal memproses pengiriman: ' . $e->getMessage(), $code);
-        }
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/api/staff/orders",
-     *     summary="Daftar pesanan apotek (Staff)",
-     *     description="Mengambil daftar pesanan yang masuk ke apotek tempat staf bekerja. Mendukung filter status dan paginasi.",
-     *     operationId="staffListOrders",
-     *     tags={"Orders (Staff)"},
-     *     security={{"sanctum": {}}},
-     *
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         description="Filter berdasarkan status pesanan (contoh: PENDING, PROCESSING, SHIPPED, COMPLETED, CANCELLED)",
-     *         @OA\Schema(type="string", example="PENDING")
-     *     ),
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         required=false,
-     *         description="Nomor halaman",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Daftar pesanan berhasil diambil",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string", example="Daftar pesanan apotek berhasil diambil"),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Tidak terautentikasi",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Staf tidak memiliki akses atau tidak aktif",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="error"),
-     *             @OA\Property(property="message", type="string", example="Anda tidak memiliki izin untuk mengakses apotek ini.")
-     *         )
-     *     )
-     * )
-     */
     public function index(Request $request)
     {
         try {
@@ -209,56 +86,6 @@ class OrderController extends BaseApiController
     }
 
     /**
-     * Simulasi perubahan status tracking Biteship (Sandbox only).
-     */
-    public function simulateTracking(Request $request, $id, $status)
-    {
-        try {
-            $validStatuses = [
-                'confirmed',
-                'allocated',
-                'pickingUp',
-                'picked',
-                'inTransit',
-                'droppingOff',
-                'returnInTransit',
-                'onHold',
-                'delivered',
-                'rejected',
-                'courierNotFound',
-                'returned',
-                'cancelled',
-                'disposed',
-                'picking_up',
-                'dropping_off',
-                'in_transit',
-                'return_in_transit',
-            ];
-
-            if (!in_array($status, $validStatuses)) {
-                return $this->errorResponse("Status '{$status}' tidak valid.", 422);
-            }
-
-            $order = $this->staffOrderService->simulateTrackingStatus(
-                $request->user(),
-                $id,
-                $status
-            );
-
-            AuditHelper::log(
-                'SIMULATE_TRACKING',
-                "Simulasi status tracking {$order->order_number} menjadi {$status}.",
-                ['order_id' => $order->id, 'tracking_status' => $status]
-            );
-
-            return $this->successResponse(new OrderResource($order), "Status tracking disimulasikan menjadi {$status}");
-        } catch (\Exception $e) {
-            $code = $e->getCode() >= 400 && $e->getCode() <= 500 ? $e->getCode() : 422;
-            return $this->errorResponse($e->getMessage(), $code);
-        }
-    }
-
-    /**
      * @OA\Patch(
      *     path="/api/staff/orders/{id}/status",
      *     summary="Perbarui status pesanan (Staff)",
@@ -322,13 +149,22 @@ class OrderController extends BaseApiController
                 $request->note
             );
 
+            $orderStatusEnum = \App\Enums\OrderStatus::from($updatedOrder->order_status);
+            $statusLabel = $orderStatusEnum->label();
+
             AuditHelper::log(
                 'UPDATE_ORDER_STATUS',
-                "Memperbarui status pesanan {$updatedOrder->order_number} menjadi {$request->status}.",
-                ['order_id' => $updatedOrder->id, 'status' => $request->status]
+                "Staf memperbarui status pesanan nomor {$updatedOrder->order_number} menjadi '{$statusLabel}'.",
+                [
+                    'order_id' => $updatedOrder->id,
+                    'status' => $orderStatusEnum->value
+                ]
             );
 
-            return $this->successResponse(new OrderResource($updatedOrder), "Status pesanan berhasil diperbarui menjadi {$request->status}");
+            return $this->successResponse(
+                new OrderResource($updatedOrder),
+                "Status pesanan berhasil diperbarui menjadi '{$statusLabel}'."
+            );
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }

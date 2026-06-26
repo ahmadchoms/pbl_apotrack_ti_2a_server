@@ -151,7 +151,7 @@ Route::prefix('admin')
 
 Route::prefix('pharmacy')
     ->name('pharmacy.')
-    ->middleware(['auth', 'role:APOTEKER,STAFF', 'verified.pharmacy', 'active.user'])
+    ->middleware(['auth', 'role:APOTEKER', 'verified.pharmacy', 'active.user'])
     ->group(function () {
 
         Route::get('/', [PharmacyDashboardController::class, 'index'])

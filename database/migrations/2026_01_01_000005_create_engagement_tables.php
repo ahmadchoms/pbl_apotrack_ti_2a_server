@@ -39,7 +39,9 @@ return new class extends Migration
             $table->unique(['order_id', 'medicine_id']);
         });
 
-        DB::statement('ALTER TABLE reviews ADD CONSTRAINT chk_rating_range CHECK (rating >= 1 AND rating <= 5)');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE reviews ADD CONSTRAINT chk_rating_range CHECK (rating >= 1 AND rating <= 5)');
+        }
     }
 
     public function down(): void

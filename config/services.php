@@ -35,17 +35,6 @@ return [
         ],
     ],
 
-    'biteship' => [
-        'key' => env('BITESHIP_API_KEY'),
-        'url' => env('BITESHIP_API_URL', 'https://api.biteship.com/v1'),
-        'webhook_secret' => env('BITESHIP_WEBHOOK_SECRET'),
-        'webhook_bypass' => env('BITESHIP_WEBHOOK_BYPASS', true),
-    ],
 
-    'shipping' => [
-        'rate_per_km'   => env('SHIPPING_RATE_PER_KM', 2500),
-        'rate_per_gram' => env('SHIPPING_RATE_PER_GRAM', 50),
-        'min_fee'       => env('SHIPPING_MIN_FEE', 10000),
-    ],
 
 ];

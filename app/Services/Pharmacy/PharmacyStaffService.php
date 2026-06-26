@@ -16,6 +16,10 @@ class PharmacyStaffService
         return PharmacyStaff::query()
             ->with(['user'])
             ->where('pharmacy_id', $pharmacyId)
+            ->where('role', 'STAFF')
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'USER');
+            })
             ->search($filters['search'] ?? null)
             ->filterStatus($filters['status'] ?? null)
             ->latest()
@@ -64,6 +68,7 @@ class PharmacyStaffService
 
     public function delete(PharmacyStaff $staff)
     {
+        event(new \App\Events\StaffRemoved($staff));
         $staff->delete();
     }
 

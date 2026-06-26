@@ -25,11 +25,9 @@ class StaffController extends Controller
         $filters = $request->only(['search', 'status']);
 
         $staff = $this->staffService->list($pharmacyId, $filters);
-        $activityLogs = $this->staffService->getActivityLogs($pharmacyId);
 
         return Inertia::render('pharmacy/staff/index', [
             'staff' => PharmacyStaffResource::collection($staff),
-            'activityLogs' => $activityLogs,
             'filters' => $filters
         ]);
     }

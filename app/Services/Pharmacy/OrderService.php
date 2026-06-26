@@ -11,13 +11,14 @@ use Illuminate\Support\Str;
 use App\Enums\OrderStatus;
 use App\Exceptions\InsufficientStockException;
 use App\Exceptions\InvalidOrderStatusTransitionException;
+use App\Models\OrderStatusLog;
 
 class OrderService
 {
     public function list(string $pharmacyId, array $filters)
     {
         return Order::query()
-            ->with(['user:id,username,email,phone', 'items.medicine', 'prescription', 'address', 'tracking'])
+            ->with(['user:id,username,email,phone', 'items.medicine', 'prescription', 'address'])
             ->forPharmacy($pharmacyId)
             ->filterStatus($filters['status'] ?? 'ALL')
             ->orderBy('created_at', 'desc')
@@ -29,8 +30,7 @@ class OrderService
         return Order::with([
             'user:id,username,email,phone',
             'prescription',
-            'items.medicine',
-            'tracking'
+            'items.medicine'
         ])->findOrFail($orderId);
     }
 
@@ -38,11 +38,11 @@ class OrderService
     {
         return DB::transaction(function () use ($pharmacyId, $data) {
             $order = Order::create([
-                'user_id' => $data['user_id'] ?? \App\Models\User::where('role', 'CUSTOMER')->first()?->id ?? Auth::id(),
+                'user_id' => $data['user_id'] ?? \App\Models\User::where('role', 'CUSTOMER')->first()?->id ?? "Pelanggan",
                 'pharmacy_id' => $pharmacyId,
                 'order_number' => 'POS-' . strtoupper(Str::random(8)),
                 'verification_code' => strtoupper(Str::random(10)),
-                'service_type' => 'WALK_IN',
+                'service_type' => 'POS',
                 'payment_method' => $data['payment_method'] ?? 'CASH',
                 'order_status' => 'COMPLETED',
                 'payment_status' => 'PAID',
@@ -74,21 +74,17 @@ class OrderService
     public function createCustomerOrder(\App\Models\User $user, array $data)
     {
         $order = DB::transaction(function () use ($user, $data) {
-            $isDelivery = ($data['service_type'] ?? 'PICK_UP') === 'DELIVERY';
-
             $order = Order::create([
                 'user_id' => $user->id,
                 'pharmacy_id' => $data['pharmacy_id'],
-                'address_id' => $isDelivery ? ($data['address_id'] ?? null) : null,
                 'order_number' => 'ORD-' . strtoupper(Str::random(8)),
                 'verification_code' => strtoupper(Str::random(10)),
-                'service_type' => $data['service_type'] ?? 'PICK_UP',
-                'payment_method' => $data['payment_method'] ?? 'TRANSFER',
+                'service_type' => 'PICKUP',
+                'payment_method' => $data['payment_method'] ?? 'CASH',
                 'order_status' => 'PENDING',
                 'payment_status' => 'UNPAID',
                 'subtotal_amount' => $data['subtotal_amount'],
-                'shipping_cost' => $isDelivery ? ($data['shipping_cost'] ?? 0) : 0,
-                'grand_total' => $data['subtotal_amount'] + ($isDelivery ? ($data['shipping_cost'] ?? 0) : 0),
+                'grand_total' => $data['subtotal_amount'],
                 'notes' => $data['notes'] ?? null,
                 'expired_at' => now()->addHours(24),
             ]);
@@ -106,18 +102,6 @@ class OrderService
                 ]);
 
                 $this->reduceStock($medicine, $item['quantity']);
-            }
-
-            if ($isDelivery) {
-                \App\Models\DeliveryTracking::create([
-                    'order_id' => $order->id,
-                    'courier' => [
-                        'company'      => $data['courier_code'] ?? null,
-                        'service_type' => $data['courier_service'] ?? null,
-                    ],
-                    'delivery_fee' => $data['shipping_cost'] ?? 0,
-                    'status' => 'WAITING_PICKUP',
-                ]);
             }
 
             $cart = \App\Models\Cart::where('user_id', $user->id)
@@ -175,9 +159,9 @@ class OrderService
             ->count();
     }
 
-    public function updateStatus(string $orderId, OrderStatus $status, ?string $note = null)
+    public function updateStatus(string $orderId, OrderStatus $status, ?string $note = null, string $source = 'PHARMACY_WEB')
     {
-        return DB::transaction(function () use ($orderId, $status, $note) {
+        return DB::transaction(function () use ($orderId, $status, $note, $source) {
             $order = Order::with('user')->where('id', $orderId)->lockForUpdate()->firstOrFail();
             $oldStatus = OrderStatus::from($order->order_status);
 
@@ -185,11 +169,18 @@ class OrderService
 
             $order->update(['order_status' => $status->value]);
 
-            \App\Models\OrderStatusLog::create([
-                'order_id' => $order->id,
-                'status' => $status->value,
-                'description' => $note ?? "Ada kabar baru! Statusnya udah berubah dari {$oldStatus->value} ke {$status->value}.",
-                'source' => 'PHARMACY_WEB'
+            if ($status === OrderStatus::COMPLETED && $order->payment_method === 'CASH') {
+                $order->update([
+                    'payment_status' => 'PAID',
+                    'paid_at' => now(),
+                ]);
+            }
+
+            OrderStatusLog::create([
+                'order_id'    => $order->id,
+                'status'      => $status->value,
+                'description' => $note ?? $status->logDescription($oldStatus->label()),
+                'source'      => $source
             ]);
 
             if ($status === OrderStatus::CANCELLED && $oldStatus !== OrderStatus::CANCELLED) {
@@ -238,23 +229,14 @@ class OrderService
             ],
             OrderStatus::PROCESSING->value => [
                 OrderStatus::READY_FOR_PICKUP->value,
-                OrderStatus::SHIPPED->value,
                 OrderStatus::CANCELLED->value
             ],
             OrderStatus::READY_FOR_PICKUP->value => [
                 OrderStatus::COMPLETED->value,
-                OrderStatus::SHIPPED->value
-            ],
-            OrderStatus::SHIPPED->value => [
-                OrderStatus::DELIVERED->value,
-                OrderStatus::CANCELLED->value
             ],
             OrderStatus::CANCEL_REQUESTED->value => [
                 OrderStatus::CANCELLED->value,
                 OrderStatus::PENDING->value,
-            ],
-            OrderStatus::DELIVERED->value => [
-                OrderStatus::COMPLETED->value
             ],
             OrderStatus::COMPLETED->value => [],
             OrderStatus::CANCELLED->value => [],

@@ -16,6 +16,7 @@ import { Link, router } from "@inertiajs/react";
 import { DashboardPharmacyLayout } from "@/layouts/pharmacy-layout";
 import { TextInput } from "@/components/shared/TextInput";
 import { SelectInput } from "@/components/shared/SelectInput";
+import { PageHeader } from "@/features/admin/components/shared/PageHeader";
 
 export default function PharmacyAuditLogs({ logs, filters = {} }) {
     const logList = logs?.data || [];
@@ -86,24 +87,18 @@ export default function PharmacyAuditLogs({ logs, filters = {} }) {
     return (
         <DashboardPharmacyLayout activeMenu="pharmacy.profile">
             <div className="pb-20 max-w-5xl mx-auto font-sans space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href={route("pharmacy.profile.index")}
-                            className="w-11 h-11 rounded-2xl bg-white shadow-[0_2px_12px_rgba(15,23,42,0.01)] border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-primary transition-all duration-300 hover:scale-105 cursor-pointer"
-                        >
-                            <ArrowLeft className="w-5 h-5 text-slate-600" />
-                        </Link>
-                        <div>
-                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-1 flex items-center gap-2">
-                                <span className="w-8 h-px bg-primary/30" />
-                                Profil & Keamanan
-                            </p>
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                                Riwayat Aktivitas Sistem
-                            </h2>
-                        </div>
-                    </div>
+                <div className="flex items-center gap-4">
+                    <Link
+                        href={route("pharmacy.profile.index")}
+                        className="w-11 h-11 rounded-2xl bg-white shadow-[0_2px_12px_rgba(15,23,42,0.01)] border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-primary transition-all duration-300 hover:scale-105 cursor-pointer shrink-0"
+                    >
+                        <ArrowLeft className="w-5 h-5 text-slate-600" />
+                    </Link>
+
+                    <PageHeader
+                        title="Riwayat Aktivitas Sistem"
+                        description="Profil & Keamanan"
+                    />
                 </div>
 
                 <Card className="border border-slate-100 rounded-3xl shadow-[0_2px_12px_rgba(15,23,42,0.01)] bg-white p-6">

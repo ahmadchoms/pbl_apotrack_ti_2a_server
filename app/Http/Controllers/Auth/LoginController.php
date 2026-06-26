@@ -49,6 +49,17 @@ class LoginController extends Controller
             $user->loadMissing('pharmacyStaff.pharmacy');
 
             $staff = $user->pharmacyStaff;
+
+            if ($staff && $staff->role === 'STAFF') {
+                Auth::logout();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
+
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'email' => ['Akses ditolak. Staff hanya diperbolehkan login melalui aplikasi mobile.'],
+                ]);
+            }
+
             $pharmacy = $staff?->pharmacy;
 
             if ($pharmacy && $pharmacy->verification_status !== 'VERIFIED') {

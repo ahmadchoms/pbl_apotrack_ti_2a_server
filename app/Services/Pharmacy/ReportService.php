@@ -57,7 +57,7 @@ class ReportService
         $callback = function () use ($pharmacyId, $startDate, $endDate) {
             $file = fopen('php://output', 'w');
 
-            fputcsv($file, ['No. Order', 'Tanggal', 'Pelanggan', 'Metode Pembayaran', 'Subtotal', 'Ongkir', 'Total']);
+            fputcsv($file, ['No. Order', 'Tanggal', 'Pelanggan', 'Metode Pembayaran', 'Subtotal', 'Total']);
 
             Order::with('user')
                 ->where('pharmacy_id', $pharmacyId)
@@ -73,7 +73,6 @@ class ReportService
                             $order->user->username,
                             $order->payment_method,
                             $order->subtotal_amount,
-                            $order->shipping_cost,
                             $order->grand_total,
                         ]);
                     }

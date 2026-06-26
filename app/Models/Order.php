@@ -60,15 +60,7 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function tracking()
-    {
-        return $this->hasOne(DeliveryTracking::class);
-    }
 
-    public function deliveryTracking()
-    {
-        return $this->hasOne(DeliveryTracking::class);
-    }
 
     public function statusLogs()
     {

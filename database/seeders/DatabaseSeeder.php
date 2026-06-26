@@ -19,7 +19,7 @@ use App\Models\MedicineBatch;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Prescription;
-use App\Models\DeliveryTracking;
+
 use App\Models\Notification;
 use App\Models\PharmacyLegality;
 use App\Models\Review;
@@ -90,6 +90,16 @@ class DatabaseSeeder extends Seeder
             ['username' => 'Dr. Yoga Pratama', 'email' => 'yoga@apotek.id', 'phone' => '088666666666', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
             ['username' => 'Nina Staff', 'email' => 'nina@apotek.id', 'phone' => '088777777777', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
             ['username' => 'Dr. Indah Lestari', 'email' => 'indah@apotek.id', 'phone' => '088888888888', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+
+            ['username' => 'Dr. Eko Prasetyo', 'email' => 'eko@apotekgenuk.id', 'phone' => '089111222333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Siti Aminah', 'email' => 'siti.staff@apotekgenuk.id', 'phone' => '089111222334', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Mega Utami', 'email' => 'mega@apotekgenuk.id', 'phone' => '089111222335', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Fahmi Staff', 'email' => 'fahmi@apotekgenuk.id', 'phone' => '089111222336', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Rizky Amelia', 'email' => 'rizky@apotekgenuk.id', 'phone' => '089111222337', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Faisal Anwar', 'email' => 'faisal@apotekgenuk.id', 'phone' => '089111222338', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dian Staff', 'email' => 'dian@apotekgenuk.id', 'phone' => '089111222339', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Indah Permata', 'email' => 'indah.p@apotekgenuk.id', 'phone' => '089111222340', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Dimas Argo', 'email' => 'dimas@apotekgenuk.id', 'phone' => '089111222341', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
         ];
 
         $createdUsers = [];
@@ -327,6 +337,150 @@ class DatabaseSeeder extends Seeder
                 'is_force_closed' => false,
                 'verified_by' => $superAdmin->id,
                 'verified_at' => Carbon::now()->subMonths(1)
+            ],
+            [
+                'name' => 'Apotek K-24 Genuk Indah',
+                'address' => 'Jl. Genuk Indah Raya No.12, Jatingaleh, Kec. Genuk, Kota Semarang',
+                'phone' => '(024) 6584321',
+                'latitude' => -6.9612,
+                'longitude' => 110.4740,
+                'rating' => 4.6,
+                'total_reviews' => 84,
+                'sia_number' => 'SIA-2024-3001',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(4)
+            ],
+            [
+                'name' => 'Kimia Farma Kaligawe',
+                'address' => 'Jl. Raya Kaligawe KM.5 No.38, Muktiharjo Lor, Kec. Genuk, Kota Semarang',
+                'phone' => '(024) 6590112',
+                'latitude' => -6.9585,
+                'longitude' => 110.4635,
+                'rating' => 4.5,
+                'total_reviews' => 112,
+                'sia_number' => 'SIA-2024-3002',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(5)
+            ],
+            [
+                'name' => 'Apotek Genuk Sehat',
+                'address' => 'Jl. Wolter Monginsidi No.88, Genuk, Kec. Genuk, Kota Semarang',
+                'phone' => '0813-9000-4321',
+                'latitude' => -6.9650,
+                'longitude' => 110.4795,
+                'rating' => 4.2,
+                'total_reviews' => 29,
+                'sia_number' => 'SIA-2024-3003',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(2)
+            ],
+            [
+                'name' => 'Apotek Cetra Medika Wolter',
+                'address' => 'Jl. Wolter Monginsidi No.145, Bangetayu Kulon, Kec. Genuk, Kota Semarang',
+                'phone' => '(024) 76924415',
+                'latitude' => -6.9732,
+                'longitude' => 110.4821,
+                'rating' => 4.4,
+                'total_reviews' => 43,
+                'sia_number' => 'SIA-2024-3004',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(3)
+            ],
+            [
+                'name' => 'Apotek Bangetayu Farma',
+                'address' => 'Jl. Stasiun Bangetayu No.10, Bangetayu Wetan, Kec. Genuk, Kota Semarang',
+                'phone' => '(024) 6512399',
+                'latitude' => -6.9765,
+                'longitude' => 110.4860,
+                'rating' => 4.3,
+                'total_reviews' => 51,
+                'sia_number' => 'SIA-2024-3005',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(1)
+            ],
+            [
+                'name' => 'Apotek Muktiharjo Prima',
+                'address' => 'Jl. Muktiharjo Raya No.17, Muktiharjo Kidul, Kec. Pedurungan, Kota Semarang', // Batas luar radius ke arah selatan genuk
+                'phone' => '0878-3321-4455',
+                'latitude' => -6.9780,
+                'longitude' => 110.4650,
+                'rating' => 4.1,
+                'total_reviews' => 18,
+                'sia_number' => 'SIA-2024-3006',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(2)
+            ],
+            [
+                'name' => 'Apotek Sembada Kaligawe',
+                'address' => 'Jl. Kaligawe Raya KM.4, Terboyo Kulon, Kec. Genuk, Kota Semarang',
+                'phone' => '(024) 6581122',
+                'latitude' => -6.9560,
+                'longitude' => 110.4570,
+                'rating' => 4.0,
+                'total_reviews' => 32,
+                'sia_number' => 'SIA-2024-3007',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(6)
+            ],
+            [
+                'name' => 'Apotek Bugen Utama',
+                'address' => 'Jl. Bugen Utara No.5A, Bangetayu Kulon, Kec. Genuk, Kota Semarang',
+                'phone' => '0821-4455-6677',
+                'latitude' => -6.9695,
+                'longitude' => 110.4755,
+                'rating' => 4.5,
+                'total_reviews' => 22,
+                'sia_number' => 'SIA-2024-3008',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subDays(15)
+            ],
+            [
+                'name' => 'Apotek Terboyo Asri',
+                'address' => 'Kawasan Industri Terboyo Blok G No.3, Terboyo Wetan, Kec. Genuk, Kota Semarang',
+                'phone' => '(024) 6594433',
+                'latitude' => -6.9490,
+                'longitude' => 110.4710,
+                'rating' => 4.2,
+                'total_reviews' => 15,
+                'sia_number' => 'SIA-2024-3009',
+                'logo_url' => $pharmacyUrl,
+                'verification_status' => 'VERIFIED',
+                'is_active' => true,
+                'is_force_closed' => false,
+                'verified_by' => $superAdmin->id,
+                'verified_at' => Carbon::now()->subMonths(3)
             ]
         ];
 
@@ -387,6 +541,26 @@ class DatabaseSeeder extends Seeder
         // Apotek Surya Sehat (index 11)
         PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[11]->id, 'user_id' => $createdUsers['indah@apotek.id']->id], ['role' => 'APOTEKER']);
 
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[12]->id, 'user_id' => $createdUsers['eko@apotekgenuk.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[12]->id, 'user_id' => $createdUsers['siti.staff@apotekgenuk.id']->id], ['role' => 'STAFF']);
+
+        // Index 13: Kimia Farma Kaligawe
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[13]->id, 'user_id' => $createdUsers['mega@apotekgenuk.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[13]->id, 'user_id' => $createdUsers['fahmi@apotekgenuk.id']->id], ['role' => 'STAFF']);
+
+        // Index 14: Apotek Genuk Sehat
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[14]->id, 'user_id' => $createdUsers['rizky@apotekgenuk.id']->id], ['role' => 'APOTEKER']);
+
+        // Index 15: Apotek Cetra Medika Wolter
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[15]->id, 'user_id' => $createdUsers['faisal@apotekgenuk.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[15]->id, 'user_id' => $createdUsers['dian@apotekgenuk.id']->id], ['role' => 'STAFF']);
+
+        // Index 16: Apotek Bangetayu Farma
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[16]->id, 'user_id' => $createdUsers['indah.p@apotekgenuk.id']->id], ['role' => 'APOTEKER']);
+
+        // Index 17: Apotek Muktiharjo Prima
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[17]->id, 'user_id' => $createdUsers['dimas@apotekgenuk.id']->id], ['role' => 'APOTEKER']);
+
         // ==========================================
         // 4. MEDICINE SEEDS (EXPANDED)
         // ==========================================
@@ -441,6 +615,15 @@ class DatabaseSeeder extends Seeder
 
             // Apotek Surya Sehat → Herbal, Vitamin, Antasida
             'Apotek Surya Sehat'             => ['Tolak Angin Cair', 'Antangin JRG', 'Promag Tablet', 'Mylanta', 'Imboost Force', 'Enervon-C', 'Panadol Extra 500mg'],
+            'Apotek K-24 Genuk Indah'     => $allMedicineNames,
+            'Kimia Farma Kaligawe'        => $allMedicineNames,
+            'Apotek Genuk Sehat'          => ['Panadol Extra 500mg', 'Promag Tablet', 'Sanmol Sirup 60ml', 'Bodrex', 'Mylanta', 'Tolak Angin Cair'],
+            'Apotek Cetra Medika Wolter'  => ['Amoxicillin 500mg', 'Amlodipine 5mg', 'Metformin 500mg', 'Panadol Extra 500mg'],
+            'Apotek Bangetayu Farma'      => ['Panadol Extra 500mg', 'Betadine Antiseptic 15ml', 'Sanmol Sirup 60ml', 'Enervon-C'],
+            'Apotek Muktiharjo Prima'     => ['Insto Regular 7.5ml', 'Enervon-C', 'Imboost Force', 'Promag Tablet'],
+            'Apotek Sembada Kaligawe'     => ['Tolak Angin Cair', 'Antangin JRG', 'Mylanta', 'Imboost Force'],
+            'Apotek Bugen Utama'          => ['Panadol Extra 500mg', 'Bodrex', 'Diapet', 'Sanmol Sirup 60ml'],
+            'Apotek Terboyo Asri'         => ['Panadol Extra 500mg', 'Promag Tablet', 'Betadine Antiseptic 15ml', 'Amoxicillin 500mg'],
         ];
 
         $insertedMedicines = [];
@@ -522,14 +705,12 @@ class DatabaseSeeder extends Seeder
         $o1 = Order::firstOrCreate(['order_number' => 'ORD-2026-PENDING'], [
             'user_id' => $budi->id,
             'pharmacy_id' => $phar1->id,
-            'address_id' => $addrBudi->id,
-            'service_type' => 'DELIVERY',
+            'service_type' => 'PICKUP',
             'payment_method' => 'QRIS',
             'order_status' => 'PENDING',
             'payment_status' => 'UNPAID',
             'subtotal_amount' => 12000,
-            'shipping_cost' => 15000,
-            'grand_total' => 27000,
+            'grand_total' => 12000,
             'verification_code' => strtoupper(Str::random(10)),
             'expired_at' => Carbon::now()->addHours(24)
         ]);
@@ -539,14 +720,12 @@ class DatabaseSeeder extends Seeder
         $o2 = Order::firstOrCreate(['order_number' => 'ORD-2026-PROCESS'], [
             'user_id' => $siti->id,
             'pharmacy_id' => $phar1->id,
-            'address_id' => $addrSiti->id,
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'VIRTUAL_ACCOUNT',
+            'service_type' => 'PICKUP',
+            'payment_method' => 'QRIS',
             'order_status' => 'PROCESSING',
             'payment_status' => 'PAID',
             'subtotal_amount' => 45000,
-            'shipping_cost' => 10000,
-            'grand_total' => 55000,
+            'grand_total' => 45000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subMinutes(30),
             'expired_at' => Carbon::now()->addHours(24)
@@ -562,7 +741,6 @@ class DatabaseSeeder extends Seeder
             'order_status' => 'READY_FOR_PICKUP',
             'payment_status' => 'PAID',
             'subtotal_amount' => 15000,
-            'shipping_cost' => 0,
             'grand_total' => 15000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subHours(1),
@@ -570,55 +748,21 @@ class DatabaseSeeder extends Seeder
         ]);
         OrderItem::firstOrCreate(['order_id' => $o3->id, 'medicine_id' => $medsPhar1['Betadine Antiseptic 15ml']->id], ['medicine_name' => 'Betadine Antiseptic 15ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 15000, 'subtotal' => 15000]);
 
-        // 4. SHIPPED (Kurir Sedang Mengantar)
-        $o4 = Order::firstOrCreate(['order_number' => 'ORD-2026-SHIPPED'], [
+        // 4. COMPLETED - Pickup order (verifikasi kode)
+        $o4 = Order::firstOrCreate(['order_number' => 'ORD-2026-COMPLETED-2'], [
             'user_id' => $siti->id,
             'pharmacy_id' => $phar1->id,
-            'address_id' => $addrSiti->id,
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'QRIS',
-            'order_status' => 'SHIPPED',
+            'service_type' => 'PICKUP',
+            'payment_method' => 'CASH',
+            'order_status' => 'COMPLETED',
             'payment_status' => 'PAID',
             'subtotal_amount' => 22000,
-            'shipping_cost' => 15000,
-            'grand_total' => 37000,
+            'grand_total' => 22000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subHours(2),
             'expired_at' => Carbon::now()->addHours(24)
         ]);
         OrderItem::firstOrCreate(['order_id' => $o4->id, 'medicine_id' => $medsPhar1['Sanmol Sirup 60ml']->id], ['medicine_name' => 'Sanmol Sirup 60ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 22000, 'subtotal' => 22000]);
-        DeliveryTracking::firstOrCreate(['order_id' => $o4->id], [
-            'biteship_order_id'    => 'BTS-TEST-001',
-            'biteship_tracking_id' => 'TRK-TEST-001',
-            'tracking_number'      => 'GRB-99999',
-            'tracking_link'        => 'https://biteship.com/tracking/GRB-99999',
-            'status'               => 'dropping_off',
-            'delivery_fee'         => 15000,
-            'courier' => [
-                'company'             => 'grab',
-                'driver_name'         => 'Budi Santoso',
-                'driver_phone'        => '08111222333',
-                'driver_photo_url'    => 'https://picsum.photos/200',
-                'driver_plate_number' => 'H 4321 ZZ',
-            ],
-            'origin' => [
-                'contact_name'  => 'Apotek Sehat Selalu',
-                'contact_phone' => '021-12345678',
-                'address'       => 'Jl. Sudirman No. 10, Jakarta Pusat',
-            ],
-            'destination' => [
-                'contact_name'  => 'Siti Rahayu',
-                'contact_phone' => '083333333333',
-                'address'       => 'Gedung Cyber, Jl. Kuningan Barat No. 8, Jakarta Selatan',
-            ],
-            'history' => [
-                ['status' => 'confirmed',    'note' => 'Pesanan dikonfirmasi.',        'service_type' => 'instant', 'updated_at' => now()->subHours(3)->toIso8601String()],
-                ['status' => 'allocated',    'note' => 'Kurir ditemukan.',             'service_type' => 'instant', 'updated_at' => now()->subHours(2)->toIso8601String()],
-                ['status' => 'picking_up',   'note' => 'Kurir menuju apotek.',         'service_type' => 'instant', 'updated_at' => now()->subMinutes(90)->toIso8601String()],
-                ['status' => 'picked',       'note' => 'Paket diambil kurir.',         'service_type' => 'instant', 'updated_at' => now()->subMinutes(60)->toIso8601String()],
-                ['status' => 'dropping_off', 'note' => 'Dalam perjalanan ke customer.', 'service_type' => 'instant', 'updated_at' => now()->subMinutes(30)->toIso8601String()],
-            ],
-        ]);
 
         // 5. COMPLETED (Dengan Resep)
         // Membuat data Prescription terlebih dahulu
@@ -632,18 +776,17 @@ class DatabaseSeeder extends Seeder
             'verified_at' => Carbon::now()->subDays(2)
         ]);
 
-        $o5 = Order::firstOrCreate(['order_number' => 'ORD-2026-PRESCRIPTION'], [
+        $o5 = Order::firstOrCreate(['order_number' => 'ORD-2026-COMPLETED-WITH-PRESC'], [
             'user_id' => $budi->id,
             'pharmacy_id' => $phar1->id,
-            'address_id' => $addrBudi->id,
             'prescription_id' => $presc1->id, // Hubungkan dengan resep
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'BANK_TRANSFER',
+            'service_type' => 'PICKUP',
+            'payment_method' => 'CASH',
             'order_status' => 'COMPLETED',
             'payment_status' => 'PAID',
+            'is_reviewed' => true,
             'subtotal_amount' => 17000, // 8500 (Amoxicillin) + 8500 (Amoxicillin)
-            'shipping_cost' => 12000,
-            'grand_total' => 29000,
+            'grand_total' => 17000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subDays(1),
             'expired_at' => Carbon::now()->addHours(24)
@@ -670,7 +813,6 @@ class DatabaseSeeder extends Seeder
             'order_status' => 'CANCELLED',
             'payment_status' => 'UNPAID',
             'subtotal_amount' => 35000,
-            'shipping_cost' => 0,
             'grand_total' => 35000,
             'verification_code' => strtoupper(Str::random(10)),
             'cancellation_reason' => 'Dibatalkan oleh sistem (Expired).',
@@ -678,18 +820,16 @@ class DatabaseSeeder extends Seeder
         ]);
         OrderItem::firstOrCreate(['order_id' => $o6->id, 'medicine_id' => $medsPhar1['Tolak Angin Cair']->id], ['medicine_name' => 'Tolak Angin Cair', 'unit_name' => 'Box', 'quantity' => 1, 'price' => 35000, 'subtotal' => 35000]);
 
-        // 7. SHIPPING TEST ORDER (READY_FOR_PICKUP & DELIVERY)
-        $o7 = Order::firstOrCreate(['order_number' => 'ORD-2026-SHIP-TEST'], [
+        // 7. READY_FOR_PICKUP ORDER
+        $o7 = Order::firstOrCreate(['order_number' => 'ORD-2026-READY-2'], [
             'user_id' => $budi->id,
             'pharmacy_id' => $phar1->id,
-            'address_id' => $addrBudi->id,
-            'service_type' => 'DELIVERY',
+            'service_type' => 'PICKUP',
             'payment_method' => 'QRIS',
             'order_status' => 'READY_FOR_PICKUP',
             'payment_status' => 'PAID',
             'subtotal_amount' => 24000,
-            'shipping_cost' => 10000,
-            'grand_total' => 34000,
+            'grand_total' => 24000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subHours(1),
             'expired_at' => Carbon::now()->addHours(24)
@@ -722,11 +862,11 @@ class DatabaseSeeder extends Seeder
                 'read_at' => null,
                 'created_at' => Carbon::now()->subMinutes(30)
             ],
-            // Notifikasi Order (Siti - SHIPPED)
+            // Notifikasi Order (Siti - COMPLETED)
             [
                 'user_id' => $siti->id,
-                'title' => 'Pesanan Sedang Dikirim',
-                'message' => 'Pesanan Anda (' . $o4->order_number . ') sedang dalam perjalanan oleh kurir.',
+                'title' => 'Pesanan Selesai',
+                'message' => 'Pesanan Anda (' . $o4->order_number . ') telah selesai dan obat berhasil diambil.',
                 'type' => 'ORDER_UPDATE',
                 'reference_type' => 'Order',
                 'reference_id' => $o4->id,

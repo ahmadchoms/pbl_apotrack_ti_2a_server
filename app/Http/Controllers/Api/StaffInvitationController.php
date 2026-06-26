@@ -91,13 +91,26 @@ class StaffInvitationController extends Controller
             ], 409);
         }
 
-        DB::transaction(function () use ($pharmacyId, $user) {
-            PharmacyStaff::create([
-                'pharmacy_id' => $pharmacyId,
-                'user_id'     => $user->id,
-                'role'        => 'STAFF',
-                'is_active'   => true,
-            ]);
+        $existingTrashedStaff = PharmacyStaff::onlyTrashed()
+            ->where('pharmacy_id', $pharmacyId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        DB::transaction(function () use ($pharmacyId, $user, $existingTrashedStaff) {
+            if ($existingTrashedStaff) {
+                $existingTrashedStaff->restore();
+                $existingTrashedStaff->update([
+                    'role'      => 'STAFF',
+                    'is_active' => true,
+                ]);
+            } else {
+                PharmacyStaff::create([
+                    'pharmacy_id' => $pharmacyId,
+                    'user_id'     => $user->id,
+                    'role'        => 'STAFF',
+                    'is_active'   => true,
+                ]);
+            }
         });
 
         return response()->json([

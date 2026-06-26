@@ -41,7 +41,7 @@ class CustomerOrderService
      */
     public function showOrder(User $user, string $id): Order
     {
-        return Order::with(['items.medicine', 'pharmacy', 'tracking', 'statusLogs', 'prescription', 'reviews', 'address'])
+        return Order::with(['items.medicine', 'pharmacy', 'statusLogs', 'prescription', 'reviews', 'address'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
     }
@@ -89,21 +89,7 @@ class CustomerOrderService
             ->paginate($perPage);
     }
 
-    /**
-     * Get courier tracking details.
-     */
-    public function getTracking(User $user, string $id)
-    {
-        $order = Order::with(['tracking'])
-            ->where('user_id', $user->id)
-            ->findOrFail($id);
 
-        if (!$order->tracking) {
-            throw new \Exception('Informasi pengiriman tidak ditemukan untuk pesanan ini.', 404);
-        }
-
-        return $order->tracking;
-    }
 
     /**
      * Simulate payment for UI testing (ACID Protected & Pessimistic Locking).

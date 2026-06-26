@@ -45,7 +45,6 @@ export default function OrderShow({ order: orderWrapper }) {
 
     const statusCfg =
         STATUS_CONFIG[order.order_status] || STATUS_CONFIG.PENDING;
-    const isDelivery = order.service_type === "DELIVERY";
     const needsPrescription = order.requires_prescription;
     const isPrescriptionVerified = order.prescription?.status === "VERIFIED";
 
@@ -100,44 +99,34 @@ export default function OrderShow({ order: orderWrapper }) {
     return (
         <DashboardPharmacyLayout activeMenu="Daftar Pesanan">
             <div className="max-w-[1600px] mx-auto pb-20">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 px-4">
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href={route("pharmacy.orders.index")}
-                            className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/30 transition-all shadow-sm"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </Link>
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                                    Detail Transaksi
-                                </span>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
-                                    ID: {order.order_number}
-                                </span>
-                            </div>
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                                Pesanan{" "}
-                                <span className="text-primary">
-                                    {order.buyer?.username}
-                                </span>
-                            </h2>
+                <div className="flex items-center gap-4 mb-8">
+                    <Link
+                        href={route("pharmacy.orders.index")}
+                        className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/30 transition-all shadow-sm"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                                Detail Transaksi
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
+                                ID: {order.order_number}
+                            </span>
                         </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            className="h-11 rounded-xl border-slate-200 font-bold text-slate-600 gap-2 shadow-sm bg-white"
-                        >
-                            <Printer className="w-4 h-4" /> Cetak Struk
-                        </Button>
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                            Pesanan{" "}
+                            <span className="text-primary">
+                                {order.buyer?.username}
+                            </span>
+                        </h2>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
                     <div className="lg:col-span-5 xl:col-span-4">
-                        <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/30 overflow-hidden sticky top-6 bg-white flex flex-col h-[calc(100vh-200px)]">
+                        <Card className="py-0 gap-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/30 overflow-hidden sticky top-6 bg-white flex flex-col h-[calc(100vh-200px)]">
                             <div className="p-8 border-b border-slate-50 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500 shadow-inner">
@@ -163,7 +152,7 @@ export default function OrderShow({ order: orderWrapper }) {
                                     </Button>
                                 )}
                             </div>
-                            <CardContent className="flex-1 min-h-0 p-8 flex flex-col bg-slate-50/50">
+                            <CardContent className="pt-0 flex-1 min-h-0 p-8 flex flex-col bg-slate-50/50">
                                 {needsPrescription ? (
                                     <div className="flex-1 relative rounded-3xl overflow-hidden border border-slate-200 bg-white group shadow-2xl">
                                         {order.prescription?.image_url ? (
@@ -301,15 +290,9 @@ export default function OrderShow({ order: orderWrapper }) {
                                             Tipe Layanan
                                         </span>
                                         <div className="flex items-center gap-1.5">
-                                            {isDelivery ? (
-                                                <Truck className="w-3 h-3 text-indigo-400" />
-                                            ) : (
-                                                <Package className="w-3 h-3 text-amber-400" />
-                                            )}
+                                            <Package className="w-3 h-3 text-amber-400" />
                                             <span className="text-xs font-bold text-slate-600">
-                                                {isDelivery
-                                                    ? "Antar Alamat"
-                                                    : "Ambil di Apotek"}
+                                                Ambil di Apotek
                                             </span>
                                         </div>
                                     </div>
@@ -317,7 +300,7 @@ export default function OrderShow({ order: orderWrapper }) {
                             </Card>
                         </div>
 
-                        <Card className="pt-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/20 bg-white overflow-hidden">
+                        <Card className="py-0 gap-0 rounded-[2.5rem] border-slate-200/80 shadow-2xl shadow-slate-200/20 bg-white overflow-hidden">
                             <div className="p-8 border-b border-slate-50">
                                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-3">
                                     <Pill className="w-5 h-5 text-primary" />{" "}
@@ -407,31 +390,37 @@ export default function OrderShow({ order: orderWrapper }) {
                             </div>
                         </Card>
 
-                        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200/80 shadow-2xl shadow-slate-200/30">
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                                <Clock className="w-3.5 h-3.5" /> Manajemen
-                                Status & Aksi
+                        <div className="bg-white rounded-3xl p-7 border border-slate-100 shadow-sm">
+                            <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-slate-400/80" />
+                                Manajemen Status & Aksi
                             </h3>
 
-                            <div className="flex flex-wrap gap-4">
+                            <div className="flex flex-wrap gap-3.5">
                                 {order.order_status === "PENDING" && (
                                     <>
                                         {needsPrescription &&
                                             !isPrescriptionVerified && (
                                                 <Button
-                                                    className="h-14 px-8 rounded-2xl bg-violet-500 hover:bg-violet-600 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-violet-500/30 flex-1 min-w-[200px]"
+                                                    className="h-12 px-6 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs tracking-wide transition-colors flex-1 min-w-[180px]"
                                                     onClick={() =>
                                                         handleValidatePrescription(
                                                             "VERIFIED",
                                                         )
                                                     }
                                                 >
-                                                    <CheckCircle2 className="w-5 h-5 mr-2" />{" "}
+                                                    <CheckCircle2 className="w-4 h-4 mr-2" />
                                                     Validasi Resep
                                                 </Button>
                                             )}
+
                                         <Button
-                                            className={`h-14 px-8 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/30 flex-1 min-w-[200px] ${needsPrescription && !isPrescriptionVerified ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
+                                            className={`h-12 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wide transition-all flex-1 min-w-[180px] ${
+                                                needsPrescription &&
+                                                !isPrescriptionVerified
+                                                    ? "opacity-40 cursor-not-allowed pointer-events-none"
+                                                    : ""
+                                            }`}
                                             disabled={
                                                 needsPrescription &&
                                                 !isPrescriptionVerified
@@ -440,17 +429,18 @@ export default function OrderShow({ order: orderWrapper }) {
                                                 handleUpdateStatus("PROCESSING")
                                             }
                                         >
-                                            <CheckCircle2 className="w-5 h-5 mr-2" />{" "}
+                                            <CheckCircle2 className="w-4 h-4 mr-2" />
                                             Setujui & Proses
                                         </Button>
+
                                         <Button
                                             variant="outline"
-                                            className="h-14 px-8 rounded-2xl border-rose-200 text-rose-500 hover:bg-rose-50 font-black text-[11px] uppercase tracking-[0.2em] flex-1 min-w-[200px]"
+                                            className="h-12 px-6 rounded-xl border-slate-200 text-rose-600 hover:bg-rose-50/50 font-semibold text-xs tracking-wide transition-colors flex-1 min-w-[180px]"
                                             onClick={() =>
                                                 setShowRejectDialog(true)
                                             }
                                         >
-                                            <XCircle className="w-5 h-5 mr-2" />{" "}
+                                            <XCircle className="w-4 h-4 mr-2" />
                                             Tolak Pesanan
                                         </Button>
                                     </>
@@ -458,29 +448,14 @@ export default function OrderShow({ order: orderWrapper }) {
 
                                 {order.order_status === "PROCESSING" && (
                                     <Button
-                                        className="h-14 px-8 rounded-2xl bg-primary hover:bg-primary/80 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-blue-900/30 flex-1"
+                                        className="h-12 px-6 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-xs tracking-wide shadow-md shadow-slate-900/10 transition-all flex-1 flex items-center justify-center"
                                         onClick={() =>
-                                            handleUpdateStatus(
-                                                isDelivery
-                                                    ? "SHIPPED"
-                                                    : "READY_FOR_PICKUP",
-                                            )
+                                            handleUpdateStatus(READY_FOR_PICKUP)
                                         }
                                     >
-                                        {isDelivery ? (
-                                            <>
-                                                {" "}
-                                                <Truck className="w-5 h-5 mr-2" />{" "}
-                                                Tandai Sudah Dikirim{" "}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {" "}
-                                                <CheckCircle2 className="w-5 h-5 mr-2" />{" "}
-                                                Tandai Siap Diambil{" "}
-                                            </>
-                                        )}
-                                        <ArrowRight className="ml-4 w-4 h-4 opacity-50" />
+                                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                                        Tandai Siap Diambil
+                                        <ArrowRight className="ml-3 w-3.5 h-3.5 opacity-60" />
                                     </Button>
                                 )}
 
@@ -490,27 +465,27 @@ export default function OrderShow({ order: orderWrapper }) {
                                     "DELIVERED",
                                 ].includes(order.order_status) && (
                                     <Button
-                                        className="h-14 px-8 rounded-2xl bg-slate-800 hover:bg-black text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-slate-900/30 flex-1"
+                                        className="h-12 px-6 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-xs tracking-wide shadow-md shadow-slate-900/10 transition-all flex-1"
                                         onClick={() =>
                                             handleUpdateStatus("COMPLETED")
                                         }
                                     >
-                                        <CheckCircle2 className="w-5 h-5 mr-2" />{" "}
+                                        <CheckCircle2 className="w-4 h-4 mr-2" />
                                         Selesaikan Transaksi
                                     </Button>
                                 )}
 
                                 {order.order_status === "CANCEL_REQUESTED" && (
-                                    <div className="flex-1 flex flex-col gap-4">
+                                    <div className="flex-1 flex flex-col gap-3.5">
                                         {order.cancellation_reason && (
-                                            <div className="flex items-start gap-3 p-5 bg-rose-50 rounded-2xl border border-rose-100">
-                                                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                                            <div className="flex items-start gap-3 p-4 bg-rose-50/50 rounded-xl border border-rose-100/60">
+                                                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
                                                 <div>
-                                                    <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1">
+                                                    <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wider mb-0.5">
                                                         Alasan Pembatalan dari
                                                         Customer
                                                     </p>
-                                                    <p className="text-sm text-rose-700 font-medium leading-relaxed">
+                                                    <p className="text-xs text-rose-700/90 font-medium leading-relaxed">
                                                         {
                                                             order.cancellation_reason
                                                         }
@@ -520,26 +495,26 @@ export default function OrderShow({ order: orderWrapper }) {
                                         )}
                                         <div className="flex gap-3">
                                             <Button
-                                                className="h-14 px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-rose-500/30 flex-1"
+                                                className="h-12 px-6 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs tracking-wide transition-colors flex-1"
                                                 onClick={() =>
                                                     setShowApproveCancelDialog(
                                                         true,
                                                     )
                                                 }
                                             >
-                                                <XCircle className="w-5 h-5 mr-2" />
+                                                <XCircle className="w-4 h-4 mr-2" />
                                                 Setujui Pembatalan
                                             </Button>
                                             <Button
                                                 variant="outline"
-                                                className="h-14 px-8 rounded-2xl border-slate-200 text-slate-600 hover:bg-slate-50 font-black text-[11px] uppercase tracking-[0.2em] flex-1"
+                                                className="h-12 px-6 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs tracking-wide transition-colors flex-1"
                                                 onClick={() =>
                                                     setShowRejectCancelDialog(
                                                         true,
                                                     )
                                                 }
                                             >
-                                                <CheckCircle2 className="w-5 h-5 mr-2" />
+                                                <CheckCircle2 className="w-4 h-4 mr-2" />
                                                 Tolak, Lanjutkan Pesanan
                                             </Button>
                                         </div>
@@ -547,13 +522,13 @@ export default function OrderShow({ order: orderWrapper }) {
                                 )}
 
                                 {order.order_status === "CANCELLED" && (
-                                    <div className="flex-1 flex items-center gap-3 p-6 bg-rose-50 rounded-2xl border border-rose-100">
-                                        <XCircle className="w-8 h-8 text-rose-500 shrink-0" />
+                                    <div className="flex-1 flex items-center gap-3.5 p-5 bg-slate-50 rounded-xl border border-slate-100">
+                                        <XCircle className="w-6 h-6 text-slate-400 shrink-0" />
                                         <div>
-                                            <p className="text-xs font-black text-rose-700 uppercase tracking-widest">
+                                            <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                                                 Pesanan Dibatalkan
                                             </p>
-                                            <p className="text-[11px] text-rose-500 font-medium mt-1">
+                                            <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                                                 Transaksi ini telah dihentikan
                                                 dan tidak dapat diproses lebih
                                                 lanjut.
@@ -563,13 +538,13 @@ export default function OrderShow({ order: orderWrapper }) {
                                 )}
 
                                 {order.order_status === "COMPLETED" && (
-                                    <div className="flex-1 flex items-center gap-3 p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
-                                        <CheckCircle2 className="w-8 h-8 text-emerald-500 shrink-0" />
+                                    <div className="flex-1 flex items-center gap-3.5 p-5 bg-emerald-50/60 rounded-xl border border-emerald-100/80">
+                                        <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                                         <div>
-                                            <p className="text-xs font-black text-emerald-700 uppercase tracking-widest">
+                                            <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
                                                 Pesanan Selesai
                                             </p>
-                                            <p className="text-[11px] text-emerald-500 font-medium mt-1">
+                                            <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
                                                 Transaksi telah berhasil
                                                 diselesaikan dan obat telah
                                                 diterima oleh pasien.

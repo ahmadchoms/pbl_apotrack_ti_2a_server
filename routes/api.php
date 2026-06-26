@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\Customer\DeviceTokenController;
 use App\Http\Controllers\Api\Staff\OrderController as StaffOrderController;
 use App\Http\Controllers\Api\Staff\MedicineController as StaffMedicineController;
 use App\Http\Controllers\Api\Staff\AuditController as StaffAuditController;
-use App\Http\Controllers\Api\BiteshipWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,8 +21,6 @@ use App\Http\Controllers\Api\BiteshipWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// --- PUBLIC ROUTES (Rate Limited) ---
-Route::post('/webhooks/biteship', [BiteshipWebhookController::class, 'handle'])->middleware('biteship.webhook');
 Route::get('/pharmacies/{pharmacyId}/reviews', [ReviewController::class, 'index']); // Public API Review
 
 Route::middleware('throttle:5,1')->group(function () {
@@ -74,11 +71,7 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/orders/history', [OrderController::class, 'history']);
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
-        Route::get('/orders/{id}/tracking', [OrderController::class, 'tracking']);
         Route::post('/orders/{id}/confirm-received', [OrderController::class, 'confirmReceived']);
-
-        // Shipping Rates
-        Route::post('/shipping/rates', [OrderController::class, 'shippingRates']);
 
         // Uploads
         Route::post('/orders/{id}/prescription', [OrderController::class, 'uploadPrescription']);
@@ -101,10 +94,8 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::get('/orders/{id}', [StaffOrderController::class, 'show']);
         Route::patch('/orders/{id}/status', [StaffOrderController::class, 'updateStatus']);
         Route::post('/orders/verify', [StaffOrderController::class, 'verify']);
-        Route::post('/orders/{id}/ship', [StaffOrderController::class, 'shipOrder']);
         Route::post('/orders/{id}/approve-cancellation', [StaffOrderController::class, 'approveCancellation']);
         Route::post('/orders/{id}/reject-cancellation', [StaffOrderController::class, 'rejectCancellation']);
-        Route::post('/orders/{id}/simulate-tracking/{status}', [StaffOrderController::class, 'simulateTracking']);
         Route::post('/pos/orders', [StaffOrderController::class, 'storePOS']);
 
         // Inventory Management

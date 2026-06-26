@@ -30,20 +30,17 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users');
             $table->foreignUuid('pharmacy_id')->constrained('pharmacies');
-            $table->foreignUuid('address_id')->nullable()->constrained('user_addresses');
             $table->foreignUuid('prescription_id')->nullable()->constrained('prescriptions');
             $table->string('order_number', 30)->unique();
             $table->string('verification_code', 10)->unique();
-            $table->string('service_type', 20);
+            $table->string('service_type', 20)->default('PICKUP');
             $table->string('payment_method', 20);
             $table->string('order_status', 20)->default('PENDING');
             $table->string('payment_status', 20)->default('UNPAID');
             $table->decimal('subtotal_amount', 12, 2);
-            $table->decimal('shipping_cost', 12, 2)->default(0);
             $table->decimal('grand_total', 12, 2);
             $table->text('notes')->nullable();
             $table->text('cancellation_reason')->nullable();
-            $table->float('distance_km', 8, 2)->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('expired_at');
             $table->timestamps();
@@ -105,30 +102,10 @@ return new class extends Migration
         if (DB::getDriverName() !== 'sqlite') {
             DB::statement('ALTER TABLE order_items ADD CONSTRAINT chk_quantity_positive CHECK (quantity > 0)');
         }
-
-        Schema::create('delivery_trackings', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('order_id')->unique()->constrained('orders')->cascadeOnDelete();
-
-            $table->string('biteship_order_id', 100)->nullable()->unique();
-            $table->string('biteship_tracking_id', 100)->nullable()->unique();
-            $table->string('tracking_number', 50)->nullable()->comment('Waybill ID');
-            $table->text('tracking_link')->nullable()->comment('Link tracking publik Biteship');
-            $table->string('status', 30)->default('confirmed');
-            $table->decimal('delivery_fee', 12, 2)->default(0);
-
-            $table->jsonb('courier')->nullable();
-            $table->jsonb('origin')->nullable();
-            $table->jsonb('destination')->nullable();
-            $table->jsonb('history')->default('[]');
-
-            $table->timestamps();
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('delivery_trackings');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('carts');
         Schema::dropIfExists('order_status_logs');

@@ -122,16 +122,6 @@ export const STATUS_CONFIG = {
         dot: "bg-purple-500",
         badge: "bg-purple-50 text-purple-700 border-purple-200/80 ring-1 ring-purple-300/30",
     },
-    SHIPPED: {
-        label: "Dikirim",
-        dot: "bg-indigo-500",
-        badge: "bg-indigo-50 text-indigo-700 border-indigo-200/80 ring-1 ring-indigo-300/30",
-    },
-    DELIVERED: {
-        label: "Sampai",
-        dot: "bg-teal-500",
-        badge: "bg-teal-50 text-teal-700 border-teal-200/80 ring-1 ring-teal-300/30",
-    },
     CANCEL_REQUESTED: {
         label: "Pengajuan Batal",
         dot: "bg-slate-500",

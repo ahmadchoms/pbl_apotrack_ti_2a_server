@@ -20,13 +20,8 @@ class StoreCustomerOrderRequest extends BaseApiRequest
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric',
             'subtotal_amount' => 'required|numeric',
-            'service_type' => 'required|string|in:PICK_UP,DELIVERY',
+            'service_type' => 'required|string|in:PICKUP,PICK_UP',
             'payment_method' => 'required|string|in:CASH,TRANSFER,E-WALLET,QRIS',
-            
-            'address_id' => 'required_if:service_type,DELIVERY|nullable|exists:user_addresses,id',
-            'courier_code' => 'nullable|string',
-            'courier_service' => 'nullable|string',
-            'shipping_cost' => 'required_if:service_type,DELIVERY|numeric',
             'notes' => 'nullable|string'
         ];
     }
