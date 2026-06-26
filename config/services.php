@@ -48,4 +48,11 @@ return [
         'min_fee'       => env('SHIPPING_MIN_FEE', 10000),
     ],
 
+    'supabase' => [
+    'url'         => env('SUPABASE_URL'),
+    'service_key' => env('SUPABASE_SERVICE_KEY'),
+    'url_public'  => env('SUPABASE_URL_PUBLIC'),
+    'url_private' => env('SUPABASE_URL_PRIVATE'),
+    ],
+
 ];
