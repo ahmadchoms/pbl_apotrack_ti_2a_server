@@ -19,7 +19,6 @@ use App\Models\MedicineBatch;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Prescription;
-use App\Models\DeliveryTracking;
 use App\Models\Notification;
 use App\Models\PharmacyLegality;
 use App\Models\Review;
@@ -31,324 +30,149 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Konstanta URL Supabase (Tetap)
-        $avatarUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/avatar/avatar.jpg';
-        $pharmacyUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/pharmacies/pharmacy.jpg';
-        $medicineUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/medicines/medicines.jpg';
-        $licenseUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-private/licenses/license.jpeg';
-        $prescriptionUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-private/prescriptions/resep-dokter.jpg';
+        $pubBase  = rtrim(config('services.supabase.url_public'), '/');
+        $privBase = rtrim(config('services.supabase.url_private'), '/');
+
+        $avatarUrl       = "{$pubBase}/avatar/avatar.jpg";
+        $licenseUrl      = "{$privBase}/licenses/license.jpeg";
+        $licenseBlurUrl  = "{$privBase}/licenses/license_buram.jpeg"; // SIA buram Apotek Abal Abal
+        $prescriptionUrl = "{$privBase}/prescriptions/resep-dokter.jpg";
+
+        // Foto per apotek
+        $pharBase = "{$pubBase}/pharmacies";
+        $pharmacyLogoMap = [
+            'Apotek Sehat Selalu'                   => "{$pharBase}/apotek_sehat_selalu.jpg",
+            'Apotek Farma Prima (Tutup Sementara)'  => "{$pharBase}/apotek_farma_prima.jpg",
+            'Apotek Abal Abal'                      => "{$pharBase}/apotek_sehat_selalu.jpg", // pakai generic, toh rejected
+            'Apotek Baru Buka'                      => "{$pharBase}/apotek_sehat_selalu.jpg", // pakai generic, toh pending
+            'Apotek Tembalang'                      => "{$pharBase}/apotek_tembalang.jpg",
+            'Apotek KeluargaKu Banjarsari'          => "{$pharBase}/apotek_keluargaku.jpg",
+            'Kimia Farma Bulusan'                   => "{$pharBase}/kimia_farma_bulusan.jpg",
+            'Apotek K-24 Kedungmundu'               => "{$pharBase}/apotek_k24_kedungmundu.jpg",
+            'Kimia Farma Sendang Mulyo'             => "{$pharBase}/kimia_farma_sendang_mulyo.jpg",
+            'Apotek Sehit'                          => "{$pharBase}/apotek_sehit.jpg",
+            'Apotek Subur Sehat'                    => "{$pharBase}/apotek_subur_sehat.jpg",
+            'Apotek Surya Sehat'                    => "{$pharBase}/apotek_surya_sehat.jpg",
+        ];
+
+        // Foto per obat
+        $medBase = "{$pubBase}/medicines";
+        $medicineImageMap = [
+            'Panadol Extra 500mg'      => "{$medBase}/panadol.jpg",
+            'Amoxicillin 500mg'        => "{$medBase}/amoxicillin.jpg",
+            'Promag Tablet'            => "{$medBase}/promag.jpg",
+            'Imboost Force'            => "{$medBase}/imboost.jpg",
+            'Betadine Antiseptic 15ml' => "{$medBase}/betadine.jpg",
+            'Sanmol Sirup 60ml'        => "{$medBase}/sanmol.jpg",
+            'Insto Regular 7.5ml'      => "{$medBase}/insto.jpg",
+            'Tolak Angin Cair'         => "{$medBase}/tolak_angin.jpg",
+            'Amlodipine 5mg'           => "{$medBase}/amlodipine.jpg",
+            'Metformin 500mg'          => "{$medBase}/metformin.jpg",
+            'Bodrex'                   => "{$medBase}/bodrex.jpg",
+            'Diapet'                   => "{$medBase}/diapet.jpg",
+            'Antangin JRG'             => "{$medBase}/antangin.jpg",
+            'Mylanta'                  => "{$medBase}/mylanta.jpg",
+            'Enervon-C'                => "{$medBase}/enervon.jpg",
+        ];
 
         // ==========================================
-        // 1. MASTER DATA SEEDS
+        // 1. MASTER DATA
         // ==========================================
-        $categories = ['Antibiotik', 'Analgesik', 'Antipiretik', 'Antihipertensi', 'Antidiabetes', 'Vitamin & Suplemen', 'Antihistamin', 'Antasida & GERD', 'Batuk & Flu', 'P3K & Antiseptik', 'Kesehatan Mata', 'Ibu & Bayi'];
-        foreach ($categories as $cat) {
+        foreach (['Antibiotik','Analgesik','Antipiretik','Antihipertensi','Antidiabetes','Vitamin & Suplemen','Antihistamin','Antasida & GERD','Batuk & Flu','P3K & Antiseptik','Kesehatan Mata','Ibu & Bayi'] as $cat) {
             MedicineCategory::firstOrCreate(['name' => $cat]);
         }
-
-        $forms = ['Tablet', 'Kapsul', 'Sirup', 'Suspensi', 'Tetes (mata/telinga)', 'Salep / Krim', 'Injeksi', 'Botol', 'Sachet'];
-        foreach ($forms as $form) {
+        foreach (['Tablet','Kapsul','Sirup','Suspensi','Tetes (mata/telinga)','Salep / Krim','Injeksi','Botol','Sachet'] as $form) {
             MedicineForm::firstOrCreate(['name' => $form]);
         }
-
-        $types = ['Obat Bebas', 'Obat Bebas Terbatas', 'Obat Wajib Apotek', 'Obat Keras', 'Alat Kesehatan', 'Herbal'];
-        foreach ($types as $type) {
+        foreach (['Obat Bebas','Obat Bebas Terbatas','Obat Wajib Apotek','Obat Keras','Alat Kesehatan','Herbal'] as $type) {
             MedicineType::firstOrCreate(['name' => $type]);
         }
-
-        $units = ['Strip', 'Box', 'Botol', 'Tube', 'Pcs', 'Sachet'];
-        foreach ($units as $unit) {
+        foreach (['Strip','Box','Botol','Tube','Pcs','Sachet'] as $unit) {
             MedicineUnit::firstOrCreate(['name' => $unit]);
         }
 
         // ==========================================
-        // 2. USER & ADDRESS SEEDS (REVISED)
+        // 2. USERS & ADDRESSES
         // ==========================================
-        // Semua user selain admin adalah 'USER'. Peran di apotek diatur di PharmacyStaff.
         $users = [
-            ['username' => 'Super Admin', 'email' => 'admin@apotek.id', 'phone' => '081111111111', 'role' => 'SUPER_ADMIN', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Budi Santoso', 'email' => 'budi@customer.id', 'phone' => '082222222222', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Siti Rahayu', 'email' => 'siti@customer.id', 'phone' => '083333333333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Prayitno Apoteker', 'email' => 'prayitno@apotek.id', 'phone' => '084444444444', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Rina Staff', 'email' => 'rina@apotek.id', 'phone' => '085555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Andi Apoteker', 'email' => 'andi@apotek2.id', 'phone' => '087777777777', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true], // Apoteker cabang lain
-            ['username' => 'Hanif Nakal', 'email' => 'hanif@banned.id', 'phone' => '086666666666', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => false],
-
-            // User Tembalang
-            ['username' => 'Budi Hartono', 'email' => 'budi.hartono@apotek.id', 'phone' => '087111111111', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dewi Sartika', 'email' => 'dewi@apotek.id', 'phone' => '087222222222', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Agus Widodo', 'email' => 'agus@apotek.id', 'phone' => '087333333333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Rina Marlina', 'email' => 'rina.marlina@apotek.id', 'phone' => '087444444444', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Bambang Staff', 'email' => 'bambang@apotek.id', 'phone' => '087555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-
-            // User Staff Apotek Baru Tembalang
-            ['username' => 'Dr. Hadi Apoteker', 'email' => 'hadi@apotek.id', 'phone' => '088111111111', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Siska Staff', 'email' => 'siska@apotek.id', 'phone' => '088222222222', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Maya Sari', 'email' => 'maya@apotek.id', 'phone' => '088333333333', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Rudi Staff', 'email' => 'rudi@apotek.id', 'phone' => '088444444444', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Farida Dewi', 'email' => 'farida@apotek.id', 'phone' => '088555555555', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Yoga Pratama', 'email' => 'yoga@apotek.id', 'phone' => '088666666666', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Nina Staff', 'email' => 'nina@apotek.id', 'phone' => '088777777777', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
-            ['username' => 'Dr. Indah Lestari', 'email' => 'indah@apotek.id', 'phone' => '088888888888', 'role' => 'USER', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Super Admin',        'email' => 'admin@apotek.id',            'phone' => '081111111111', 'role' => 'SUPER_ADMIN', 'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Budi Santoso',        'email' => 'budi@customer.id',           'phone' => '082222222222', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Siti Rahayu',         'email' => 'siti@customer.id',           'phone' => '083333333333', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Prayitno',        'email' => 'prayitno@apotek.id',         'phone' => '084444444444', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rina Staff',          'email' => 'rina@apotek.id',             'phone' => '085555555555', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Andi',            'email' => 'andi@apotek2.id',            'phone' => '087777777777', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Hanif Nakal',         'email' => 'hanif@banned.id',            'phone' => '086666666666', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => false],
+            ['username' => 'Budi Hartono',        'email' => 'budi.hartono@apotek.id',     'phone' => '087111111111', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dewi Sartika',        'email' => 'dewi@apotek.id',             'phone' => '087222222222', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Agus Widodo',     'email' => 'agus@apotek.id',             'phone' => '087333333333', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rina Marlina',        'email' => 'rina.marlina@apotek.id',     'phone' => '087444444444', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Bambang Staff',       'email' => 'bambang@apotek.id',          'phone' => '087555555555', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Hadi',            'email' => 'hadi@apotek.id',             'phone' => '088111111111', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Siska Staff',         'email' => 'siska@apotek.id',            'phone' => '088222222222', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Maya Sari',       'email' => 'maya@apotek.id',             'phone' => '088333333333', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Rudi Staff',          'email' => 'rudi@apotek.id',             'phone' => '088444444444', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Farida Dewi',     'email' => 'farida@apotek.id',           'phone' => '088555555555', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Yoga Pratama',    'email' => 'yoga@apotek.id',             'phone' => '088666666666', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Nina Staff',          'email' => 'nina@apotek.id',             'phone' => '088777777777', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
+            ['username' => 'Dr. Indah Lestari',   'email' => 'indah@apotek.id',            'phone' => '088888888888', 'role' => 'USER',        'avatar_url' => $avatarUrl, 'is_active' => true],
         ];
 
         $createdUsers = [];
-        $superAdmin = null;
-
+        $superAdmin   = null;
         foreach ($users as $u) {
             $u['password_hash'] = Hash::make('Test@12345');
             $userModel = User::firstOrCreate(['email' => $u['email']], $u);
             $createdUsers[$u['email']] = $userModel;
-
-            if ($u['role'] === 'SUPER_ADMIN') {
-                $superAdmin = $userModel;
-            }
+            if ($u['role'] === 'SUPER_ADMIN') $superAdmin = $userModel;
         }
 
-        // Addresses
-        $budi = $createdUsers['budi@customer.id'];
+        $budi     = $createdUsers['budi@customer.id'];
+        $siti     = $createdUsers['siti@customer.id'];
         $addrBudi = UserAddress::firstOrCreate(['user_id' => $budi->id], [
-            'label' => 'Rumah Utama',
-            'address_detail' => 'Jl. Mawar Merah No. 15, RT 02/RW 04, Jakarta Barat',
-            'latitude' => -6.1751,
-            'longitude' => 106.8272,
-            'is_primary' => true
+            'label' => 'Rumah Utama', 'address_detail' => 'Jl. Mawar Merah No. 15, RT 02/RW 04, Jakarta Barat',
+            'latitude' => -6.1751, 'longitude' => 106.8272, 'is_primary' => true,
         ]);
-
-        $siti = $createdUsers['siti@customer.id'];
         $addrSiti = UserAddress::firstOrCreate(['user_id' => $siti->id], [
-            'label' => 'Kantor',
-            'address_detail' => 'Gedung Cyber, Jl. Kuningan Barat No. 8, Jakarta Selatan',
-            'latitude' => -6.2394,
-            'longitude' => 106.8312,
-            'is_primary' => true
+            'label' => 'Kantor', 'address_detail' => 'Gedung Cyber, Jl. Kuningan Barat No. 8, Jakarta Selatan',
+            'latitude' => -6.2394, 'longitude' => 106.8312, 'is_primary' => true,
         ]);
 
         // ==========================================
-        // 3. PHARMACY SEEDS (REVISED)
+        // 3. PHARMACIES
         // ==========================================
-        // Menghapus 'license_document_url' dan menambahkan data dokumen ke tabel terpisah
         $pharmacies = [
-            [
-                'name' => 'Apotek Sehat Selalu',
-                'address' => 'Jl. Sudirman No. 10, Jakarta Pusat',
-                'phone' => '021-12345678',
-                'latitude' => -6.2088,
-                'longitude' => 106.8456,
-                'rating' => 4.8,
-                'total_reviews' => 124,
-                'sia_number' => 'SIA-2024-0001',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(6)
-            ],
-            [
-                'name' => 'Apotek Farma Prima (Tutup Sementara)',
-                'address' => 'Jl. Gatot Subroto No. 55, Jakarta Selatan',
-                'phone' => '021-98765432',
-                'latitude' => -6.2350,
-                'longitude' => 106.8200,
-                'rating' => 4.5,
-                'total_reviews' => 89,
-                'sia_number' => 'SIA-2024-0055',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => true,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(2)
-            ],
-            [
-                'name' => 'Apotek Abal Abal',
-                'address' => 'Jl. Gelap Gulita No. 99, Jakarta Timur',
-                'phone' => '021-00000000',
-                'latitude' => -6.2500,
-                'longitude' => 106.8500,
-                'rating' => 0,
-                'total_reviews' => 0,
-                'sia_number' => 'SIA-PALSU-123',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'REJECTED',
-                'is_active' => false,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subDays(5),
-                'rejection_reason' => 'Dokumen SIA buram dan SIPA sudah kadaluarsa.' // Kolom baru
-            ],
-            [
-                'name' => 'Apotek Baru Buka',
-                'address' => 'Jl. Merdeka No. 1, Jakarta Utara',
-                'phone' => '021-88889999',
-                'latitude' => -6.1500,
-                'longitude' => 106.9000,
-                'rating' => 0,
-                'total_reviews' => 0,
-                'sia_number' => 'SIA-2024-0099',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'PENDING',
-                'is_active' => false,
-                'is_force_closed' => false,
-                'verified_by' => null,
-                'verified_at' => null
-            ],
-
-            // Apotek Tembalang
-            [
-                'name' => 'Apotek Tembalang',
-                'address' => 'Jl. Adipati Unus / Prof. Sudarto No.35, Tembalang, Kec. Tembalang, Kota Semarang',
-                'phone' => '(024) 7475442',
-                'latitude' => -7.0596,
-                'longitude' => 110.4391,
-                'rating' => 4.5,
-                'total_reviews' => 56,
-                'sia_number' => 'SIA-2024-1001',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(3)
-            ],
-            [
-                'name' => 'Apotek KeluargaKu Banjarsari',
-                'address' => 'Jl. Banjarsari Raya No.58H, Tembalang, Kec. Tembalang, Kota Semarang',
-                'phone' => '0812-1409-6959',
-                'latitude' => -7.0580,
-                'longitude' => 110.4410,
-                'rating' => 4.3,
-                'total_reviews' => 34,
-                'sia_number' => 'SIA-2024-1002',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(2)
-            ],
-            [
-                'name' => 'Kimia Farma Bulusan',
-                'address' => 'Jl. Timoho Raya No.287, Bulusan, Kec. Tembalang, Kota Semarang',
-                'phone' => '(024) 1234567',
-                'latitude' => -7.0604,
-                'longitude' => 110.4436,
-                'rating' => 4.6,
-                'total_reviews' => 78,
-                'sia_number' => 'SIA-2024-1003',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(4)
-            ],
-
-            // ══════════════════════════════════════════════
-            // APOTEK BARU — Sekitar Tembalang (Radius 20 km)
-            // ══════════════════════════════════════════════
-            [
-                'name' => 'Apotek K-24 Kedungmundu',
-                'address' => 'Jl. Kedungmundu No.137, Tandang, Kec. Tembalang, Kota Semarang',
-                'phone' => '(024) 76738208',
-                'latitude' => -7.0380,
-                'longitude' => 110.4350,
-                'rating' => 4.2,
-                'total_reviews' => 45,
-                'sia_number' => 'SIA-2024-2001',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(3)
-            ],
-            [
-                'name' => 'Kimia Farma Sendang Mulyo',
-                'address' => 'Jl. Fatmawati No.42, Sendangmulyo, Kec. Tembalang, Kota Semarang',
-                'phone' => '0811-2922-310',
-                'latitude' => -7.0520,
-                'longitude' => 110.4420,
-                'rating' => 4.4,
-                'total_reviews' => 62,
-                'sia_number' => 'SIA-2024-2002',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(2)
-            ],
-            [
-                'name' => 'Apotek Sehit',
-                'address' => 'Jl. Bougenvile Raya No.30, Sendangmulyo, Kec. Tembalang, Kota Semarang',
-                'phone' => '(024) 76419235',
-                'latitude' => -7.0500,
-                'longitude' => 110.4450,
-                'rating' => 4.1,
-                'total_reviews' => 28,
-                'sia_number' => 'SIA-2024-2003',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(1)
-            ],
-            [
-                'name' => 'Apotek Subur Sehat',
-                'address' => 'Jl. Klipang Golf Raya No. A I/1, Sendangmulyo, Kec. Tembalang, Kota Semarang',
-                'phone' => '(024) 74712345',
-                'latitude' => -7.0470,
-                'longitude' => 110.4490,
-                'rating' => 4.0,
-                'total_reviews' => 19,
-                'sia_number' => 'SIA-2024-2004',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(2)
-            ],
-            [
-                'name' => 'Apotek Surya Sehat',
-                'address' => 'Ruko Pandanaran Hills Blok AC-05, Mangunharjo, Kec. Tembalang, Kota Semarang',
-                'phone' => '(024) 76456789',
-                'latitude' => -7.0620,
-                'longitude' => 110.4320,
-                'rating' => 4.3,
-                'total_reviews' => 37,
-                'sia_number' => 'SIA-2024-2005',
-                'logo_url' => $pharmacyUrl,
-                'verification_status' => 'VERIFIED',
-                'is_active' => true,
-                'is_force_closed' => false,
-                'verified_by' => $superAdmin->id,
-                'verified_at' => Carbon::now()->subMonths(1)
-            ]
+            // ── VERIFIED & AKTIF ──
+            ['name' => 'Apotek Sehat Selalu',                  'address' => 'Jl. Sudirman No. 10, Jakarta Pusat',                                               'phone' => '021-12345678',   'latitude' => -6.2088, 'longitude' => 106.8456, 'rating' => 4.8, 'total_reviews' => 124, 'sia_number' => 'SIA-2024-0001', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(6),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Apotek Farma Prima (Tutup Sementara)', 'address' => 'Jl. Gatot Subroto No. 55, Jakarta Selatan',                                        'phone' => '021-98765432',   'latitude' => -6.2350, 'longitude' => 106.8200, 'rating' => 4.5, 'total_reviews' => 89,  'sia_number' => 'SIA-2024-0055', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => true,  'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(2),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            // ── REJECTED — dokumen buram ──
+            ['name' => 'Apotek Abal Abal',                     'address' => 'Jl. Gelap Gulita No. 99, Jakarta Timur',                                           'phone' => '021-00000000',   'latitude' => -6.2500, 'longitude' => 106.8500, 'rating' => 0,   'total_reviews' => 0,   'sia_number' => 'SIA-PALSU-123', 'verification_status' => 'REJECTED',  'is_active' => false, 'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subDays(5),    'rejection_reason' => 'Dokumen SIA buram dan SIPA sudah kadaluarsa.',  'license_url' => $licenseBlurUrl],
+            // ── PENDING ──
+            ['name' => 'Apotek Baru Buka',                     'address' => 'Jl. Merdeka No. 1, Jakarta Utara',                                                 'phone' => '021-88889999',   'latitude' => -6.1500, 'longitude' => 106.9000, 'rating' => 0,   'total_reviews' => 0,   'sia_number' => 'SIA-2024-0099', 'verification_status' => 'PENDING',   'is_active' => false, 'is_force_closed' => false, 'verified_by' => null,            'verified_at' => null,                         'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            // ── TEMBALANG ──
+            ['name' => 'Apotek Tembalang',                     'address' => 'Jl. Adipati Unus / Prof. Sudarto No.35, Tembalang, Kec. Tembalang, Kota Semarang', 'phone' => '(024) 7475442',  'latitude' => -7.0596, 'longitude' => 110.4391, 'rating' => 4.5, 'total_reviews' => 56,  'sia_number' => 'SIA-2024-1001', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(3),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Apotek KeluargaKu Banjarsari',         'address' => 'Jl. Banjarsari Raya No.58H, Tembalang, Kec. Tembalang, Kota Semarang',             'phone' => '0812-1409-6959', 'latitude' => -7.0580, 'longitude' => 110.4410, 'rating' => 4.3, 'total_reviews' => 34,  'sia_number' => 'SIA-2024-1002', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(2),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Kimia Farma Bulusan',                  'address' => 'Jl. Timoho Raya No.287, Bulusan, Kec. Tembalang, Kota Semarang',                   'phone' => '(024) 1234567',  'latitude' => -7.0604, 'longitude' => 110.4436, 'rating' => 4.6, 'total_reviews' => 78,  'sia_number' => 'SIA-2024-1003', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(4),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Apotek K-24 Kedungmundu',              'address' => 'Jl. Kedungmundu No.137, Tandang, Kec. Tembalang, Kota Semarang',                   'phone' => '(024) 76738208', 'latitude' => -7.0380, 'longitude' => 110.4350, 'rating' => 4.2, 'total_reviews' => 45,  'sia_number' => 'SIA-2024-2001', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(3),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Kimia Farma Sendang Mulyo',            'address' => 'Jl. Fatmawati No.42, Sendangmulyo, Kec. Tembalang, Kota Semarang',                 'phone' => '0811-2922-310',  'latitude' => -7.0520, 'longitude' => 110.4420, 'rating' => 4.4, 'total_reviews' => 62,  'sia_number' => 'SIA-2024-2002', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(2),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Apotek Sehit',                         'address' => 'Jl. Bougenvile Raya No.30, Sendangmulyo, Kec. Tembalang, Kota Semarang',           'phone' => '(024) 76419235', 'latitude' => -7.0500, 'longitude' => 110.4450, 'rating' => 4.1, 'total_reviews' => 28,  'sia_number' => 'SIA-2024-2003', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(1),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Apotek Subur Sehat',                   'address' => 'Jl. Klipang Golf Raya No. A I/1, Sendangmulyo, Kec. Tembalang, Kota Semarang',     'phone' => '(024) 74712345', 'latitude' => -7.0470, 'longitude' => 110.4490, 'rating' => 4.0, 'total_reviews' => 19,  'sia_number' => 'SIA-2024-2004', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(2),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
+            ['name' => 'Apotek Surya Sehat',                   'address' => 'Ruko Pandanaran Hills Blok AC-05, Mangunharjo, Kec. Tembalang, Kota Semarang',      'phone' => '(024) 76456789', 'latitude' => -7.0620, 'longitude' => 110.4320, 'rating' => 4.3, 'total_reviews' => 37,  'sia_number' => 'SIA-2024-2005', 'verification_status' => 'VERIFIED',  'is_active' => true,  'is_force_closed' => false, 'verified_by' => $superAdmin->id, 'verified_at' => Carbon::now()->subMonths(1),  'rejection_reason' => null,                                             'license_url' => $licenseUrl],
         ];
 
         $pharmaModels = [];
         foreach ($pharmacies as $p) {
-            $pharmacyData = collect($p)->except('sia_number')->toArray();
+            $pharmacyData = collect($p)->except(['sia_number', 'license_url'])->toArray();
+            $pharmacyData['logo_url'] = $pharmacyLogoMap[$p['name']] ?? "{$pharBase}/apotek_sehat_selalu.jpg";
             $pharmaModel = Pharmacy::firstOrCreate(['name' => $p['name']], $pharmacyData);
             $pharmaModels[] = $pharmaModel;
 
-            // Seeding Pharmacy Documents (Implementasi Tabel Baru)
-            $documents = ['SIA', 'SIPA', 'KTP_PEMILIK'];
-            foreach ($documents as $docType) {
-                PharmacyLegality::firstOrCreate([
-                    'pharmacy_id' => $pharmaModel->id,
-                ], [
-                    'sia_number'       => $p['sia_number'] ?? 'SIA-000-111',
-                    'sipa_number'      => 'SIPA-' . rand(1000, 9999),
-                    'stra_number'      => 'STRA-' . rand(1000, 9999),
-                    'apoteker_nik'     => '317' . rand(1000000000000, 9999999999999),
-                    'sia_document_url' => $licenseUrl,
-                ]);
-            }
+            PharmacyLegality::firstOrCreate(['pharmacy_id' => $pharmaModel->id], [
+                'sia_number'       => $p['sia_number'],
+                'sipa_number'      => 'SIPA-' . rand(1000, 9999),
+                'stra_number'      => 'STRA-' . rand(1000, 9999),
+                'apoteker_nik'     => '317' . rand(1000000000000, 9999999999999),
+                'sia_document_url' => $p['license_url'], // buram untuk Abal Abal, valid untuk lainnya
+            ]);
 
             for ($i = 0; $i <= 6; $i++) {
                 PharmacyOperatingHour::updateOrCreate(
@@ -358,453 +182,300 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // Staff Assignments (Local Role Isolation)
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id, 'user_id' => $createdUsers['prayitno@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id, 'user_id' => $createdUsers['rina@apotek.id']->id], ['role' => 'STAFF']);
-
-        // Dokter Andi adalah Apoteker di cabang 'Apotek Farma Prima'
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[1]->id, 'user_id' => $createdUsers['andi@apotek2.id']->id], ['role' => 'APOTEKER']);
-
-        // Staff Tembalang
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id, 'user_id' => $createdUsers['budi.hartono@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id, 'user_id' => $createdUsers['dewi@apotek.id']->id], ['role' => 'STAFF']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[5]->id, 'user_id' => $createdUsers['agus@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id, 'user_id' => $createdUsers['rina.marlina@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id, 'user_id' => $createdUsers['bambang@apotek.id']->id], ['role' => 'STAFF']);
-
-        // Staff Apotek Baru Tembalang
-        // K-24 Kedungmundu (index 7)
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[7]->id, 'user_id' => $createdUsers['hadi@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[7]->id, 'user_id' => $createdUsers['siska@apotek.id']->id], ['role' => 'STAFF']);
-        // Kimia Farma Sendang Mulyo (index 8)
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[8]->id, 'user_id' => $createdUsers['maya@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[8]->id, 'user_id' => $createdUsers['rudi@apotek.id']->id], ['role' => 'STAFF']);
-        // Apotek Sehit (index 9)
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[9]->id, 'user_id' => $createdUsers['farida@apotek.id']->id], ['role' => 'APOTEKER']);
-        // Apotek Subur Sehat (index 10)
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[10]->id, 'user_id' => $createdUsers['yoga@apotek.id']->id], ['role' => 'APOTEKER']);
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[10]->id, 'user_id' => $createdUsers['nina@apotek.id']->id], ['role' => 'STAFF']);
-        // Apotek Surya Sehat (index 11)
-        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[11]->id, 'user_id' => $createdUsers['indah@apotek.id']->id], ['role' => 'APOTEKER']);
+        // Staff assignments
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id,  'user_id' => $createdUsers['prayitno@apotek.id']->id],    ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[0]->id,  'user_id' => $createdUsers['rina@apotek.id']->id],         ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[1]->id,  'user_id' => $createdUsers['andi@apotek2.id']->id],        ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id,  'user_id' => $createdUsers['budi.hartono@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[4]->id,  'user_id' => $createdUsers['dewi@apotek.id']->id],         ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[5]->id,  'user_id' => $createdUsers['agus@apotek.id']->id],         ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id,  'user_id' => $createdUsers['rina.marlina@apotek.id']->id], ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[6]->id,  'user_id' => $createdUsers['bambang@apotek.id']->id],      ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[7]->id,  'user_id' => $createdUsers['hadi@apotek.id']->id],         ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[7]->id,  'user_id' => $createdUsers['siska@apotek.id']->id],        ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[8]->id,  'user_id' => $createdUsers['maya@apotek.id']->id],         ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[8]->id,  'user_id' => $createdUsers['rudi@apotek.id']->id],         ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[9]->id,  'user_id' => $createdUsers['farida@apotek.id']->id],       ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[10]->id, 'user_id' => $createdUsers['yoga@apotek.id']->id],         ['role' => 'APOTEKER']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[10]->id, 'user_id' => $createdUsers['nina@apotek.id']->id],         ['role' => 'STAFF']);
+        PharmacyStaff::firstOrCreate(['pharmacy_id' => $pharmaModels[11]->id, 'user_id' => $createdUsers['indah@apotek.id']->id],        ['role' => 'APOTEKER']);
 
         // ==========================================
-        // 4. MEDICINE SEEDS (EXPANDED)
+        // 4. MEDICINES
         // ==========================================
         $medicines = [
-            ['name' => 'Panadol Extra 500mg', 'generic_name' => 'Paracetamol + Caffeine', 'category' => 'Analgesik', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'GSK', 'price' => 12000, 'weight_in_grams' => 20, 'requires_prescription' => false, 'desc' => 'Meredakan sakit kepala.', 'dosage' => 'Dewasa: 1 tablet'],
-            ['name' => 'Amoxicillin 500mg', 'generic_name' => 'Amoxicillin Trihydrate', 'category' => 'Antibiotik', 'form' => 'Kapsul', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Kimia Farma', 'price' => 8500, 'weight_in_grams' => 15, 'requires_prescription' => true, 'desc' => 'Antibiotik penisilin.', 'dosage' => 'Sesuai petunjuk dokter'],
-            ['name' => 'Promag Tablet', 'generic_name' => 'Hydrotalcite, Mg(OH)2', 'category' => 'Antasida & GERD', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Kalbe Farma', 'price' => 9000, 'weight_in_grams' => 25, 'requires_prescription' => false, 'desc' => 'Mengurangi gejala maag.', 'dosage' => '1-2 tablet, dikunyah'],
-            ['name' => 'Imboost Force', 'generic_name' => 'Echinacea, Zinc', 'category' => 'Vitamin & Suplemen', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Soho', 'price' => 45000, 'weight_in_grams' => 30, 'requires_prescription' => false, 'desc' => 'Suplemen daya tahan tubuh.', 'dosage' => 'Dewasa: 1 tablet 3x sehari'],
-            ['name' => 'Betadine Antiseptic 15ml', 'generic_name' => 'Povidone Iodine', 'category' => 'P3K & Antiseptik', 'form' => 'Botol', 'type' => 'Obat Bebas', 'unit' => 'Botol', 'manufacturer' => 'Mundipharma', 'price' => 15000, 'weight_in_grams' => 50, 'requires_prescription' => false, 'desc' => 'Antiseptik untuk luka.', 'dosage' => 'Oleskan pada luka'],
-            ['name' => 'Sanmol Sirup 60ml', 'generic_name' => 'Paracetamol', 'category' => 'Antipiretik', 'form' => 'Sirup', 'type' => 'Obat Bebas', 'unit' => 'Botol', 'manufacturer' => 'Sanbe Farma', 'price' => 22000, 'weight_in_grams' => 120, 'requires_prescription' => false, 'desc' => 'Meredakan demam anak.', 'dosage' => 'Sesuai umur anak'],
-            // Tambahan
-            ['name' => 'Insto Regular 7.5ml', 'generic_name' => 'Tetrahydrozoline', 'category' => 'Kesehatan Mata', 'form' => 'Tetes (mata/telinga)', 'type' => 'Obat Bebas Terbatas', 'unit' => 'Botol', 'manufacturer' => 'Pharma', 'price' => 14000, 'weight_in_grams' => 20, 'requires_prescription' => false, 'desc' => 'Meredakan mata merah.', 'dosage' => '1-2 tetes'],
-            ['name' => 'Tolak Angin Cair', 'generic_name' => 'Herbal Extract', 'category' => 'Batuk & Flu', 'form' => 'Sachet', 'type' => 'Herbal', 'unit' => 'Box', 'manufacturer' => 'Sido Muncul', 'price' => 35000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Mengatasi masuk angin.', 'dosage' => '1 sachet jika perlu'],
-            ['name' => 'Amlodipine 5mg', 'generic_name' => 'Amlodipine Besylate', 'category' => 'Antihipertensi', 'form' => 'Tablet', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Dexa Medica', 'price' => 6000, 'weight_in_grams' => 10, 'requires_prescription' => true, 'desc' => 'Obat penurun darah tinggi.', 'dosage' => 'Sesuai petunjuk dokter'],
-            ['name' => 'Metformin 500mg', 'generic_name' => 'Metformin HCl', 'category' => 'Antidiabetes', 'form' => 'Tablet', 'type' => 'Obat Keras', 'unit' => 'Strip', 'manufacturer' => 'Bernofarm', 'price' => 5000, 'weight_in_grams' => 10, 'requires_prescription' => true, 'desc' => 'Obat diabetes melitus tipe 2.', 'dosage' => 'Sesuai petunjuk dokter'],
-
-            // Obat tambahan Tembalang
-            ['name' => 'Bodrex', 'generic_name' => 'Paracetamol, Phenylpropanolamine', 'category' => 'Analgesik', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma', 'price' => 5500, 'weight_in_grams' => 10, 'requires_prescription' => false, 'desc' => 'Obat sakit kepala dan demam.', 'dosage' => 'Dewasa: 1 tablet 3x sehari'],
-            ['name' => 'Diapet', 'generic_name' => 'Attapulgite', 'category' => 'Antasida & GERD', 'form' => 'Kapsul', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Meprofarm', 'price' => 7000, 'weight_in_grams' => 8, 'requires_prescription' => false, 'desc' => 'Mengatasi diare.', 'dosage' => '2 kapsul setiap kali buang air'],
-            ['name' => 'Antangin JRG', 'generic_name' => 'Herbal Extract', 'category' => 'Batuk & Flu', 'form' => 'Sachet', 'type' => 'Herbal', 'unit' => 'Box', 'manufacturer' => 'Sido Muncul', 'price' => 3500, 'weight_in_grams' => 15, 'requires_prescription' => false, 'desc' => 'Meredakan masuk angin.', 'dosage' => '1 sachet 3x sehari'],
-            ['name' => 'Mylanta', 'generic_name' => 'Aluminium Hydroxide, Magnesium Hydroxide, Simethicone', 'category' => 'Antasida & GERD', 'form' => 'Suspensi', 'type' => 'Obat Bebas', 'unit' => 'Botol', 'manufacturer' => 'Johnson & Johnson', 'price' => 25000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Obat maag dan kembung.', 'dosage' => '1-2 sendok teh 3x sehari'],
-            ['name' => 'Enervon-C', 'generic_name' => 'Vitamin C, Vitamin B Kompleks', 'category' => 'Vitamin & Suplemen', 'form' => 'Tablet', 'type' => 'Obat Bebas', 'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma', 'price' => 8500, 'weight_in_grams' => 10, 'requires_prescription' => false, 'desc' => 'Suplemen vitamin C dan B.', 'dosage' => '1 tablet 1x sehari'],
+            ['name' => 'Panadol Extra 500mg',      'generic_name' => 'Paracetamol + Caffeine',                            'category' => 'Analgesik',         'form' => 'Tablet',              'type' => 'Obat Bebas',          'unit' => 'Strip', 'manufacturer' => 'GSK',             'price' => 12000, 'weight_in_grams' => 20,  'requires_prescription' => false, 'desc' => 'Meredakan sakit kepala.',        'dosage' => 'Dewasa: 1 tablet'],
+            ['name' => 'Amoxicillin 500mg',         'generic_name' => 'Amoxicillin Trihydrate',                           'category' => 'Antibiotik',        'form' => 'Kapsul',              'type' => 'Obat Keras',          'unit' => 'Strip', 'manufacturer' => 'Kimia Farma',     'price' => 8500,  'weight_in_grams' => 15,  'requires_prescription' => true,  'desc' => 'Antibiotik penisilin.',         'dosage' => 'Sesuai petunjuk dokter'],
+            ['name' => 'Promag Tablet',             'generic_name' => 'Hydrotalcite, Mg(OH)2',                           'category' => 'Antasida & GERD',   'form' => 'Tablet',              'type' => 'Obat Bebas',          'unit' => 'Strip', 'manufacturer' => 'Kalbe Farma',     'price' => 9000,  'weight_in_grams' => 25,  'requires_prescription' => false, 'desc' => 'Mengurangi gejala maag.',       'dosage' => '1-2 tablet, dikunyah'],
+            ['name' => 'Imboost Force',             'generic_name' => 'Echinacea, Zinc',                                  'category' => 'Vitamin & Suplemen','form' => 'Tablet',              'type' => 'Obat Bebas',          'unit' => 'Strip', 'manufacturer' => 'Soho',            'price' => 45000, 'weight_in_grams' => 30,  'requires_prescription' => false, 'desc' => 'Suplemen daya tahan tubuh.',    'dosage' => 'Dewasa: 1 tablet 3x sehari'],
+            ['name' => 'Betadine Antiseptic 15ml',  'generic_name' => 'Povidone Iodine',                                  'category' => 'P3K & Antiseptik',  'form' => 'Botol',               'type' => 'Obat Bebas',          'unit' => 'Botol', 'manufacturer' => 'Mundipharma',     'price' => 15000, 'weight_in_grams' => 50,  'requires_prescription' => false, 'desc' => 'Antiseptik untuk luka.',        'dosage' => 'Oleskan pada luka'],
+            ['name' => 'Sanmol Sirup 60ml',         'generic_name' => 'Paracetamol',                                      'category' => 'Antipiretik',       'form' => 'Sirup',               'type' => 'Obat Bebas',          'unit' => 'Botol', 'manufacturer' => 'Sanbe Farma',     'price' => 22000, 'weight_in_grams' => 120, 'requires_prescription' => false, 'desc' => 'Meredakan demam anak.',         'dosage' => 'Sesuai umur anak'],
+            ['name' => 'Insto Regular 7.5ml',       'generic_name' => 'Tetrahydrozoline',                                 'category' => 'Kesehatan Mata',    'form' => 'Tetes (mata/telinga)', 'type' => 'Obat Bebas Terbatas', 'unit' => 'Botol', 'manufacturer' => 'Pharma',          'price' => 14000, 'weight_in_grams' => 20,  'requires_prescription' => false, 'desc' => 'Meredakan mata merah.',         'dosage' => '1-2 tetes'],
+            ['name' => 'Tolak Angin Cair',          'generic_name' => 'Herbal Extract',                                   'category' => 'Batuk & Flu',       'form' => 'Sachet',              'type' => 'Herbal',              'unit' => 'Box',   'manufacturer' => 'Sido Muncul',     'price' => 35000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Mengatasi masuk angin.',        'dosage' => '1 sachet jika perlu'],
+            ['name' => 'Amlodipine 5mg',            'generic_name' => 'Amlodipine Besylate',                              'category' => 'Antihipertensi',    'form' => 'Tablet',              'type' => 'Obat Keras',          'unit' => 'Strip', 'manufacturer' => 'Dexa Medica',     'price' => 6000,  'weight_in_grams' => 10,  'requires_prescription' => true,  'desc' => 'Obat penurun darah tinggi.',    'dosage' => 'Sesuai petunjuk dokter'],
+            ['name' => 'Metformin 500mg',           'generic_name' => 'Metformin HCl',                                    'category' => 'Antidiabetes',      'form' => 'Tablet',              'type' => 'Obat Keras',          'unit' => 'Strip', 'manufacturer' => 'Bernofarm',       'price' => 5000,  'weight_in_grams' => 10,  'requires_prescription' => true,  'desc' => 'Obat diabetes melitus tipe 2.', 'dosage' => 'Sesuai petunjuk dokter'],
+            ['name' => 'Bodrex',                    'generic_name' => 'Paracetamol, Phenylpropanolamine',                 'category' => 'Analgesik',         'form' => 'Tablet',              'type' => 'Obat Bebas',          'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma',     'price' => 5500,  'weight_in_grams' => 10,  'requires_prescription' => false, 'desc' => 'Obat sakit kepala dan demam.',  'dosage' => 'Dewasa: 1 tablet 3x sehari'],
+            ['name' => 'Diapet',                    'generic_name' => 'Attapulgite',                                      'category' => 'Antasida & GERD',   'form' => 'Kapsul',              'type' => 'Obat Bebas',          'unit' => 'Strip', 'manufacturer' => 'Meprofarm',       'price' => 7000,  'weight_in_grams' => 8,   'requires_prescription' => false, 'desc' => 'Mengatasi diare.',              'dosage' => '2 kapsul setiap kali buang air'],
+            ['name' => 'Antangin JRG',              'generic_name' => 'Herbal Extract',                                   'category' => 'Batuk & Flu',       'form' => 'Sachet',              'type' => 'Herbal',              'unit' => 'Box',   'manufacturer' => 'Sido Muncul',     'price' => 3500,  'weight_in_grams' => 15,  'requires_prescription' => false, 'desc' => 'Meredakan masuk angin.',        'dosage' => '1 sachet 3x sehari'],
+            ['name' => 'Mylanta',                   'generic_name' => 'Aluminium Hydroxide, Magnesium Hydroxide, Simethicone', 'category' => 'Antasida & GERD', 'form' => 'Suspensi',        'type' => 'Obat Bebas',          'unit' => 'Botol', 'manufacturer' => 'Johnson & Johnson','price' => 25000, 'weight_in_grams' => 150, 'requires_prescription' => false, 'desc' => 'Obat maag dan kembung.',        'dosage' => '1-2 sendok teh 3x sehari'],
+            ['name' => 'Enervon-C',                 'generic_name' => 'Vitamin C, Vitamin B Kompleks',                    'category' => 'Vitamin & Suplemen','form' => 'Tablet',              'type' => 'Obat Bebas',          'unit' => 'Strip', 'manufacturer' => 'Sanbe Farma',     'price' => 8500,  'weight_in_grams' => 10,  'requires_prescription' => false, 'desc' => 'Suplemen vitamin C dan B.',     'dosage' => '1 tablet 1x sehari'],
         ];
 
-        // ── Mapping Obat per Apotek (Berdasarkan Kategori Fokus) ──
-        // Apotek lama (lengkap) tetap mendapat semua obat.
-        // Apotek baru mendapat subset sesuai kategori fokus.
         $allMedicineNames = array_map(fn($m) => $m['name'], $medicines);
-        $medicinesByName = [];
-        foreach ($medicines as $m) {
-            $medicinesByName[$m['name']] = $m;
-        }
+        $medicinesByName  = array_column($medicines, null, 'name');
 
         $pharmacyMedicineMap = [
-            'Apotek Sehat Selalu'            => $allMedicineNames,
-            'Apotek Farma Prima (Tutup Sementara)' => $allMedicineNames,
-            'Apotek Tembalang'               => $allMedicineNames,
-            'Apotek KeluargaKu Banjarsari'   => $allMedicineNames,
-            'Kimia Farma Bulusan'            => $allMedicineNames,
-
-            // K-24 Kedungmundu → OTC: Batuk & Flu, Vitamin, Antasida
-            'Apotek K-24 Kedungmundu'        => ['Tolak Angin Cair', 'Antangin JRG', 'Promag Tablet', 'Mylanta', 'Imboost Force', 'Enervon-C', 'Panadol Extra 500mg', 'Sanmol Sirup 60ml'],
-
-            // Kimia Farma Sendang Mulyo → Obat Keras: Antibiotik, Antihipertensi, Antidiabetes
-            'Kimia Farma Sendang Mulyo'      => ['Amoxicillin 500mg', 'Amlodipine 5mg', 'Metformin 500mg', 'Betadine Antiseptic 15ml', 'Insto Regular 7.5ml', 'Panadol Extra 500mg'],
-
-            // Apotek Sehit → P3K, Analgesik, Antipiretik
-            'Apotek Sehit'                   => ['Panadol Extra 500mg', 'Betadine Antiseptic 15ml', 'Sanmol Sirup 60ml', 'Bodrex', 'Diapet', 'Promag Tablet'],
-
-            // Apotek Subur Sehat → Kesehatan Mata, Vitamin, P3K
-            'Apotek Subur Sehat'             => ['Insto Regular 7.5ml', 'Enervon-C', 'Imboost Force', 'Betadine Antiseptic 15ml', 'Sanmol Sirup 60ml', 'Bodrex'],
-
-            // Apotek Surya Sehat → Herbal, Vitamin, Antasida
-            'Apotek Surya Sehat'             => ['Tolak Angin Cair', 'Antangin JRG', 'Promag Tablet', 'Mylanta', 'Imboost Force', 'Enervon-C', 'Panadol Extra 500mg'],
+            'Apotek Sehat Selalu'                   => $allMedicineNames,
+            'Apotek Farma Prima (Tutup Sementara)'  => $allMedicineNames,
+            'Apotek Tembalang'                      => $allMedicineNames,
+            'Apotek KeluargaKu Banjarsari'          => $allMedicineNames,
+            'Kimia Farma Bulusan'                   => $allMedicineNames,
+            'Apotek K-24 Kedungmundu'               => ['Tolak Angin Cair','Antangin JRG','Promag Tablet','Mylanta','Imboost Force','Enervon-C','Panadol Extra 500mg','Sanmol Sirup 60ml'],
+            'Kimia Farma Sendang Mulyo'             => ['Amoxicillin 500mg','Amlodipine 5mg','Metformin 500mg','Betadine Antiseptic 15ml','Insto Regular 7.5ml','Panadol Extra 500mg'],
+            'Apotek Sehit'                          => ['Panadol Extra 500mg','Betadine Antiseptic 15ml','Sanmol Sirup 60ml','Bodrex','Diapet','Promag Tablet'],
+            'Apotek Subur Sehat'                    => ['Insto Regular 7.5ml','Enervon-C','Imboost Force','Betadine Antiseptic 15ml','Sanmol Sirup 60ml','Bodrex'],
+            'Apotek Surya Sehat'                    => ['Tolak Angin Cair','Antangin JRG','Promag Tablet','Mylanta','Imboost Force','Enervon-C','Panadol Extra 500mg'],
         ];
 
         $insertedMedicines = [];
-
         foreach ($pharmaModels as $pModel) {
             if ($pModel->verification_status !== 'VERIFIED') continue;
-
-            $assignedMeds = $pharmacyMedicineMap[$pModel->name] ?? [];
-
-            foreach ($assignedMeds as $medName) {
+            foreach ($pharmacyMedicineMap[$pModel->name] ?? [] as $medName) {
                 $med = $medicinesByName[$medName] ?? null;
                 if (!$med) continue;
 
-                $isActive = (rand(1, 10) > 1); // 90% obat aktif
-
-                $m = Medicine::firstOrCreate([
-                    'pharmacy_id' => $pModel->id,
-                    'name' => $med['name']
-                ], [
-                    'category_id' => MedicineCategory::where('name', $med['category'])->first()->id,
-                    'form_id' => MedicineForm::where('name', $med['form'])->first()->id,
-                    'type_id' => MedicineType::where('name', $med['type'])->first()->id,
-                    'unit_id' => MedicineUnit::where('name', $med['unit'])->first()->id,
-                    'generic_name' => $med['generic_name'],
-                    'manufacturer' => $med['manufacturer'],
-                    'price' => $med['price'],
-                    'weight_in_grams' => $med['weight_in_grams'],
+                $m = Medicine::firstOrCreate(['pharmacy_id' => $pModel->id, 'name' => $med['name']], [
+                    'category_id'           => MedicineCategory::where('name', $med['category'])->first()->id,
+                    'form_id'               => MedicineForm::where('name', $med['form'])->first()->id,
+                    'type_id'               => MedicineType::where('name', $med['type'])->first()->id,
+                    'unit_id'               => MedicineUnit::where('name', $med['unit'])->first()->id,
+                    'generic_name'          => $med['generic_name'],
+                    'manufacturer'          => $med['manufacturer'],
+                    'price'                 => $med['price'],
+                    'weight_in_grams'       => $med['weight_in_grams'],
                     'requires_prescription' => $med['requires_prescription'],
-                    'description' => $med['desc'],
-                    'dosage_info' => $med['dosage'],
-                    'image_url' => $medicineUrl,
-                    'is_active' => $isActive
+                    'description'           => $med['desc'],
+                    'dosage_info'           => $med['dosage'],
+                    'image_url'             => $medicineImageMap[$med['name']] ?? null,
+                    'is_active'             => true,
                 ]);
 
                 $insertedMedicines[$pModel->id][$med['name']] = $m;
 
-                // Buat 2 batch untuk setiap obat (untuk test expired date & pergerakan stok)
-                $batchCode1 = 'BCH1-' . strtoupper(substr(md5($med['name'] . '1'), 0, 5));
-                $batchCode2 = 'BCH2-' . strtoupper(substr(md5($med['name'] . '2'), 0, 5));
-
                 $stock1 = rand(10, 50);
-                $stock2 = rand(0, 30); // Berpotensi 0 untuk test out-of-stock
-
-                $b1 = MedicineBatch::firstOrCreate([
-                    'medicine_id' => $m->id,
-                    'batch_number' => $batchCode1
-                ], [
-                    'expired_date' => Carbon::now()->addMonths(6)->format('Y-m-d'), // Hampir expired
-                    'stock' => $stock1
-                ]);
-
-                $b2 = MedicineBatch::firstOrCreate([
-                    'medicine_id' => $m->id,
-                    'batch_number' => $batchCode2
-                ], [
-                    'expired_date' => Carbon::now()->addMonths(24)->format('Y-m-d'), // Masih lama
-                    'stock' => $stock2
-                ]);
-
-                StockMovement::firstOrCreate([
-                    'medicine_id' => $m->id,
-                    'batch_id' => $b1->id,
-                    'type' => 'IN'
-                ], [
-                    'quantity' => $stock1,
-                    'created_by' => $superAdmin->id,
-                    'note' => 'Initial stock Batch 1'
-                ]);
+                $b1 = MedicineBatch::firstOrCreate(
+                    ['medicine_id' => $m->id, 'batch_number' => 'BCH1-' . strtoupper(substr(md5($med['name'].'1'), 0, 5))],
+                    ['expired_date' => Carbon::now()->addMonths(6)->format('Y-m-d'), 'stock' => $stock1]
+                );
+                MedicineBatch::firstOrCreate(
+                    ['medicine_id' => $m->id, 'batch_number' => 'BCH2-' . strtoupper(substr(md5($med['name'].'2'), 0, 5))],
+                    ['expired_date' => Carbon::now()->addMonths(24)->format('Y-m-d'), 'stock' => rand(0, 30)]
+                );
+                StockMovement::firstOrCreate(
+                    ['medicine_id' => $m->id, 'batch_id' => $b1->id, 'type' => 'IN'],
+                    ['quantity' => $stock1, 'created_by' => $superAdmin->id, 'note' => 'Initial stock Batch 1']
+                );
             }
         }
 
         // ==========================================
-        // 5. SAMPLE ORDERS & TRACKING (EXPANDED)
+        // 5. ORDERS
+        // service_type : PICK_UP | POS
+        // payment_method: QRIS | CASH
+        // order_status  : PENDING | PROCESSING | READY_FOR_PICKUP
+        //               | CANCELLATION_REQUESTED | COMPLETED | CANCELLED
         // ==========================================
-        $phar1 = $pharmaModels[0];
-        $medsPhar1 = $insertedMedicines[$phar1->id];
+        $phar1      = $pharmaModels[0]; // Apotek Sehat Selalu
+        $medsPhar1  = $insertedMedicines[$phar1->id];
+        $staffPhar1 = $createdUsers['prayitno@apotek.id'];
 
-        // 1. PENDING (Belum Dibayar)
+        // 1. PENDING — PICK_UP, QRIS
         $o1 = Order::firstOrCreate(['order_number' => 'ORD-2026-PENDING'], [
-            'user_id' => $budi->id,
-            'pharmacy_id' => $phar1->id,
-            'address_id' => $addrBudi->id,
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'QRIS',
-            'order_status' => 'PENDING',
-            'payment_status' => 'UNPAID',
-            'subtotal_amount' => 12000,
-            'shipping_cost' => 15000,
-            'grand_total' => 27000,
+            'user_id' => $budi->id, 'pharmacy_id' => $phar1->id, 'address_id' => $addrBudi->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'QRIS',
+            'order_status' => 'PENDING', 'payment_status' => 'UNPAID',
+            'subtotal_amount' => 12000, 'grand_total' => 12000,
             'verification_code' => strtoupper(Str::random(10)),
-            'expired_at' => Carbon::now()->addHours(24)
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o1->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], ['medicine_name' => 'Panadol Extra 500mg', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 12000, 'subtotal' => 12000]);
+        OrderItem::firstOrCreate(['order_id' => $o1->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], [
+            'medicine_name' => 'Panadol Extra 500mg', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 12000, 'subtotal' => 12000,
+        ]);
 
-        // 2. PROCESSING (Sudah dibayar, sedang diracik)
+        // 2. PROCESSING — PICK_UP, CASH
         $o2 = Order::firstOrCreate(['order_number' => 'ORD-2026-PROCESS'], [
-            'user_id' => $siti->id,
-            'pharmacy_id' => $phar1->id,
-            'address_id' => $addrSiti->id,
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'VIRTUAL_ACCOUNT',
-            'order_status' => 'PROCESSING',
-            'payment_status' => 'PAID',
-            'subtotal_amount' => 45000,
-            'shipping_cost' => 10000,
-            'grand_total' => 55000,
+            'user_id' => $siti->id, 'pharmacy_id' => $phar1->id, 'address_id' => $addrSiti->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'CASH',
+            'order_status' => 'PROCESSING', 'payment_status' => 'PAID',
+            'subtotal_amount' => 45000, 'grand_total' => 45000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subMinutes(30),
-            'expired_at' => Carbon::now()->addHours(24)
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o2->id, 'medicine_id' => $medsPhar1['Imboost Force']->id], ['medicine_name' => 'Imboost Force', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 45000, 'subtotal' => 45000]);
+        OrderItem::firstOrCreate(['order_id' => $o2->id, 'medicine_id' => $medsPhar1['Imboost Force']->id], [
+            'medicine_name' => 'Imboost Force', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 45000, 'subtotal' => 45000,
+        ]);
 
-        // 3. READY_FOR_PICKUP (Ambil Sendiri di Apotek)
+        // 3. READY_FOR_PICKUP — PICK_UP, QRIS
         $o3 = Order::firstOrCreate(['order_number' => 'ORD-2026-READY'], [
-            'user_id' => $budi->id,
-            'pharmacy_id' => $phar1->id,
-            'service_type' => 'PICKUP',
-            'payment_method' => 'QRIS',
-            'order_status' => 'READY_FOR_PICKUP',
-            'payment_status' => 'PAID',
-            'subtotal_amount' => 15000,
-            'shipping_cost' => 0,
-            'grand_total' => 15000,
+            'user_id' => $budi->id, 'pharmacy_id' => $phar1->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'QRIS',
+            'order_status' => 'READY_FOR_PICKUP', 'payment_status' => 'PAID',
+            'subtotal_amount' => 15000, 'grand_total' => 15000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subHours(1),
-            'expired_at' => Carbon::now()->addHours(24)
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o3->id, 'medicine_id' => $medsPhar1['Betadine Antiseptic 15ml']->id], ['medicine_name' => 'Betadine Antiseptic 15ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 15000, 'subtotal' => 15000]);
+        OrderItem::firstOrCreate(['order_id' => $o3->id, 'medicine_id' => $medsPhar1['Betadine Antiseptic 15ml']->id], [
+            'medicine_name' => 'Betadine Antiseptic 15ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 15000, 'subtotal' => 15000,
+        ]);
 
-        // 4. SHIPPED (Kurir Sedang Mengantar)
-        $o4 = Order::firstOrCreate(['order_number' => 'ORD-2026-SHIPPED'], [
-            'user_id' => $siti->id,
-            'pharmacy_id' => $phar1->id,
-            'address_id' => $addrSiti->id,
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'QRIS',
-            'order_status' => 'SHIPPED',
-            'payment_status' => 'PAID',
-            'subtotal_amount' => 22000,
-            'shipping_cost' => 15000,
-            'grand_total' => 37000,
+        // 4. CANCELLATION_REQUESTED — PICK_UP, QRIS
+        $o4 = Order::firstOrCreate(['order_number' => 'ORD-2026-CANCEL-REQ'], [
+            'user_id' => $siti->id, 'pharmacy_id' => $phar1->id, 'address_id' => $addrSiti->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'QRIS',
+            'order_status' => 'CANCELLATION_REQUESTED', 'payment_status' => 'PAID',
+            'subtotal_amount' => 22000, 'grand_total' => 22000,
+            'cancellation_reason' => 'Salah memilih obat',
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subHours(2),
-            'expired_at' => Carbon::now()->addHours(24)
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o4->id, 'medicine_id' => $medsPhar1['Sanmol Sirup 60ml']->id], ['medicine_name' => 'Sanmol Sirup 60ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 22000, 'subtotal' => 22000]);
-        DeliveryTracking::firstOrCreate(['order_id' => $o4->id], [
-            'biteship_order_id'    => 'BTS-TEST-001',
-            'biteship_tracking_id' => 'TRK-TEST-001',
-            'tracking_number'      => 'GRB-99999',
-            'tracking_link'        => 'https://biteship.com/tracking/GRB-99999',
-            'status'               => 'dropping_off',
-            'delivery_fee'         => 15000,
-            'courier' => [
-                'company'             => 'grab',
-                'driver_name'         => 'Budi Santoso',
-                'driver_phone'        => '08111222333',
-                'driver_photo_url'    => 'https://picsum.photos/200',
-                'driver_plate_number' => 'H 4321 ZZ',
-            ],
-            'origin' => [
-                'contact_name'  => 'Apotek Sehat Selalu',
-                'contact_phone' => '021-12345678',
-                'address'       => 'Jl. Sudirman No. 10, Jakarta Pusat',
-            ],
-            'destination' => [
-                'contact_name'  => 'Siti Rahayu',
-                'contact_phone' => '083333333333',
-                'address'       => 'Gedung Cyber, Jl. Kuningan Barat No. 8, Jakarta Selatan',
-            ],
-            'history' => [
-                ['status' => 'confirmed',    'note' => 'Pesanan dikonfirmasi.',        'service_type' => 'instant', 'updated_at' => now()->subHours(3)->toIso8601String()],
-                ['status' => 'allocated',    'note' => 'Kurir ditemukan.',             'service_type' => 'instant', 'updated_at' => now()->subHours(2)->toIso8601String()],
-                ['status' => 'picking_up',   'note' => 'Kurir menuju apotek.',         'service_type' => 'instant', 'updated_at' => now()->subMinutes(90)->toIso8601String()],
-                ['status' => 'picked',       'note' => 'Paket diambil kurir.',         'service_type' => 'instant', 'updated_at' => now()->subMinutes(60)->toIso8601String()],
-                ['status' => 'dropping_off', 'note' => 'Dalam perjalanan ke customer.', 'service_type' => 'instant', 'updated_at' => now()->subMinutes(30)->toIso8601String()],
-            ],
+        OrderItem::firstOrCreate(['order_id' => $o4->id, 'medicine_id' => $medsPhar1['Sanmol Sirup 60ml']->id], [
+            'medicine_name' => 'Sanmol Sirup 60ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 22000, 'subtotal' => 22000,
         ]);
 
-        // 5. COMPLETED (Dengan Resep)
-        // Membuat data Prescription terlebih dahulu
+        // 5. COMPLETED + resep + is_reviewed = true — PICK_UP, CASH
         $presc1 = Prescription::firstOrCreate(['image_url' => $prescriptionUrl], [
-            'user_id' => $budi->id,
-            'doctor_name' => 'Dr. Cipto Mangunkusumo',
+            'user_id'      => $budi->id,
+            'doctor_name'  => 'Dr. Cipto Mangunkusumo',
             'patient_name' => 'Budi Santoso',
-            'issued_date' => Carbon::now()->subDays(2),
-            'status' => 'VERIFIED',
-            'verified_by' => $createdUsers['prayitno@apotek.id']->id,
-            'verified_at' => Carbon::now()->subDays(2)
+            'issued_date'  => Carbon::now()->subDays(2),
+            'status'       => 'VERIFIED',
+            'verified_by'  => $staffPhar1->id,
+            'verified_at'  => Carbon::now()->subDays(2),
         ]);
-
         $o5 = Order::firstOrCreate(['order_number' => 'ORD-2026-PRESCRIPTION'], [
-            'user_id' => $budi->id,
-            'pharmacy_id' => $phar1->id,
-            'address_id' => $addrBudi->id,
-            'prescription_id' => $presc1->id, // Hubungkan dengan resep
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'BANK_TRANSFER',
-            'order_status' => 'COMPLETED',
-            'payment_status' => 'PAID',
-            'subtotal_amount' => 17000, // 8500 (Amoxicillin) + 8500 (Amoxicillin)
-            'shipping_cost' => 12000,
-            'grand_total' => 29000,
+            'user_id' => $budi->id, 'pharmacy_id' => $phar1->id, 'address_id' => $addrBudi->id,
+            'prescription_id' => $presc1->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'CASH',
+            'order_status' => 'COMPLETED', 'payment_status' => 'PAID',
+            'subtotal_amount' => 17000, 'grand_total' => 17000,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subDays(1),
-            'expired_at' => Carbon::now()->addHours(24)
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => true,
         ]);
-
-        // Update ID order di tabel resep
         $presc1->update(['order_id' => $o5->id]);
-
-        OrderItem::firstOrCreate(['order_id' => $o5->id, 'medicine_id' => $medsPhar1['Amoxicillin 500mg']->id], ['medicine_name' => 'Amoxicillin 500mg', 'unit_name' => 'Strip', 'requires_prescription' => true, 'quantity' => 2, 'price' => 8500, 'subtotal' => 17000]);
-
+        OrderItem::firstOrCreate(['order_id' => $o5->id, 'medicine_id' => $medsPhar1['Amoxicillin 500mg']->id], [
+            'medicine_name' => 'Amoxicillin 500mg', 'unit_name' => 'Strip',
+            'requires_prescription' => true, 'quantity' => 2, 'price' => 8500, 'subtotal' => 17000,
+        ]);
         Review::firstOrCreate(['order_id' => $o5->id], [
-            'user_id' => $budi->id,
-            'pharmacy_id' => $phar1->id,
-            'rating' => 4,
-            'comment' => 'Proses verifikasi resep cepat.'
+            'user_id' => $budi->id, 'pharmacy_id' => $phar1->id,
+            'rating' => 4, 'comment' => 'Proses verifikasi resep cepat.',
         ]);
 
-        // 6. CANCELLED (Dibatalkan)
-        $o6 = Order::firstOrCreate(['order_number' => 'ORD-2026-CANCELLED'], [
-            'user_id' => $siti->id,
-            'pharmacy_id' => $phar1->id,
-            'service_type' => 'PICKUP',
-            'payment_method' => 'QRIS',
-            'order_status' => 'CANCELLED',
-            'payment_status' => 'UNPAID',
-            'subtotal_amount' => 35000,
-            'shipping_cost' => 0,
-            'grand_total' => 35000,
+        // 6. COMPLETED tanpa ulasan — PICK_UP, QRIS
+        $o6 = Order::firstOrCreate(['order_number' => 'ORD-2026-COMPLETED-2'], [
+            'user_id' => $siti->id, 'pharmacy_id' => $phar1->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'QRIS',
+            'order_status' => 'COMPLETED', 'payment_status' => 'PAID',
+            'subtotal_amount' => 35000, 'grand_total' => 35000,
             'verification_code' => strtoupper(Str::random(10)),
-            'cancellation_reason' => 'Dibatalkan oleh sistem (Expired).',
-            'expired_at' => Carbon::now()->subHours(5)
+            'paid_at' => Carbon::now()->subHours(5),
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o6->id, 'medicine_id' => $medsPhar1['Tolak Angin Cair']->id], ['medicine_name' => 'Tolak Angin Cair', 'unit_name' => 'Box', 'quantity' => 1, 'price' => 35000, 'subtotal' => 35000]);
+        OrderItem::firstOrCreate(['order_id' => $o6->id, 'medicine_id' => $medsPhar1['Tolak Angin Cair']->id], [
+            'medicine_name' => 'Tolak Angin Cair', 'unit_name' => 'Box', 'quantity' => 1, 'price' => 35000, 'subtotal' => 35000,
+        ]);
 
-        // 7. SHIPPING TEST ORDER (READY_FOR_PICKUP & DELIVERY)
-        $o7 = Order::firstOrCreate(['order_number' => 'ORD-2026-SHIP-TEST'], [
-            'user_id' => $budi->id,
-            'pharmacy_id' => $phar1->id,
-            'address_id' => $addrBudi->id,
-            'service_type' => 'DELIVERY',
-            'payment_method' => 'QRIS',
-            'order_status' => 'READY_FOR_PICKUP',
-            'payment_status' => 'PAID',
-            'subtotal_amount' => 24000,
-            'shipping_cost' => 10000,
-            'grand_total' => 34000,
+        // 7. CANCELLED — PICK_UP, QRIS
+        $o7 = Order::firstOrCreate(['order_number' => 'ORD-2026-CANCELLED'], [
+            'user_id' => $siti->id, 'pharmacy_id' => $phar1->id,
+            'service_type' => 'PICK_UP', 'payment_method' => 'QRIS',
+            'order_status' => 'CANCELLED', 'payment_status' => 'UNPAID',
+            'subtotal_amount' => 9000, 'grand_total' => 9000,
+            'cancellation_reason' => 'Dibatalkan oleh sistem (Expired).',
+            'verification_code' => strtoupper(Str::random(10)),
+            'expired_at' => Carbon::now()->subHours(5), 'is_reviewed' => false,
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o7->id, 'medicine_id' => $medsPhar1['Promag Tablet']->id], [
+            'medicine_name' => 'Promag Tablet', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 9000, 'subtotal' => 9000,
+        ]);
+
+        // 8. POS — staff Apoteker, CASH
+        $o8 = Order::firstOrCreate(['order_number' => 'ORD-2026-POS-1'], [
+            'user_id' => $staffPhar1->id, 'pharmacy_id' => $phar1->id,
+            'service_type' => 'POS', 'payment_method' => 'CASH',
+            'order_status' => 'COMPLETED', 'payment_status' => 'PAID',
+            'subtotal_amount' => 27000, 'grand_total' => 27000,
+            'verification_code' => strtoupper(Str::random(10)),
+            'paid_at' => Carbon::now()->subHours(3),
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o8->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], [
+            'medicine_name' => 'Panadol Extra 500mg', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 12000, 'subtotal' => 12000,
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o8->id, 'medicine_id' => $medsPhar1['Betadine Antiseptic 15ml']->id], [
+            'medicine_name' => 'Betadine Antiseptic 15ml', 'unit_name' => 'Botol', 'quantity' => 1, 'price' => 15000, 'subtotal' => 15000,
+        ]);
+
+        // 9. POS — staff Rina, QRIS
+        $o9 = Order::firstOrCreate(['order_number' => 'ORD-2026-POS-2'], [
+            'user_id' => $createdUsers['rina@apotek.id']->id, 'pharmacy_id' => $phar1->id,
+            'service_type' => 'POS', 'payment_method' => 'QRIS',
+            'order_status' => 'COMPLETED', 'payment_status' => 'PAID',
+            'subtotal_amount' => 53500, 'grand_total' => 53500,
             'verification_code' => strtoupper(Str::random(10)),
             'paid_at' => Carbon::now()->subHours(1),
-            'expired_at' => Carbon::now()->addHours(24)
+            'expired_at' => Carbon::now()->addHours(24), 'is_reviewed' => false,
         ]);
-        OrderItem::firstOrCreate(['order_id' => $o7->id, 'medicine_id' => $medsPhar1['Panadol Extra 500mg']->id], ['medicine_name' => 'Panadol Extra 500mg', 'unit_name' => 'Strip', 'quantity' => 2, 'price' => 12000, 'subtotal' => 24000]);
+        OrderItem::firstOrCreate(['order_id' => $o9->id, 'medicine_id' => $medsPhar1['Imboost Force']->id], [
+            'medicine_name' => 'Imboost Force', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 45000, 'subtotal' => 45000,
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o9->id, 'medicine_id' => $medsPhar1['Bodrex']->id], [
+            'medicine_name' => 'Bodrex', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 5500, 'subtotal' => 5500,
+        ]);
+        OrderItem::firstOrCreate(['order_id' => $o9->id, 'medicine_id' => $medsPhar1['Diapet']->id], [
+            'medicine_name' => 'Diapet', 'unit_name' => 'Strip', 'quantity' => 1, 'price' => 7000, 'subtotal' => 7000,
+        ]);
 
         // ==========================================
-        // 6. NOTIFICATION SEEDS
+        // 6. NOTIFICATIONS
         // ==========================================
-        $notifications = [
-            // Notifikasi Sistem (Budi)
-            [
-                'user_id' => $budi->id,
-                'title' => 'Selamat Datang di ApoTrack!',
-                'message' => 'Terima kasih telah mendaftar. Nikmati kemudahan tebus resep dan beli obat langsung dari rumah.',
-                'type' => 'SYSTEM',
-                'is_read' => true,
-                'read_at' => Carbon::now()->subDays(5),
-                'created_at' => Carbon::now()->subDays(5)
-            ],
-            // Notifikasi Order (Siti - PROCESSING)
-            [
-                'user_id' => $siti->id,
-                'title' => 'Pesanan Diproses',
-                'message' => 'Pesanan Anda (' . $o2->order_number . ') sedang disiapkan oleh apotek.',
-                'type' => 'ORDER_UPDATE',
-                'reference_type' => 'Order',
-                'reference_id' => $o2->id,
-                'is_read' => false,
-                'read_at' => null,
-                'created_at' => Carbon::now()->subMinutes(30)
-            ],
-            // Notifikasi Order (Siti - SHIPPED)
-            [
-                'user_id' => $siti->id,
-                'title' => 'Pesanan Sedang Dikirim',
-                'message' => 'Pesanan Anda (' . $o4->order_number . ') sedang dalam perjalanan oleh kurir.',
-                'type' => 'ORDER_UPDATE',
-                'reference_type' => 'Order',
-                'reference_id' => $o4->id,
-                'is_read' => false,
-                'read_at' => null,
-                'created_at' => Carbon::now()->subHours(2)
-            ],
-            // Notifikasi Resep (Budi - COMPLETED)
-            [
-                'user_id' => $budi->id,
-                'title' => 'Resep Diverifikasi',
-                'message' => 'Resep Anda telah diverifikasi oleh Apoteker. Pesanan Anda sudah selesai.',
-                'type' => 'PRESCRIPTION_UPDATE',
-                'reference_type' => 'Order',
-                'reference_id' => $o5->id,
-                'is_read' => true,
-                'read_at' => Carbon::now()->subHours(12),
-                'created_at' => Carbon::now()->subDays(1)
-            ],
-        ];
-
-        foreach ($notifications as $notif) {
-            Notification::create($notif);
-        }
+        Notification::create([
+            'user_id' => $budi->id, 'title' => 'Selamat Datang di ApoTrack!',
+            'message' => 'Terima kasih telah mendaftar. Nikmati kemudahan tebus resep dan beli obat langsung dari apotek.',
+            'type' => 'SYSTEM', 'is_read' => true,
+            'read_at' => Carbon::now()->subDays(5), 'created_at' => Carbon::now()->subDays(5),
+        ]);
+        Notification::create([
+            'user_id' => $siti->id, 'title' => 'Pesanan Diproses',
+            'message' => 'Pesanan Anda (' . $o2->order_number . ') sedang disiapkan oleh apotek.',
+            'type' => 'ORDER_UPDATE', 'reference_type' => 'Order', 'reference_id' => $o2->id,
+            'is_read' => false, 'read_at' => null, 'created_at' => Carbon::now()->subMinutes(30),
+        ]);
+        Notification::create([
+            'user_id' => $siti->id, 'title' => 'Permintaan Batal Diterima',
+            'message' => 'Permintaan pembatalan pesanan (' . $o4->order_number . ') sedang diproses apotek.',
+            'type' => 'ORDER_UPDATE', 'reference_type' => 'Order', 'reference_id' => $o4->id,
+            'is_read' => false, 'read_at' => null, 'created_at' => Carbon::now()->subHours(2),
+        ]);
+        Notification::create([
+            'user_id' => $budi->id, 'title' => 'Resep Diverifikasi',
+            'message' => 'Resep Anda telah diverifikasi oleh Apoteker. Pesanan Anda sudah selesai.',
+            'type' => 'PRESCRIPTION_UPDATE', 'reference_type' => 'Order', 'reference_id' => $o5->id,
+            'is_read' => true, 'read_at' => Carbon::now()->subHours(12), 'created_at' => Carbon::now()->subDays(1),
+        ]);
 
         // ==========================================
-        // 7. AUDIT LOGS SEEDS
+        // 7. AUDIT LOGS
         // ==========================================
-        $auditLogs = [
-            // Super Admin memverifikasi apotek
-            [
-                'user_id' => $superAdmin->id,
-                'action' => 'PHARMACY_VERIFIED',
-                'description' => 'Memverifikasi Apotek Sehat Selalu berdasarkan dokumen SIA dan SIPA yang valid.',
-                'metadata' => ['pharmacy_id' => $phar1->id, 'pharmacy_name' => $phar1->name],
-                'status' => 'SUCCESS',
-                'created_at' => Carbon::now()->subMonths(6)
-            ],
-            // Super Admin menolak apotek
-            [
-                'user_id' => $superAdmin->id,
-                'action' => 'PHARMACY_REJECTED',
-                'description' => 'Menolak verifikasi Apotek Abal Abal karena dokumen tidak valid.',
-                'metadata' => ['pharmacy_name' => 'Apotek Abal Abal'],
-                'status' => 'SUCCESS',
-                'created_at' => Carbon::now()->subDays(5)
-            ],
-            // Dr. Prayitno (Apoteker) login
-            [
-                'user_id' => $createdUsers['prayitno@apotek.id']->id,
-                'action' => 'LOGIN',
-                'description' => 'User berhasil login ke sistem manajemen apotek.',
-                'metadata' => ['device' => 'Desktop'],
-                'status' => 'SUCCESS',
-                'created_at' => Carbon::now()->subHours(8)
-            ],
-            // Hanif Nakal gagal login karena dibanned
-            [
-                'user_id' => $createdUsers['hanif@banned.id']->id,
-                'action' => 'LOGIN',
-                'description' => 'Gagal login karena status akun tidak aktif (banned).',
-                'metadata' => ['reason' => 'account_inactive'],
-                'status' => 'FAILED',
-                'created_at' => Carbon::now()->subHours(2)
-            ],
-            // Order creation oleh Budi
-            [
-                'user_id' => $budi->id,
-                'action' => 'ORDER_CREATED',
-                'description' => 'Membuat pesanan baru dengan nomor ' . $o1->order_number,
-                'metadata' => ['order_id' => $o1->id, 'total' => 27000],
-                'status' => 'SUCCESS',
-                'created_at' => Carbon::now()->subMinutes(10)
-            ],
-        ];
-
-        foreach ($auditLogs as $log) {
-            AuditLog::create($log);
-        }
+        AuditLog::create(['user_id' => $superAdmin->id,                              'action' => 'PHARMACY_VERIFIED',  'description' => 'Memverifikasi Apotek Sehat Selalu berdasarkan dokumen SIA dan SIPA yang valid.',     'metadata' => ['pharmacy_id' => $phar1->id],   'status' => 'SUCCESS', 'created_at' => Carbon::now()->subMonths(6)]);
+        AuditLog::create(['user_id' => $superAdmin->id,                              'action' => 'PHARMACY_REJECTED',  'description' => 'Menolak verifikasi Apotek Abal Abal karena dokumen SIA buram dan SIPA kadaluarsa.', 'metadata' => ['pharmacy_name' => 'Apotek Abal Abal'], 'status' => 'SUCCESS', 'created_at' => Carbon::now()->subDays(5)]);
+        AuditLog::create(['user_id' => $createdUsers['prayitno@apotek.id']->id,      'action' => 'LOGIN',              'description' => 'User berhasil login ke sistem manajemen apotek.',                                    'metadata' => ['device' => 'Desktop'],         'status' => 'SUCCESS', 'created_at' => Carbon::now()->subHours(8)]);
+        AuditLog::create(['user_id' => $createdUsers['hanif@banned.id']->id,         'action' => 'LOGIN',              'description' => 'Gagal login karena status akun tidak aktif (banned).',                               'metadata' => ['reason' => 'account_inactive'],'status' => 'FAILED',  'created_at' => Carbon::now()->subHours(2)]);
+        AuditLog::create(['user_id' => $budi->id,                                    'action' => 'ORDER_CREATED',      'description' => 'Membuat pesanan baru dengan nomor ' . $o1->order_number,                             'metadata' => ['order_id' => $o1->id],         'status' => 'SUCCESS', 'created_at' => Carbon::now()->subMinutes(10)]);
+        AuditLog::create(['user_id' => $staffPhar1->id,                              'action' => 'POS_ORDER_CREATED',  'description' => 'Staff membuat transaksi POS dengan nomor ' . $o8->order_number,                      'metadata' => ['order_id' => $o8->id],         'status' => 'SUCCESS', 'created_at' => Carbon::now()->subHours(3)]);
     }
 }
