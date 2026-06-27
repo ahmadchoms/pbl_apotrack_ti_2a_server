@@ -21,7 +21,24 @@ use App\Http\Controllers\Api\Staff\AuditController as StaffAuditController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/pharmacies/{pharmacyId}/reviews', [ReviewController::class, 'index']); // Public API Review
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+Route::get('/pharmacies/{pharmacyId}/reviews', [ReviewController::class, 'index']);
+
+Route::get('/storage/v1/object/public/{bucket}/{path}', function ($bucket, $path) {
+    $supabaseUrl = "http://127.0.0.1:54321/storage/v1/object/public/{$bucket}/{$path}";
+    try {
+        $response = Http::get($supabaseUrl);
+        if ($response->successful()) {
+            return response($response->body(), 200)
+                ->header('Content-Type', $response->header('Content-Type'));
+        }
+    } catch (\Exception $e) {
+        Log::error("Storage proxy failed: " . $e->getMessage());
+    }
+    return response('File not found', 404);
+})->where('path', '.*');
 
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
@@ -32,10 +49,8 @@ Route::middleware('throttle:3,1')->group(function () {
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
 });
 
-// --- PROTECTED ROUTES (Requires Auth & Active User) ---
 Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
 
-    // Auth & Profile
     Route::get('/me', [AuthController::class, 'me']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::put('/password', [AuthController::class, 'changePassword']);
@@ -43,7 +58,6 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
     Route::delete('/account', [AuthController::class, 'deleteAccount']);
     Route::post('/devices/token', [DeviceTokenController::class, 'store']);
 
-    // Catalog & Exploration (Moved to Protected for Security)
     Route::get('/pharmacies', [PharmacyController::class, 'index']);
     Route::get('/pharmacies/{id}', [PharmacyController::class, 'show']);
     Route::get('/medicines', [MedicineController::class, 'index']);
@@ -51,45 +65,35 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
     Route::get('/categories/popular', [MedicineCategoryController::class, 'popular']);
     Route::get('/categories', [MedicineCategoryController::class, 'index']);
 
-    // Shared Features (Notifications)
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
-    // --- CUSTOMER ROUTES (role:USER) ---
     Route::middleware('role:USER')->group(function () {
-        // Address Management
         Route::apiResource('user/addresses', AddressController::class);
 
-        // Cart Management
         Route::get('/cart', [CartController::class, 'index']);
         Route::post('/cart/items', [CartController::class, 'store']);
         Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
 
-        // Order Management
         Route::get('/orders', [OrderController::class, 'index']);
         Route::get('/orders/history', [OrderController::class, 'history']);
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
         Route::post('/orders/{id}/confirm-received', [OrderController::class, 'confirmReceived']);
 
-        // Uploads
         Route::post('/orders/{id}/prescription', [OrderController::class, 'uploadPrescription']);
         Route::post('/orders/{id}/simulate-payment', [OrderController::class, 'simulatePayment']);
         Route::post('/orders/{id}/cancel', [OrderController::class, 'requestCancellation']);
         Route::post('/orders/{id}/confirm-received', [OrderController::class, 'confirmReceived']);
 
-        // Reviews
         Route::post('/reviews', [ReviewController::class, 'store']);
 
-        // Staff Invitation (for Customers invited to join as Staff)
         Route::post('/staff/join', [App\Http\Controllers\Api\StaffInvitationController::class, 'join']);
     });
 
-    // --- PHARMACY STAFF ROUTES (role:STAFF|APOTEKER) ---
     Route::middleware('role:STAFF|APOTEKER')->prefix('staff')->group(function () {
 
-        // Order Management & POS
         Route::get('/orders', [StaffOrderController::class, 'index']);
         Route::get('/orders/{id}', [StaffOrderController::class, 'show']);
         Route::patch('/orders/{id}/status', [StaffOrderController::class, 'updateStatus']);
@@ -98,11 +102,9 @@ Route::middleware(['auth:sanctum', 'active.user'])->group(function () {
         Route::post('/orders/{id}/reject-cancellation', [StaffOrderController::class, 'rejectCancellation']);
         Route::post('/pos/orders', [StaffOrderController::class, 'storePOS']);
 
-        // Inventory Management
         Route::apiResource('medicines', StaffMedicineController::class);
         Route::post('/medicines/{id}/stock', [StaffMedicineController::class, 'updateStock']);
 
-        // Audits & Logs
         Route::get('/audits', [StaffAuditController::class, 'index']);
     });
 });

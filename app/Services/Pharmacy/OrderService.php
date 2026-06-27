@@ -38,7 +38,7 @@ class OrderService
     {
         return DB::transaction(function () use ($pharmacyId, $data) {
             $order = Order::create([
-                'user_id' => $data['user_id'] ?? \App\Models\User::where('role', 'CUSTOMER')->first()?->id ?? "Pelanggan",
+                'user_id' => $data['user_id'] ?? \App\Models\User::where('role', 'USER')->first()?->id,
                 'pharmacy_id' => $pharmacyId,
                 'order_number' => 'POS-' . strtoupper(Str::random(8)),
                 'verification_code' => strtoupper(Str::random(10)),
