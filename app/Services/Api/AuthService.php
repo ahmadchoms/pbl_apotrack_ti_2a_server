@@ -158,10 +158,32 @@ class AuthService
         return DB::transaction(function () use ($user, $data) {
             $u = User::where('id', $user->id)->lockForUpdate()->firstOrFail();
 
+            $avatarUrl = $u->avatar_url;
+
+            if (isset($data['image'])) {
+                $file     = $data['image'];
+                $filename = 'avatar/' . $u->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $contents = file_get_contents($file->getRealPath());
+
+                $supabaseUrl = rtrim(config('services.supabase.url'), '/');
+                $bucket      = 'apotrack-public';
+                $uploadUrl   = "{$supabaseUrl}/storage/v1/object/{$bucket}/{$filename}";
+
+                $response = \Illuminate\Support\Facades\Http::withHeaders([
+                    'Authorization' => 'Bearer ' . config('services.supabase.service_key'),
+                    'Content-Type'  => $file->getMimeType(),
+                ])->withBody($contents, $file->getMimeType())->post($uploadUrl);
+
+                if ($response->successful()) {
+                    $avatarUrl = "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$filename}";
+                }
+            }
+
             $u->update([
-                'username' => $data['username'],
-                'email'    => $data['email'],
-                'phone'    => $data['phone'] ?? $u->phone,
+                'username'   => $data['username'],
+                'email'      => $data['email'],
+                'phone'      => $data['phone'] ?? $u->phone,
+                'avatar_url' => $avatarUrl,
             ]);
 
             return $u->fresh()->load(['pharmacyStaff.pharmacy']);

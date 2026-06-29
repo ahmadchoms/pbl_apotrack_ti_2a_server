@@ -17,6 +17,7 @@ class UpdateProfileRequest extends BaseApiRequest
             'username' => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $this->user()->id,
             'phone'    => 'nullable|string|max:20',
+            'image'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }
