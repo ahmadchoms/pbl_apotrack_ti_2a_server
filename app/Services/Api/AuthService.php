@@ -31,6 +31,7 @@ class AuthService
             'otp' => (string) $otp,
         ];
 
+        Cache::put('registration_' . $email, $userData, now()->addMinutes(10));
 
         Log::info("OTP untuk $email adalah: $otp");
 

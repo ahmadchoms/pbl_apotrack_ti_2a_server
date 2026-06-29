@@ -15,6 +15,7 @@ class MedicineController extends BaseApiController
     public function index(Request $request)
     {
         $query = Medicine::with(['pharmacy:id,name,address', 'category:id,name', 'form:id,name', 'type:id,name', 'unit:id,name'])
+            ->where('is_active', true)
             ->whereHas('pharmacy', function ($q) {
                 $q->where('verification_status', 'VERIFIED');
             })
@@ -79,6 +80,7 @@ class MedicineController extends BaseApiController
     public function show($id)
     {
         $medicine = Medicine::with(['pharmacy:id,name,address,phone', 'category', 'form', 'type', 'unit', 'batches'])
+            ->where('is_active', true)
             ->whereHas('pharmacy', function ($q) {
                 $q->where('verification_status', 'VERIFIED');
             })

@@ -6,6 +6,16 @@ const rawPrivateKey = Deno.env.get("FCM_PRIVATE_KEY") ?? ""
 const cleanPrivateKey = rawPrivateKey.trim().replace(/^"/, "").replace(/"$/, "")
 const FCM_PRIVATE_KEY = cleanPrivateKey.replace(/\\n/g, "\n")
 
+if (!FCM_PROJECT_ID || !FCM_CLIENT_EMAIL || !FCM_PRIVATE_KEY) {
+  console.error("=========================================================================");
+  console.error("[ERROR] Missing required FCM environment variables!");
+  console.error("FCM_PROJECT_ID:", FCM_PROJECT_ID ? "Loaded" : "MISSING");
+  console.error("FCM_CLIENT_EMAIL:", FCM_CLIENT_EMAIL ? "Loaded" : "MISSING");
+  console.error("FCM_PRIVATE_KEY:", FCM_PRIVATE_KEY ? "Loaded" : "MISSING");
+  console.error("Please run the function server with: npx supabase functions serve notify-user --env-file supabase/functions/notify-user/.env");
+  console.error("=========================================================================");
+}
+
 async function getAccessToken(): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const jwt = await createJWT({
@@ -43,6 +53,10 @@ async function createJWT(payload: Record<string, unknown>): Promise<string> {
   const payloadB64 = btoa(
     String.fromCharCode(...new Uint8Array(encoder.encode(JSON.stringify(payload)))),
   )
+
+  if (!FCM_PRIVATE_KEY) {
+    throw new Error("Missing FCM_PRIVATE_KEY. The environment variables were not loaded correctly.");
+  }
 
   const key = await crypto.subtle.importKey(
     "pkcs8",
