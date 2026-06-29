@@ -31,12 +31,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Konstanta URL Supabase (Tetap)
-        $avatarUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/avatar/avatar.jpg';
-        $pharmacyUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/pharmacies/pharmacy.jpg';
-        $medicineUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-public/medicines/medicines.jpg';
-        $licenseUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-private/licenses/license.jpeg';
-        $prescriptionUrl = 'https://rccoezzqqntpdarqqkht.supabase.co/storage/v1/object/public/apotrack-private/prescriptions/resep-dokter.jpg';
+        // Konstanta URL Assets Lokal (Menggunakan URL dinamis agar kompatibel dengan ngrok/localhost)
+        $avatarUrl = url('assets/avatar/avatar.jpg');
+        $pharmacyUrl = url('assets/pharmacies/pharmacy.jpg');
+        $medicineUrl = url('assets/medicines/panadol.jpg'); // Default fallback
+        $licenseUrl = url('assets/licenses/license.jpeg');
+        $prescriptionUrl = url('assets/prescriptions/resep-dokter.jpg');
 
         // ==========================================
         // 1. MASTER DATA SEEDS
@@ -484,9 +484,36 @@ class DatabaseSeeder extends Seeder
             ]
         ];
 
+        $pharmacyImages = [
+            'Apotek Sehat Selalu' => 'apotek_sehat_selalu.jpg',
+            'Apotek Farma Prima (Tutup Sementara)' => 'apotek_farma_prima.jpg',
+            'Apotek Tembalang' => 'apotek_tembalang.jpg',
+            'Apotek KeluargaKu Banjarsari' => 'apotek_keluargaku.jpg',
+            'Kimia Farma Bulusan' => 'kimia_farma_bulusan.jpg',
+            'Apotek K-24 Kedungmundu' => 'apotek_k24_kedungmundu.jpg',
+            'Kimia Farma Sendang Mulyo' => 'kimia_farma_sendang_mulyo.jpg',
+            'Apotek Sehit' => 'apotek_sehit.jpg',
+            'Apotek Subur Sehat' => 'apotek_subur_sehat.jpg',
+            'Apotek Surya Sehat' => 'apotek_surya_sehat.jpg',
+            'Apotek K-24 Genuk Indah' => 'apotek_k24_kedungmundu.jpg',
+            'Kimia Farma Kaligawe' => 'kimia_farma_bulusan.jpg',
+            'Apotek Genuk Sehat' => 'apotek_sehat_selalu.jpg',
+            'Apotek Cetra Medika Wolter' => 'apotek_surya_sehat.jpg',
+            'Apotek Bangetayu Farma' => 'apotek_subur_sehat.jpg',
+            'Apotek Muktiharjo Prima' => 'apotek_surya_sehat.jpg',
+            'Apotek Sembada Kaligawe' => 'apotek_sehat_selalu.jpg',
+            'Apotek Bugen Utama' => 'apotek_subur_sehat.jpg',
+            'Apotek Terboyo Asri' => 'apotek_sehit.jpg',
+        ];
+
         $pharmaModels = [];
         foreach ($pharmacies as $p) {
             $pharmacyData = collect($p)->except('sia_number')->toArray();
+            if (isset($pharmacyImages[$p['name']])) {
+                $pharmacyData['logo_url'] = url('assets/pharmacies/' . $pharmacyImages[$p['name']]);
+            } else {
+                $pharmacyData['logo_url'] = $pharmacyUrl;
+            }
             $pharmaModel = Pharmacy::firstOrCreate(['name' => $p['name']], $pharmacyData);
             $pharmaModels[] = $pharmaModel;
 
@@ -639,6 +666,28 @@ class DatabaseSeeder extends Seeder
 
                 $isActive = (rand(1, 10) > 1); // 90% obat aktif
 
+                $medicineImages = [
+                    'Panadol Extra 500mg' => 'panadol.jpg',
+                    'Amoxicillin 500mg' => 'amoxicillin.jpg',
+                    'Promag Tablet' => 'promag.jpg',
+                    'Imboost Force' => 'imboost.jpg',
+                    'Betadine Antiseptic 15ml' => 'betadine.jpg',
+                    'Sanmol Sirup 60ml' => 'sanmol.jpg',
+                    'Insto Regular 7.5ml' => 'insto.jpg',
+                    'Tolak Angin Cair' => 'tolak_angin.jpg',
+                    'Amlodipine 5mg' => 'amlodipine.jpg',
+                    'Metformin 500mg' => 'metformin.jpg',
+                    'Bodrex' => 'bodrex.jpg',
+                    'Diapet' => 'diapet.jpg',
+                    'Antangin JRG' => 'antangin.jpg',
+                    'Mylanta' => 'mylanta.jpg',
+                    'Enervon-C' => 'enervon.jpg',
+                ];
+
+                $medImageUrl = isset($medicineImages[$med['name']])
+                    ? url('assets/medicines/' . $medicineImages[$med['name']])
+                    : $medicineUrl;
+
                 $m = Medicine::firstOrCreate([
                     'pharmacy_id' => $pModel->id,
                     'name' => $med['name']
@@ -654,7 +703,7 @@ class DatabaseSeeder extends Seeder
                     'requires_prescription' => $med['requires_prescription'],
                     'description' => $med['desc'],
                     'dosage_info' => $med['dosage'],
-                    'image_url' => $medicineUrl,
+                    'image_url' => $medImageUrl,
                     'is_active' => $isActive
                 ]);
 
