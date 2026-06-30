@@ -192,6 +192,34 @@ serve(async (req) => {
     const result = await fcmRes.json()
     console.log("FCM result:", result)
 
+    // Jika token kedaluwarsa atau tidak terdaftar, hapus dari database
+    const isUnregistered = result?.error?.details?.some(
+      (detail: any) => detail.errorCode === "UNREGISTERED"
+    ) || result?.error?.status === "NOT_FOUND";
+
+    if (isUnregistered) {
+      console.log(`[FCM] Token is unregistered. Deleting from database: ${token}`);
+      try {
+        const delRes = await fetch(
+          `${Deno.env.get("SUPABASE_URL")}/rest/v1/device_tokens?fcm_token=eq.${encodeURIComponent(token)}`,
+          {
+            method: "DELETE",
+            headers: {
+              apikey: Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+              Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""}`,
+            },
+          }
+        );
+        if (delRes.ok) {
+          console.log(`[FCM] Token successfully deleted.`);
+        } else {
+          console.error(`[FCM] Failed to delete token. Status: ${delRes.status}`);
+        }
+      } catch (delErr) {
+        console.error("[FCM] Failed to delete stale token:", delErr);
+      }
+    }
+
     return new Response(JSON.stringify({ sent: fcmRes.ok, result }), {
       headers: { "Content-Type": "application/json" },
     })

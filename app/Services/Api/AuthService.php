@@ -160,23 +160,11 @@ class AuthService
 
             $avatarUrl = $u->avatar_url;
 
-            if (isset($data['image'])) {
-                $file     = $data['image'];
-                $filename = 'avatar/' . $u->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $contents = file_get_contents($file->getRealPath());
-
-                $supabaseUrl = rtrim(config('services.supabase.url'), '/');
-                $bucket      = 'apotrack-public';
-                $uploadUrl   = "{$supabaseUrl}/storage/v1/object/{$bucket}/{$filename}";
-
-                $response = \Illuminate\Support\Facades\Http::withHeaders([
-                    'Authorization' => 'Bearer ' . config('services.supabase.service_key'),
-                    'Content-Type'  => $file->getMimeType(),
-                ])->withBody($contents, $file->getMimeType())->post($uploadUrl);
-
-                if ($response->successful()) {
-                    $avatarUrl = "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$filename}";
-                }
+            if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                $file = $data['image'];
+                $filename = $u->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('avatar', $filename, 'supabase_public');
+                $avatarUrl = \Illuminate\Support\Facades\Storage::disk('supabase_public')->url($path);
             }
 
             $u->update([
